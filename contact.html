@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contact — Unique Scales</title>
+<meta name="description" content="Request a quote or sample from Unique Scales. Tell us your market, target volume, and target price — we respond within 1 business day." />
+<link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body data-page="contact">
+<div class="nav"><div class="container nav-inner" id="nav-mount"></div></div>
+
+<section class="hero" style="padding:56px 0 48px">
+  <div class="container">
+    <div class="eyebrow" style="color:#A7E3C9">Contact</div>
+    <h1 data-i18n="contact.title">Request a quote or a sample</h1>
+    <p data-i18n="contact.sub">Tell us about your market, target volume, and target price. We respond within 1 business day.</p>
+  </div>
+</section>
+
+<section style="padding-top:24px">
+  <div class="container">
+    <div class="form-wrap">
+      <form id="lead-form" action="https://formsubmit.co/hanhan@lefu.cc" method="POST">
+        <input type="hidden" name="_subject" value="Website inquiry — Unique Scales" />
+        <input type="hidden" name="_template" value="table" />
+        <div class="form-row">
+          <div class="form-field">
+            <label data-i18n="contact.name">Your name</label>
+            <input type="text" name="name" required data-i18n-attr="placeholder:contact.name" />
+          </div>
+          <div class="form-field">
+            <label data-i18n="contact.company">Company</label>
+            <input type="text" name="company" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label data-i18n="contact.country">Country / Region</label>
+            <input type="text" name="country" />
+          </div>
+          <div class="form-field">
+            <label data-i18n="contact.email">Email</label>
+            <input type="email" name="email" required data-i18n-attr="placeholder:contact.email" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label data-i18n="contact.phone">Phone / WhatsApp (optional)</label>
+            <input type="text" name="phone" />
+          </div>
+          <div class="form-field">
+            <label data-i18n="contact.interest">Product interest</label>
+            <select name="interest" id="interest-select" required>
+              <option value="" data-i18n="contact.interest.opt">Select…</option>
+              <option value="8-electrode" data-i18n="contact.interest.8">8-Electrode body composition</option>
+              <option value="kitchen" data-i18n="contact.interest.k">Kitchen & nutrition scales</option>
+              <option value="bathroom" data-i18n="contact.interest.b">Bathroom scales</option>
+              <option value="oem" data-i18n="contact.interest.oem">OEM / private-label</option>
+              <option value="full" data-i18n="contact.interest.full">Full catalog</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label data-i18n="contact.volume">Estimated annual volume</label>
+          <select name="volume" id="volume-select" required></select>
+        </div>
+        <div class="form-field">
+          <label data-i18n="contact.msg">Project details (target market, must-have features, target price)</label>
+          <textarea name="message" data-i18n-attr="placeholder:contact.msg"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" data-i18n="contact.submit">Send inquiry</button>
+        <p class="form-note" data-i18n="contact.note">By submitting you agree to our processing your inquiry for sales purposes. We do not share your data with third parties.</p>
+        <div class="form-success" data-i18n="contact.success">Thank you — your inquiry has been sent. Our sales team will reply within 1 business day.</div>
+      </form>
+      <p class="muted" style="margin-top:22px;font-size:14px">
+        <span data-i18n="contact.direct">Or reach us directly:</span>
+        <a href="mailto:hanhan@lefu.cc" data-i18n="contact.emailto">hanhan@lefu.cc</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer id="foot-mount"></footer>
+<script src="/assets/i18n.js"></script>
+<script src="/assets/partials.js"></script>
+<script src="/assets/form.js"></script>
+</body>
+</html>
