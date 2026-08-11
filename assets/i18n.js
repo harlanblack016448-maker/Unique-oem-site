@@ -9,7 +9,6 @@
       "nav.bathroom":"Bathroom Scales",
       "nav.about":"About",
       "nav.cap":"Capabilities",
-      "nav.contact":"Contact",
       "nav.cta":"Request a Quote",
 
       "hero.eyebrow":"Shenzhen Unique Scales · Est. 2010",
@@ -236,7 +235,6 @@
       "nav.bathroom":"浴室秤",
       "nav.about":"关于我们",
       "nav.cap":"能力工厂",
-      "nav.contact":"联系我们",
       "nav.cta":"询价",
 
       "hero.eyebrow":"深圳准衡秤业 · 成立于 2010",
@@ -464,6 +462,8 @@
   // Expose the dictionary and a re-apply event so other scripts (e.g. dynamic form options) can react to language changes.
   window.__us_dict = DICT;
   window.__us_getLang = getLang;
+  window.__us_apply = apply;
+  window.__us_setLang = setLang;
 
   function apply(){
     const lang = getLang();
@@ -494,12 +494,16 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     apply();
-    document.querySelectorAll(".lang-toggle button").forEach(b=>{
-      b.addEventListener("click", ()=> setLang(b.dataset.lang));
-    });
-    // Mobile menu
+    // Mobile menu (also wired in partials.js after nav injection)
     const mb = document.querySelector(".menu-btn");
     const nl = document.querySelector(".nav-links");
     if (mb && nl) mb.addEventListener("click", ()=> nl.classList.toggle("open"));
+  });
+
+  // Delegated click for language toggle — works regardless of when the
+  // nav (with .lang-toggle buttons) is injected by partials.js.
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".lang-toggle button");
+    if (btn && btn.dataset.lang) setLang(btn.dataset.lang);
   });
 })();

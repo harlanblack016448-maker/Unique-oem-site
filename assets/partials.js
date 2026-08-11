@@ -10,8 +10,7 @@
   <a href="/products/bathroom.html" data-nav="b" data-i18n="nav.bathroom">Bathroom Scales</a>
   <a href="/about.html" data-nav="about" data-i18n="nav.about">About</a>
   <a href="/capabilities.html" data-nav="cap" data-i18n="nav.cap">Capabilities</a>
-  <a href="/contact.html" data-nav="contact" data-i18n="nav.contact">Contact</a>
-  <a href="/contact.html" class="cta-btn" data-i18n="nav.cta">Request a Quote</a>
+  <a href="/contact.html" data-nav="contact" class="cta-btn" data-i18n="nav.cta">Request a Quote</a>
   <div class="lang-toggle">
     <button data-lang="en">EN</button>
     <button data-lang="zh">中文</button>
@@ -60,5 +59,7 @@
     const mb = document.querySelector(".menu-btn");
     const nl = document.querySelector(".nav-links");
     if (mb && nl) mb.addEventListener("click", ()=> nl.classList.toggle("open"));
+    // Re-apply translations now that the nav/footer (with data-i18n attrs) are in the DOM.
+    if (window.__us_apply) window.__us_apply();
   });
 })();
