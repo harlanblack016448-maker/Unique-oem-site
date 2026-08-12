@@ -8,60 +8,66 @@
 <link rel="stylesheet" href="/assets/style.css" />
 </head>
 <body data-page="about">
-<div class="nav"><div class="container nav-inner" id="nav-mount"></div></div>
 
-<section class="hero" style="padding:56px 0 48px">
+<div class="global-nav"><div class="global-nav-inner" id="nav-mount"></div></div>
+
+<!-- Hero -->
+<section class="tile tile-light hero-tile" style="padding:100px 0 80px">
   <div class="container">
-    <div class="eyebrow" style="color:#A7E3C9">About</div>
+    <div class="tagline" style="color:var(--primary);margin-bottom:12px">About</div>
     <h1 data-i18n="about.title">About Unique Scales</h1>
-    <p data-i18n="about.sub">Founded in 2010 in Shenzhen, 16 years dedicated to engineering the perfect scale.</p>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:600px;margin:16px auto 0" data-i18n="about.sub">Founded in 2010 in Shenzhen, 16 years dedicated to engineering the perfect scale.</p>
   </div>
 </section>
 
-<section style="padding-top:24px">
+<!-- Mission / Vision / Values -->
+<section class="tile tile-parchment">
   <div class="container">
-    <div class="grid grid-3">
-      <div class="card">
+    <div class="grid-3" style="max-width:900px;margin:0 auto">
+      <div class="utility-card">
         <h3 data-i18n="about.mission.title">Mission</h3>
-        <p class="card-body" data-i18n="about.mission.text"></p>
+        <p data-i18n="about.mission.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card">
         <h3 data-i18n="about.vision.title">Vision</h3>
-        <p class="card-body" data-i18n="about.vision.text"></p>
+        <p data-i18n="about.vision.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card">
         <h3 data-i18n="about.values.title">Values</h3>
-        <p class="card-body" data-i18n="about.values.text"></p>
+        <p data-i18n="about.values.text"></p>
       </div>
     </div>
   </div>
 </section>
 
-<section style="background:#fff">
-  <div class="container">
+<!-- Company Overview -->
+<section class="tile tile-light">
+  <div class="container" style="max-width:800px">
     <h2 data-i18n="about.overview.title">Company overview</h2>
-    <p class="section-lead" data-i18n="about.overview.text"></p>
+    <p class="lead" style="color:var(--ink-muted-48);margin-top:16px" data-i18n="about.overview.text"></p>
   </div>
 </section>
 
-<section class="stats" style="background:var(--brand-dark)">
+<!-- 2024 in numbers (Dark) -->
+<section class="tile tile-dark">
   <div class="container">
-    <h2 style="color:#fff;font-size:20px;margin-bottom:18px" data-i18n="about.kpi.title">2024 in numbers</h2>
-    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div><div class="stat-num">71</div><div class="stat-lbl" data-i18n="about.kpi.1"></div></div>
-      <div><div class="stat-num">49</div><div class="stat-lbl" data-i18n="about.kpi.2"></div></div>
-      <div><div class="stat-num">70</div><div class="stat-lbl" data-i18n="about.kpi.3"></div></div>
-      <div><div class="stat-num">2,600</div><div class="stat-lbl" data-i18n="about.kpi.4"></div></div>
-      <div><div class="stat-num">&lt;1‰</div><div class="stat-lbl" data-i18n="about.kpi.5"></div></div>
-      <div><div class="stat-num">2</div><div class="stat-lbl" data-i18n="about.kpi.6"></div></div>
+    <h2 style="font-size:34px;margin-bottom:40px" data-i18n="about.kpi.title">2024 in numbers</h2>
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);max-width:800px;margin:0 auto">
+      <div><div class="stat-num" style="color:#fff">71</div><div class="stat-lbl" style="color:var(--body-muted)" data-i18n="about.kpi.1"></div></div>
+      <div><div class="stat-num" style="color:#fff">49</div><div class="stat-lbl" style="color:var(--body-muted)" data-i18n="about.kpi.2"></div></div>
+      <div><div class="stat-num" style="color:#fff">70</div><div class="stat-lbl" style="color:var(--body-muted)" data-i18n="about.kpi.3"></div></div>
+      <div><div class="stat-num" style="color:#fff">2,600</div><div class="stat-lbl" style="color:var(--body-muted)" data-i18n="about.kpi.4"></div></div>
+      <div><div class="stat-num" style="color:#fff">&lt;1‰</div><div class="stat-lbl" style="color:var(--body-muted)" data-i18n="about.kpi.5"></div></div>
+      <div><div class="stat-num" style="color:#fff">2</div><div class="stat-lbl" style="color:var(--body-muted)" data-i18n="about.kpi.6"></div></div>
     </div>
   </div>
 </section>
 
-<section style="background:#fff">
+<!-- Timeline -->
+<section class="tile tile-parchment">
   <div class="container">
     <h2 data-i18n="about.story.title">Our journey</h2>
-    <div class="grid grid-2">
+    <div class="grid-2" style="margin-top:40px;text-align:left">
       <div class="timeline">
         <div class="tl-item"><div class="tl-year">2010</div><div class="tl-text">Founded in Shenzhen. Focus on OEM service for smart scales.</div></div>
         <div class="tl-item"><div class="tl-year">2011</div><div class="tl-text">Passed ISO 9001:2008.</div></div>
@@ -81,62 +87,64 @@
   </div>
 </section>
 
-<section>
+<!-- Info Cards -->
+<section class="tile tile-light">
   <div class="container">
-    <div class="grid grid-2">
-      <div class="card">
+    <div class="grid-2" style="max-width:900px;margin:0 auto;text-align:left">
+      <div class="utility-card" style="text-align:left">
         <h3 data-i18n="about.coverage.title">Global business coverage</h3>
-        <p class="card-body" data-i18n="about.coverage.text"></p>
+        <p style="color:var(--ink-muted-48);margin-top:8px" data-i18n="about.coverage.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card" style="text-align:left">
         <h3 data-i18n="about.ip.title">Intellectual property</h3>
-        <p class="card-body" data-i18n="about.ip.text"></p>
+        <p style="color:var(--ink-muted-48);margin-top:8px" data-i18n="about.ip.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card" style="text-align:left">
         <h3 data-i18n="about.rd.title">R&D depth</h3>
-        <p class="card-body" data-i18n="about.rd.text"></p>
+        <p style="color:var(--ink-muted-48);margin-top:8px" data-i18n="about.rd.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card" style="text-align:left">
         <h3 data-i18n="about.privacy.title">Privacy & data security</h3>
-        <p class="card-body" data-i18n="about.privacy.text"></p>
+        <p style="color:var(--ink-muted-48);margin-top:8px" data-i18n="about.privacy.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card" style="text-align:left">
         <h3 data-i18n="about.partner.title">Global reach</h3>
-        <p class="card-body" data-i18n="about.partner.text"></p>
+        <p style="color:var(--ink-muted-48);margin-top:8px" data-i18n="about.partner.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card" style="text-align:left">
         <h3 data-i18n="about.integ.title">App integrations</h3>
-        <p class="card-body" data-i18n="about.integ.text"></p>
+        <p style="color:var(--ink-muted-48);margin-top:8px" data-i18n="about.integ.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card" style="text-align:left">
         <h3 data-i18n="about.recog.title">Recognition</h3>
-        <p class="card-body" data-i18n="about.recog.text"></p>
+        <p style="color:var(--ink-muted-48);margin-top:8px" data-i18n="about.recog.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card" style="text-align:left">
         <h3 data-i18n="about.facility.title">Facility</h3>
-        <p class="card-body" data-i18n="about.facility.text"></p>
+        <p style="color:var(--ink-muted-48);margin-top:8px" data-i18n="about.facility.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card" style="text-align:left">
         <h3 data-i18n="about.future.title">What's next</h3>
-        <p class="card-body" data-i18n="about.future.text"></p>
+        <p style="color:var(--ink-muted-48);margin-top:8px" data-i18n="about.future.text"></p>
       </div>
-      <div class="card">
+      <div class="utility-card" style="text-align:left">
         <h3 data-i18n="about.values2.title">The values we pursue</h3>
-        <p class="card-body" data-i18n="about.values2.text"></p>
+        <p style="color:var(--ink-muted-48);margin-top:8px" data-i18n="about.values2.text"></p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="cta-banner">
-  <div class="container">
-    <h2 data-i18n="home.cta.title">Ready to build your smart scale line?</h2>
-    <p data-i18n="home.cta.sub">Tell us your market, volume, and target price — we'll respond within 1 business day.</p>
-    <a href="/contact.html" data-i18n="nav.cta">Request a Quote</a>
+<!-- CTA -->
+<section class="tile tile-dark-2" style="padding:64px 0">
+  <div class="container text-center">
+    <h2 style="font-size:34px;margin-bottom:8px" data-i18n="home.cta.title">Ready to build your smart scale line?</h2>
+    <p class="lead" style="color:var(--body-muted);margin-bottom:28px" data-i18n="home.cta.sub">Tell us your market, volume, and target price — we'll respond within 1 business day.</p>
+    <a href="/contact.html" class="btn-pill" data-i18n="nav.cta">Request a Quote</a>
   </div>
 </section>
 
-<footer id="foot-mount"></footer>
+<footer class="site-footer" id="foot-mount"></footer>
 <script src="/assets/i18n.js"></script>
 <script src="/assets/partials.js"></script>
 </body>

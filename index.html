@@ -8,22 +8,41 @@
 <link rel="stylesheet" href="/assets/style.css" />
 </head>
 <body data-page="home">
-<div class="nav"><div class="container nav-inner" id="nav-mount"></div></div>
 
-<section class="hero">
-  <div class="container hero-wrap">
-    <div>
-      <div class="eyebrow" style="color:#A7E3C9" data-i18n="hero.eyebrow">Shenzhen Unique Scales · Est. 2010</div>
-      <h1 data-i18n="hero.title">The world's largest shipper of 8-electrode body composition analyzers.</h1>
-      <p data-i18n="hero.sub">16 years dedicated to engineering precision smart scales for global brands. OEM / ODM hardware, custom app, and cloud health data — all from one automated factory in Shenzhen.</p>
-      <a href="/contact.html" class="cta" data-i18n="hero.cta1">Request a Quote</a>
-      <a href="/products/8-electrode.html" class="cta ghost" data-i18n="hero.cta2">Explore Products</a>
+<!-- Global Nav -->
+<div class="global-nav"><div class="global-nav-inner" id="nav-mount"></div></div>
+
+<!-- Sub Nav -->
+<div class="sub-nav">
+  <div class="sub-nav-inner">
+    <div class="cat" data-i18n="subnav.title">Unique Scales</div>
+    <div class="sub-nav-links">
+      <a href="/products/8-electrode.html" data-i18n="nav.eight">8-Electrode</a>
+      <a href="/products/kitchen.html" data-i18n="nav.kitchen">Kitchen Scales</a>
+      <a href="/products/bathroom.html" data-i18n="nav.bathroom">Bathroom Scales</a>
+      <a href="/contact.html" class="btn-pill" style="font-size:14px;padding:8px 18px" data-i18n="nav.cta">Request a Quote</a>
     </div>
-    <img src="/assets/img/flagship-cm0001.jpg" alt="Unique Scales 8-electrode body composition analyzer" class="hero-img" />
+  </div>
+</div>
+
+<!-- Hero Tile -->
+<section class="tile tile-light hero-tile">
+  <div class="container">
+    <div class="tagline" style="color:var(--primary);margin-bottom:12px" data-i18n="hero.eyebrow">Shenzhen Unique Scales · Est. 2010</div>
+    <h1 data-i18n="hero.title">The world's largest shipper of 8-electrode body composition analyzers.</h1>
+    <p class="lead" style="color:var(--ink-muted-48)" data-i18n="hero.sub">16 years dedicated to engineering precision smart scales for global brands. OEM / ODM hardware, custom app, and cloud health data — all from one automated factory in Shenzhen.</p>
+    <div class="cta-group">
+      <a href="/contact.html" class="btn-pill" data-i18n="hero.cta1">Request a Quote</a>
+      <a href="/products/8-electrode.html" class="btn-pill-secondary" data-i18n="hero.cta2">Explore Products</a>
+    </div>
+    <div class="hero-img-wrap">
+      <img src="/assets/img/flagship-cm0001.jpg" alt="Unique Scales 8-electrode body composition analyzer" />
+    </div>
   </div>
 </section>
 
-<section class="stats">
+<!-- Stats Strip -->
+<section class="stats-strip">
   <div class="container stats-grid">
     <div><div class="stat-num">12M+</div><div class="stat-lbl" data-i18n="home.stats.cap">Annual capacity</div></div>
     <div><div class="stat-num">400+</div><div class="stat-lbl" data-i18n="home.stats.brands">Hardware products</div></div>
@@ -32,81 +51,101 @@
   </div>
 </section>
 
-<section>
+<!-- Product Tile: 8-Electrode (Light) -->
+<section class="tile tile-light">
   <div class="container">
-    <div class="eyebrow" data-i18n="home.products.eyebrow">Product lines</div>
-    <h2 data-i18n="home.products.title">Product lines, engineered for your market</h2>
-    <p class="section-lead" data-i18n="home.products.sub">Three core platforms — flagship 8-electrode body composition, kitchen & nutrition, and bathroom.</p>
-    <div class="grid grid-3">
-      <div class="card featured">
-        <div class="card-image"><img src="/assets/img/flagship-cm0001.jpg" alt="8-electrode body composition" /></div>
-        <span class="tag" data-i18n="home.products.8.tag">Flagship</span>
-        <h3 data-i18n="home.products.8.title">8-Electrode Body Composition Analyzer</h3>
-        <p class="card-body" data-i18n="home.products.8.d">Segmental body composition with handle electrodes. The industry's most accurate consumer BIA — the platform behind the world's #1 kitchen scale brand on US Amazon.</p>
-        <p style="margin-top:14px"><a href="/products/8-electrode.html" data-i18n="home.products.cta">Explore details →</a></p>
-      </div>
-      <div class="card secondary">
-        <div class="card-image"><img src="/assets/img/kitchen-coffee.jpg" alt="Kitchen nutrition scale" /></div>
-        <span class="tag" data-i18n="home.products.k.tag">Core</span>
-        <h3 data-i18n="home.products.k.title">Kitchen & Nutrition Scales</h3>
-        <p class="card-body" data-i18n="home.products.k.d">High-precision nutrition tracking with dedicated coffee-brewing and macro modes. App-sync over BLE / Wi-Fi with a 3-million-item food database.</p>
-        <p style="margin-top:14px"><a href="/products/kitchen.html" data-i18n="home.products.cta">Explore details →</a></p>
-      </div>
-      <div class="card tertiary">
-        <div class="card-image"><img src="/assets/img/bathroom-glass.jpg" alt="Bathroom scale" /></div>
-        <span class="tag" data-i18n="home.products.b.tag">Volume</span>
-        <h3 data-i18n="home.products.b.title">Bathroom Scales</h3>
-        <p class="card-body" data-i18n="home.products.b.d">Sleek, durable glass platforms with TFT, LED or VA displays. Multiple BOM tiers for entry, mid, and premium lines.</p>
-        <p style="margin-top:14px"><a href="/products/bathroom.html" data-i18n="home.products.cta">Explore details →</a></p>
-      </div>
+    <div class="tagline" style="color:var(--primary);margin-bottom:8px" data-i18n="home.products.8.tag">Flagship</div>
+    <h2 data-i18n="home.products.8.title">8-Electrode Body Composition Analyzer</h2>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:600px;margin:12px auto 28px" data-i18n="home.products.8.sub">Segmental body composition with handle electrodes. The industry's most accurate consumer BIA.</p>
+    <div class="cta-group">
+      <a href="/products/8-electrode.html" class="btn-pill" data-i18n="8.cta">Learn more</a>
+      <a href="/contact.html" class="btn-pill-secondary" data-i18n="nav.cta">Request a Quote</a>
+    </div>
+    <div class="product-tile-img">
+      <img src="/assets/img/eight-electrode-wide.jpg" alt="8-electrode body composition analyzer" />
     </div>
   </div>
 </section>
 
-<section style="background:#fff">
+<!-- Product Tile: Kitchen (Dark) -->
+<section class="tile tile-dark">
   <div class="container">
-    <div class="eyebrow">Services</div>
+    <div class="tagline" style="color:var(--primary-on-dark);margin-bottom:8px" data-i18n="home.products.k.tag">Core</div>
+    <h2 data-i18n="home.products.k.title">Kitchen & Nutrition Scales</h2>
+    <p class="lead" style="color:var(--body-muted);max-width:600px;margin:12px auto 28px" data-i18n="home.products.k.sub">High-precision nutrition tracking with dedicated coffee-brewing and macro modes. App-sync over BLE / Wi-Fi.</p>
+    <div class="cta-group">
+      <a href="/products/kitchen.html" class="btn-pill" data-i18n="k.cta">Learn more</a>
+      <a href="/contact.html" class="btn-pill-secondary" style="border-color:var(--primary-on-dark);color:var(--primary-on-dark)" data-i18n="nav.cta">Request a Quote</a>
+    </div>
+    <div class="product-tile-img">
+      <img src="/assets/img/kitchen-coffee.jpg" alt="Kitchen nutrition scale" style="box-shadow:0 3px 30px rgba(0,0,0,.4)" />
+    </div>
+  </div>
+</section>
+
+<!-- Product Tile: Bathroom (Parchment) -->
+<section class="tile tile-parchment">
+  <div class="container">
+    <div class="tagline" style="color:var(--primary);margin-bottom:8px" data-i18n="home.products.b.tag">Volume</div>
+    <h2 data-i18n="home.products.b.title">Bathroom Scales</h2>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:600px;margin:12px auto 28px" data-i18n="home.products.b.sub">Sleek platforms with the right display for every price point. Volume-ready for global retail and private-label programs.</p>
+    <div class="cta-group">
+      <a href="/products/bathroom.html" class="btn-pill" data-i18n="b.cta">Learn more</a>
+      <a href="/contact.html" class="btn-pill-secondary" data-i18n="nav.cta">Request a Quote</a>
+    </div>
+    <div class="product-tile-img">
+      <img src="/assets/img/bathroom-glass.jpg" alt="Bathroom scale" />
+    </div>
+  </div>
+</section>
+
+<!-- Services (Light) -->
+<section class="tile tile-light">
+  <div class="container">
+    <div class="tagline" style="color:var(--primary);margin-bottom:8px" data-i18n="home.services.eyebrow">Services</div>
     <h2 data-i18n="home.services.title">What we offer</h2>
-    <p class="section-lead" data-i18n="home.services.sub">One factory, full stack — hardware, firmware, app, and cloud.</p>
-    <div class="grid grid-2">
-      <div class="card">
-        <h3 data-i18n="home.services.oem.title">OEM manufacturing</h3>
-        <p class="card-body" data-i18n="home.services.oem.d"></p>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:600px;margin:12px auto 40px" data-i18n="home.services.sub">One factory, full stack — hardware, firmware, app, and cloud.</p>
+    <div class="grid-2" style="max-width:800px;margin:0 auto">
+      <div class="utility-card">
+        <h3 data-i18n="home.services.1">OEM manufacturing</h3>
+        <p data-i18n="home.services.1d">Build to your specification with your branding, packaging, and color IDs.</p>
       </div>
-      <div class="card">
-        <h3 data-i18n="home.services.odm.title">ODM co-development</h3>
-        <p class="card-body" data-i18n="home.services.odm.d"></p>
+      <div class="utility-card">
+        <h3 data-i18n="home.services.2">ODM co-development</h3>
+        <p data-i18n="home.services.2d">Co-develop from our proven platforms — R&D, ID design, structural design, firmware, calibration.</p>
       </div>
-      <div class="card">
-        <h3 data-i18n="home.services.app.title">Custom App & Cloud</h3>
-        <p class="card-body" data-i18n="home.services.app.d"></p>
+      <div class="utility-card">
+        <h3 data-i18n="home.services.3">Custom App & Cloud</h3>
+        <p data-i18n="home.services.3d">Full-stack iOS / Android / HarmonyOS app development, plus cloud health data and integration with Apple Health, Google Fit, and Fitbit.</p>
       </div>
-      <div class="card">
-        <h3 data-i18n="home.services.cert.title">Compliance & Certification</h3>
-        <p class="card-body" data-i18n="home.services.cert.d"></p>
+      <div class="utility-card">
+        <h3 data-i18n="home.services.4">Compliance & Certification</h3>
+        <p data-i18n="home.services.4d">CE, FCC, RoHS, RCM, ISO 9001 / 13485 / 14001 / 45001, SMETA, plus material compliance.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section>
+<!-- Why Us (Dark) -->
+<section class="tile tile-dark">
   <div class="container">
-    <div class="eyebrow">Why us</div>
+    <div class="tagline" style="color:var(--primary-on-dark);margin-bottom:8px" data-i18n="home.why.eyebrow">Why us</div>
     <h2 data-i18n="home.why.title">Why partner with us</h2>
-    <div class="grid grid-2">
+    <div class="grid-2" style="max-width:800px;margin:40px auto 0;text-align:left">
       <ul class="feat-list">
-        <li data-i18n="home.why.1"></li>
-        <li data-i18n="home.why.2"></li>
-        <li data-i18n="home.why.3"></li>
+        <li data-i18n="home.why.1">Industry-first dual-band 2.4G / 5G Wi-Fi + BLE dual-mode smart scales.</li>
+        <li data-i18n="home.why.2">In-house sensor calibration lab and BIA algorithm — over 70 R&D engineers.</li>
+        <li data-i18n="home.why.3">Vertically integrated: first & second-generation flexible automated production lines.</li>
       </ul>
       <ul class="feat-list">
-        <li data-i18n="home.why.4"></li>
-        <li data-i18n="home.why.5"></li>
+        <li data-i18n="home.why.4">Serving Fortune 500 brands and 50+ OEMs across 100+ countries.</li>
+        <li data-i18n="home.why.5">National High-Tech Enterprise and Shenzhen Specialized & Innovative Enterprise.</li>
       </ul>
     </div>
   </div>
 </section>
 
+<!-- Certs (White) -->
 <section class="certs">
   <div class="container">
     <div class="certs-label" data-i18n="home.certs.label">Certifications & compliance</div>
@@ -121,15 +160,17 @@
   </div>
 </section>
 
-<section class="cta-banner">
-  <div class="container">
-    <h2 data-i18n="home.cta.title">Ready to build your smart scale line?</h2>
-    <p data-i18n="home.cta.sub">Tell us your market, volume, and target price — we'll respond within 1 business day.</p>
-    <a href="/contact.html" data-i18n="hero.cta1">Request a Quote</a>
+<!-- CTA Banner (Dark) -->
+<section class="tile tile-dark-2" style="padding:64px 0">
+  <div class="container text-center">
+    <h2 style="font-size:34px;margin-bottom:8px" data-i18n="home.cta.title">Ready to build your smart scale line?</h2>
+    <p class="lead" style="color:var(--body-muted);margin-bottom:28px" data-i18n="home.cta.sub">Tell us your market, volume, and target price — we'll respond within 1 business day.</p>
+    <a href="/contact.html" class="btn-pill" data-i18n="hero.cta1">Request a Quote</a>
   </div>
 </section>
 
-<footer id="foot-mount"></footer>
+<!-- Footer -->
+<footer class="site-footer" id="foot-mount"></footer>
 
 <script src="/assets/i18n.js"></script>
 <script src="/assets/partials.js"></script>

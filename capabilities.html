@@ -8,21 +8,24 @@
 <link rel="stylesheet" href="/assets/style.css" />
 </head>
 <body data-page="cap">
-<div class="nav"><div class="container nav-inner" id="nav-mount"></div></div>
 
-<section class="hero" style="padding:56px 0 48px">
+<div class="global-nav"><div class="global-nav-inner" id="nav-mount"></div></div>
+
+<!-- Hero -->
+<section class="tile tile-light hero-tile" style="padding:100px 0 60px">
   <div class="container">
-    <div class="eyebrow" style="color:#A7E3C9">Capabilities</div>
+    <div class="tagline" style="color:var(--primary);margin-bottom:12px">Capabilities</div>
     <h1 data-i18n="cap.title">Capabilities & facility</h1>
-    <p data-i18n="cap.sub">From organizational systems to in-house labs and automated lines — full-stack OEM/ODM under one roof.</p>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:640px;margin:16px auto 0" data-i18n="cap.sub">From organizational systems to in-house labs and automated lines — full-stack OEM/ODM under one roof.</p>
   </div>
 </section>
 
-<section style="padding-top:24px">
+<!-- Org Chart -->
+<section class="tile tile-parchment">
   <div class="container">
-    <div class="eyebrow" data-i18n="cap.org.title">Organizational structure</div>
+    <div class="tagline" style="color:var(--primary);margin-bottom:8px" data-i18n="cap.org.title">Organizational structure</div>
     <h2 data-i18n="cap.org.title">Organizational structure</h2>
-    <p class="section-lead" data-i18n="cap.org.intro">Built around two OEM tracks and seven operating systems.</p>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:600px;margin:12px auto 40px" data-i18n="cap.org.intro">Built around two OEM tracks and seven operating systems.</p>
     <div class="org-chart">
       <div class="org-top">Shenzhen Unique Scales Co., Ltd.</div>
       <div class="org-tracks">
@@ -52,18 +55,22 @@
   </div>
 </section>
 
-<section style="background:#fff">
+<!-- Labs -->
+<section class="tile tile-light">
   <div class="container">
+    <div class="tagline" style="color:var(--primary);margin-bottom:8px" data-i18n="cap.labs.title">In-house laboratories</div>
     <h2 data-i18n="cap.labs.title">In-house laboratories</h2>
-    <p class="section-lead" data-i18n="cap.labs.sub">18+ dedicated test stations covering mechanical, environmental, electrical safety and material compliance.</p>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:600px;margin:12px auto 40px" data-i18n="cap.labs.sub">18+ dedicated test stations covering mechanical, environmental, electrical safety and material compliance.</p>
     <div class="lab-grid" id="lab-grid"></div>
   </div>
 </section>
 
-<section>
+<!-- Production Lines -->
+<section class="tile tile-dark">
   <div class="container">
+    <div class="tagline" style="color:var(--primary-on-dark);margin-bottom:8px" data-i18n="cap.prod.title">Automated production lines</div>
     <h2 data-i18n="cap.prod.title">Automated production lines</h2>
-    <p class="section-lead" data-i18n="cap.prod.sub">Two fully automated lines with single-station imported equipment — consistent quality at scale.</p>
+    <p class="lead" style="color:var(--body-muted);max-width:600px;margin:12px auto 40px" data-i18n="cap.prod.sub">Two fully automated lines with single-station imported equipment — consistent quality at scale.</p>
     <div class="prod-gallery">
       <figure><img src="/assets/img/prodline_1.jpg" alt="Automated production line 1" /><figcaption>Automated assembly line</figcaption></figure>
       <figure><img src="/assets/img/prodline_2.jpg" alt="Automated production line 2" /><figcaption>Single-station imported equipment</figcaption></figure>
@@ -75,27 +82,29 @@
   </div>
 </section>
 
-<section style="background:#fff">
+<!-- Partners -->
+<section class="tile tile-parchment">
   <div class="container">
+    <div class="tagline" style="color:var(--primary);margin-bottom:8px" data-i18n="cap.partner.title">Trusted partners</div>
     <h2 data-i18n="cap.partner.title">Trusted partners</h2>
-    <p class="section-lead" data-i18n="cap.partner.sub">We serve 50+ brands across 100+ countries — including Fortune 500 companies in consumer electronics, wearables, and home appliances.</p>
-    <ul class="feat-list" id="partner-bullets" style="max-width:760px"></ul>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:600px;margin:12px auto 40px" data-i18n="cap.partner.sub">We serve 50+ brands across 100+ countries — including Fortune 500 companies in consumer electronics, wearables, and home appliances.</p>
+    <ul class="partner-bullets" id="partner-bullets"></ul>
   </div>
 </section>
 
-<section class="cta-banner">
-  <div class="container">
-    <h2 data-i18n="home.cta.title">Ready to build your smart scale line?</h2>
-    <p data-i18n="home.cta.sub">Tell us your market, volume, and target price — we'll respond within 1 business day.</p>
-    <a href="/contact.html" data-i18n="nav.cta">Request a Quote</a>
+<!-- CTA -->
+<section class="tile tile-dark-2" style="padding:64px 0">
+  <div class="container text-center">
+    <h2 style="font-size:34px;margin-bottom:8px" data-i18n="home.cta.title">Ready to build your smart scale line?</h2>
+    <p class="lead" style="color:var(--body-muted);margin-bottom:28px" data-i18n="home.cta.sub">Tell us your market, volume, and target price — we'll respond within 1 business day.</p>
+    <a href="/contact.html" class="btn-pill" data-i18n="nav.cta">Request a Quote</a>
   </div>
 </section>
 
-<footer id="foot-mount"></footer>
+<footer class="site-footer" id="foot-mount"></footer>
 <script src="/assets/i18n.js"></script>
 <script src="/assets/partials.js"></script>
 <script>
-  // Render the labs grid and partner bullets from the current i18n dictionary so they auto-translate.
   (function(){
     function fill(id, key, tag){
       var el = document.getElementById(id); if (!el || !window.__us_dict) return;

@@ -8,25 +8,31 @@
 <link rel="stylesheet" href="/assets/style.css" />
 </head>
 <body data-page="b">
-<div class="nav"><div class="container nav-inner" id="nav-mount"></div></div>
 
-<section class="hero" style="padding:64px 0 56px">
-  <div class="container hero-wrap">
-    <div>
-      <div class="eyebrow" style="color:#A7E3C9" data-i18n="b.eyebrow">Volume platform</div>
-      <h1 data-i18n="b.title">Bathroom Scales</h1>
-      <p data-i18n="b.sub">Sleek platforms with the right display for every price point. Volume-ready for global retail and private-label programs.</p>
-      <a href="/contact.html" class="cta" data-i18n="nav.cta">Request a Quote</a>
+<div class="global-nav"><div class="global-nav-inner" id="nav-mount"></div></div>
+
+<!-- Hero -->
+<section class="tile tile-light hero-tile" style="padding:100px 0 60px">
+  <div class="container">
+    <div class="tagline" style="color:var(--primary);margin-bottom:12px" data-i18n="b.eyebrow">Volume platform</div>
+    <h1 data-i18n="b.title">Bathroom Scales</h1>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:640px;margin:16px auto 32px" data-i18n="b.sub">Sleek platforms with the right display for every price point. Volume-ready for global retail and private-label programs.</p>
+    <div class="cta-group">
+      <a href="/contact.html" class="btn-pill" data-i18n="nav.cta">Request a Quote</a>
+      <a href="#models" class="btn-pill-secondary" data-i18n="b.cta">Learn more</a>
     </div>
-    <img src="/assets/img/bathroom-glass.jpg" alt="Bathroom scale" class="hero-img" />
+    <div class="hero-img-wrap" style="margin-top:48px">
+      <img src="/assets/img/bathroom-glass.jpg" alt="Bathroom scale" />
+    </div>
   </div>
 </section>
 
-<section>
+<!-- Features (Parchment) -->
+<section class="tile tile-parchment">
   <div class="container">
-    <div class="grid grid-2">
+    <div class="pro-hero">
       <div>
-        <h2 style="font-size:22px" data-i18n="b.title">Bathroom — what's inside</h2>
+        <h2 style="font-size:34px;margin-bottom:16px" data-i18n="b.title">Bathroom — what's inside</h2>
         <ul class="feat-list">
           <li data-i18n="b.f1"></li>
           <li data-i18n="b.f2"></li>
@@ -37,19 +43,20 @@
           <li data-i18n="b.f7"></li>
           <li data-i18n="b.f8"></li>
         </ul>
-        <a href="/contact.html" class="btn-primary" style="margin-top:18px" data-i18n="b.cta">Request the full bathroom catalog</a>
+        <a href="/contact.html" class="btn-pill" style="margin-top:24px" data-i18n="nav.cta">Request a Quote</a>
       </div>
       <div>
-        <img src="/assets/img/kitchen-black-glass.jpg" alt="Bathroom scale profile" style="border-radius:12px;box-shadow:var(--shadow)" />
+        <img src="/assets/img/bathroom-glass.jpg" alt="Bathroom scale profile" />
       </div>
     </div>
   </div>
 </section>
 
-<section style="background:#fff">
+<!-- Model Lineup (Light) -->
+<section class="tile tile-light" id="models">
   <div class="container">
     <h2 data-i18n="b.models.title">Bathroom model lineup (selection)</h2>
-    <p class="section-lead">Multiple BOM tiers covering entry, mid, and premium segments. Optional heart-rate, BMI, and BIA on selected models.</p>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:600px;margin:12px auto 40px">Multiple BOM tiers covering entry, mid, and premium segments. Optional heart-rate, BMI, and BIA on selected models.</p>
     <div class="model-grid">
       <div class="model-chip"><div class="m">CF596</div><div class="d">LED, slim</div></div>
       <div class="model-chip"><div class="m">CF535</div><div class="d">LED, slim</div></div>
@@ -69,15 +76,16 @@
   </div>
 </section>
 
-<section class="cta-banner">
-  <div class="container">
-    <h2 data-i18n="b.cta">Request the full bathroom catalog</h2>
-    <p data-i18n="contact.sub">Tell us about your market, target volume, and target price. We respond within 1 business day.</p>
-    <a href="/contact.html" data-i18n="nav.cta">Request a Quote</a>
+<!-- CTA -->
+<section class="tile tile-dark-2" style="padding:64px 0">
+  <div class="container text-center">
+    <h2 style="font-size:34px;margin-bottom:8px" data-i18n="b.cta">Learn more</h2>
+    <p class="lead" style="color:var(--body-muted);margin-bottom:28px" data-i18n="contact.sub">Tell us about your market, target volume, and target price. We respond within 1 business day.</p>
+    <a href="/contact.html" class="btn-pill" data-i18n="nav.cta">Request a Quote</a>
   </div>
 </section>
 
-<footer id="foot-mount"></footer>
+<footer class="site-footer" id="foot-mount"></footer>
 <script src="/assets/i18n.js"></script>
 <script src="/assets/partials.js"></script>
 </body>

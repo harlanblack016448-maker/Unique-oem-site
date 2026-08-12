@@ -1,6 +1,6 @@
 # Unique Scales — OEM/ODM Website
 
-A bilingual (English / 中文) static marketing site for Shenzhen Unique Scales Co., Ltd., focused on overseas OEM/ODM customer acquisition. Built as plain HTML/CSS/JS — no build step, no backend.
+A bilingual (English / 中文) static marketing site for Shenzhen Unique Scales Co., Ltd., focused on overseas OEM/ODM customer acquisition. Built as plain HTML/CSS/JS — no build step, no backend. UI follows Apple web design language: photography-first, alternating light/dark tiles, single Action Blue accent (#0066cc), SF Pro-style typography, pill-shaped CTAs.
 
 ## Structure
 

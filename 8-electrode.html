@@ -8,25 +8,31 @@
 <link rel="stylesheet" href="/assets/style.css" />
 </head>
 <body data-page="8">
-<div class="nav"><div class="container nav-inner" id="nav-mount"></div></div>
 
-<section class="hero" style="padding:64px 0 56px">
-  <div class="container hero-wrap">
-    <div>
-      <div class="eyebrow" style="color:#A7E3C9" data-i18n="8.eyebrow">Flagship platform</div>
-      <h1 data-i18n="8.title">8-Electrode Body Composition Analyzer</h1>
-      <p data-i18n="8.sub">Segmental body composition that goes far beyond weight. The flagship platform trusted by global brands and the world's largest kitchen scale brand on US Amazon.</p>
-      <a href="/contact.html" class="cta" data-i18n="nav.cta">Request a Quote</a>
+<div class="global-nav"><div class="global-nav-inner" id="nav-mount"></div></div>
+
+<!-- Hero -->
+<section class="tile tile-light hero-tile" style="padding:100px 0 60px">
+  <div class="container">
+    <div class="tagline" style="color:var(--primary);margin-bottom:12px" data-i18n="8.eyebrow">Flagship platform</div>
+    <h1 data-i18n="8.title">8-Electrode Body Composition Analyzer</h1>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:640px;margin:16px auto 32px" data-i18n="8.sub">Segmental body composition that goes far beyond weight. The flagship platform trusted by global brands and the world's largest kitchen scale brand on US Amazon.</p>
+    <div class="cta-group">
+      <a href="/contact.html" class="btn-pill" data-i18n="nav.cta">Request a Quote</a>
+      <a href="#models" class="btn-pill-secondary" data-i18n="8.cta">Learn more</a>
     </div>
-    <img src="/assets/img/flagship-cm0001.jpg" alt="8-electrode body composition analyzer" class="hero-img" />
+    <div class="hero-img-wrap" style="margin-top:48px">
+      <img src="/assets/img/flagship-cm0001.jpg" alt="8-electrode body composition analyzer" />
+    </div>
   </div>
 </section>
 
-<section>
+<!-- Features (Parchment) -->
+<section class="tile tile-parchment">
   <div class="container">
-    <div class="grid grid-2">
+    <div class="pro-hero">
       <div>
-        <h2 style="font-size:22px" data-i18n="8.title">8-Electrode — what's inside</h2>
+        <h2 style="font-size:34px;margin-bottom:16px" data-i18n="8.title">8-Electrode — what's inside</h2>
         <ul class="feat-list">
           <li data-i18n="8.f1"></li>
           <li data-i18n="8.f2"></li>
@@ -37,34 +43,36 @@
           <li data-i18n="8.f7"></li>
           <li data-i18n="8.f8"></li>
         </ul>
-        <a href="/contact.html" class="btn-primary" style="margin-top:18px" data-i18n="8.cta">Request the full 8-electrode catalog</a>
+        <a href="/contact.html" class="btn-pill" style="margin-top:24px" data-i18n="nav.cta">Request a Quote</a>
       </div>
       <div>
-        <img src="/assets/img/eight-electrode-wide.jpg" alt="8-electrode wide view" style="border-radius:12px;box-shadow:var(--shadow)" />
+        <img src="/assets/img/eight-electrode-wide.jpg" alt="8-electrode wide view" />
       </div>
     </div>
   </div>
 </section>
 
-<section>
+<!-- DEXA + Flagship cards (Dark) -->
+<section class="tile tile-dark">
   <div class="container">
-    <div class="grid grid-2" style="align-items:center">
-      <div class="card featured">
-        <span class="tag" data-i18n="8.dexa.title">Clinical-grade accuracy</span>
-        <p class="card-body" data-i18n="8.dexa.text" style="margin-top:8px"></p>
+    <div class="grid-2" style="max-width:900px;margin:0 auto;text-align:left">
+      <div class="utility-card" style="text-align:left;background:var(--surface-tile-2);border-color:rgba(255,255,255,.08)">
+        <h3 style="color:#fff" data-i18n="8.dexa.title">Clinical-grade accuracy</h3>
+        <p style="color:var(--body-muted);margin-top:8px" data-i18n="8.dexa.text"></p>
       </div>
-      <div class="card secondary">
-        <span class="tag" data-i18n="8.flagship.title">Flagship: CF663 voice-AI analyzer</span>
-        <p class="card-body" data-i18n="8.flagship.text" style="margin-top:8px"></p>
+      <div class="utility-card" style="text-align:left;background:var(--surface-tile-2);border-color:rgba(255,255,255,.08)">
+        <h3 style="color:#fff" data-i18n="8.flagship.title">Flagship: CF663 voice-AI analyzer</h3>
+        <p style="color:var(--body-muted);margin-top:8px" data-i18n="8.flagship.text"></p>
       </div>
     </div>
   </div>
 </section>
 
-<section style="background:#fff">
+<!-- Model Lineup (Light) -->
+<section class="tile tile-light" id="models">
   <div class="container">
     <h2 data-i18n="8.models.title">Model lineup (selection)</h2>
-    <p class="section-lead" data-i18n="8.models.sub">Production-ready models with regional certification. Custom variants available.</p>
+    <p class="lead" style="color:var(--ink-muted-48);max-width:600px;margin:12px auto 40px" data-i18n="8.models.sub">Production-ready models with regional certification. Custom variants available.</p>
     <div class="model-grid">
       <div class="model-chip"><div class="m">CF663</div><div class="d">7″ touch TFT + voice AI</div></div>
       <div class="model-chip"><div class="m">CM0001</div><div class="d">Handle + 7″ TFT</div></div>
@@ -85,10 +93,11 @@
   </div>
 </section>
 
-<section>
-  <div class="container">
+<!-- Specs (Parchment) -->
+<section class="tile tile-parchment">
+  <div class="container" style="max-width:800px">
     <h2 data-i18n="8.spec.title">Example specs — CM0001BLE+WiFi</h2>
-    <table class="spec-table">
+    <table class="spec-table" style="margin-top:24px">
       <tr><th data-i18n="8.spec.scale">Scale size</th><td>440 × 360 × 1130 mm</td></tr>
       <tr><th data-i18n="8.spec.screen">Display</th><td>7″ TFT (154.4 × 86.2 mm)</td></tr>
       <tr><th data-i18n="8.spec.trs">Transmission</th><td>BLE + 2.4G / 5G Wi-Fi</td></tr>
@@ -100,15 +109,16 @@
   </div>
 </section>
 
-<section class="cta-banner">
-  <div class="container">
-    <h2 data-i18n="8.cta">Request the full 8-electrode catalog</h2>
-    <p data-i18n="contact.sub">Tell us about your market, target volume, and target price. We respond within 1 business day.</p>
-    <a href="/contact.html" data-i18n="nav.cta">Request a Quote</a>
+<!-- CTA -->
+<section class="tile tile-dark-2" style="padding:64px 0">
+  <div class="container text-center">
+    <h2 style="font-size:34px;margin-bottom:8px" data-i18n="8.cta">Learn more</h2>
+    <p class="lead" style="color:var(--body-muted);margin-bottom:28px" data-i18n="contact.sub">Tell us about your market, target volume, and target price. We respond within 1 business day.</p>
+    <a href="/contact.html" class="btn-pill" data-i18n="nav.cta">Request a Quote</a>
   </div>
 </section>
 
-<footer id="foot-mount"></footer>
+<footer class="site-footer" id="foot-mount"></footer>
 <script src="/assets/i18n.js"></script>
 <script src="/assets/partials.js"></script>
 </body>
