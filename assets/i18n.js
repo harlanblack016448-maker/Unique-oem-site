@@ -237,7 +237,7 @@
       "nav.cap":"能力工厂",
       "nav.cta":"询价",
 
-      "hero.eyebrow":"深圳准衡秤业 · 成立于 2010",
+      "hero.eyebrow":"深圳市乐福衡器有限公司 · 成立于 2010",
       "hero.title":"全球最大的八电极体脂秤制造商",
       "hero.sub":"16 年专注智能秤研发与制造。OEM / ODM 硬件、定制 App、云端健康数据——一站交付。",
       "hero.cta1":"立即询价",
@@ -409,7 +409,7 @@
       "contact.direct":"或直接联系：",
       "contact.emailto":"hanhan@lefu.cc",
 
-      "about.title":"关于准衡",
+      "about.title":"关于乐福衡器",
       "about.sub":"成立于 2010 年，深圳，16 年专注打造完美秤。",
       "about.mission.title":"使命",
       "about.mission.text":"助力客户赢得长期市场成功。",
@@ -427,7 +427,7 @@
       "about.facility.title":"工厂实力",
       "about.facility.text":"30,000 平米工厂，20 条产线，1,000 名员工，年产能 1200 万+ 台，年产值约 5 亿元人民币（6,000 万欧元）。",
       "about.overview.title":"公司概况",
-      "about.overview.text":"成立于 2010 年，准衡是国家高新技术企业，集智能秤研发、生产、销售、服务于一体。已服务 100+ 国家与地区客户，累计开发 400+ 硬件产品、200+ 软件应用。连续 7 年获评国家高新技术企业，并获深圳专精特新企业认定。",
+      "about.overview.text":"成立于 2010 年，乐福衡器是国家高新技术企业，集智能秤研发、生产、销售、服务于一体。已服务 100+ 国家与地区客户，累计开发 400+ 硬件产品、200+ 软件应用。连续 7 年获评国家高新技术企业，并获深圳专精特新企业认定。",
       "about.coverage.title":"全球业务占比",
       "about.coverage.text":"亚洲 44% · 北美 37% · 欧洲 10% · 南美 5% · 大洋洲 3% · 非洲 1%。",
       "about.kpi.title":"2024 关键数据",
@@ -448,7 +448,7 @@
       "about.values2.title":"我们追求的价值观",
       "about.values2.text":"为客户提供可持续盈利的好产品；为客户品牌赋能；节省客户投入；以独家专利保护技术领先一步；线下渠道退货率低于 3‰；加急交付强于同行；以极致服务跨越时区打动客户；构建 5–10 年长期共赢合作。"
 
-      ,"footer.copy":"© 2026 深圳准衡秤业有限公司 保留所有权利。",
+      ,"footer.copy":"© 2026 深圳市乐福衡器有限公司 保留所有权利。",
       "footer.address":"深圳龙岗区 · 中国",
       "footer.app":"Unique Health App",
       "footer.app.d":"iOS / Android / 鸿蒙"
