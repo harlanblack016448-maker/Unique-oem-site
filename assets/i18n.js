@@ -489,7 +489,7 @@
       const v = DICT[lang][key];
       if (v !== undefined) el.setAttribute(attr, v);
     });
-    document.querySelectorAll(".lang-toggle button").forEach(b=>{
+    document.querySelectorAll("[data-lang]").forEach(b=>{
       b.classList.toggle("active", b.dataset.lang === lang);
     });
     // Notify other scripts that translations have been applied.
@@ -504,10 +504,11 @@
     if (mb && nl) mb.addEventListener("click", ()=> nl.classList.toggle("open"));
   });
 
-  // Delegated click for language toggle — works regardless of when the
-  // nav (with .lang-toggle buttons) is injected by partials.js.
+  // Delegated click for language toggle — keyed by data-lang so it keeps
+  // working even if the surrounding CSS class (lang-toggle / lang-toggle-global)
+  // changes during redesigns.
   document.addEventListener("click", (e) => {
-    const btn = e.target.closest(".lang-toggle button");
+    const btn = e.target.closest("[data-lang]");
     if (btn && btn.dataset.lang) setLang(btn.dataset.lang);
   });
 })();

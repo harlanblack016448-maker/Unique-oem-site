@@ -11,7 +11,7 @@
   <a href="/about.html" data-nav="about" data-i18n="nav.about">About</a>
   <a href="/capabilities.html" data-nav="cap" data-i18n="nav.cap">Capabilities</a>
   <a href="/contact.html" data-nav="contact" data-i18n="nav.contact">Contact</a>
-  <div class="lang-toggle-global">
+  <div class="lang-toggle lang-toggle-global">
     <button data-lang="en">EN</button>
     <button data-lang="zh">中文</button>
   </div>
