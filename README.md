@@ -15,11 +15,13 @@ oem-landing/
 │   ├── kitchen.html        # Kitchen & nutrition scales + IoT
 │   └── bathroom.html       # Bathroom scales
 └── assets/
-    ├── style.css           # Design system
-    ├── i18n.js             # EN/中文 dictionary + toggle (localStorage)
-    ├── partials.js         # Shared nav + footer injection
-    ├── form.js             # Lead form handler + dynamic volume options
-    └── img/                # Product photos (catalog) + production-line photos (PPT)
+    ├── style.css                # Design system
+    ├── i18n.js                  # EN/中文 dictionary + toggle (localStorage)
+    ├── partials.js              # Shared nav + footer injection
+    ├── form.js                  # Lead form handler + dynamic volume options
+    ├── speed-insights.js        # Vercel Speed Insights module
+    ├── speed-insights-init.js   # Speed Insights initialization
+    └── img/                     # Product photos (catalog) + production-line photos (PPT)
 ```
 
 ## Deploy to Vercel (beginner, no git commands)
@@ -29,6 +31,16 @@ oem-landing/
 3. Go to vercel.com → **Sign Up → Continue with GitHub**.
 4. **Add New → Project** → find `oem-site` → **Import**.
 5. Framework Preset: **Other** → **Deploy**. Done in ~30s.
+
+## First-time setup (after deploying)
+
+After your first deployment, run these commands once to set up Speed Insights:
+
+```bash
+npm install
+```
+
+This installs the Vercel Speed Insights package and copies the necessary files to track site performance. The Speed Insights tracking will automatically start collecting data once deployed to Vercel.
 
 ## Lead form: receive inquiries in your inbox (no signup needed)
 

@@ -1,0 +1,15 @@
+{
+  "name": "unique-oem-site",
+  "version": "1.0.0",
+  "description": "Bilingual OEM/ODM marketing site for Shenzhen Unique Scales Co., Ltd.",
+  "scripts": {
+    "prepare": "node scripts/copy-speed-insights.js"
+  },
+  "keywords": ["scales", "oem", "odm"],
+  "author": "Shenzhen Unique Scales Co., Ltd.",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
+  }
+}
