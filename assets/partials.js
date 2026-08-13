@@ -1,9 +1,11 @@
-// partials.js — inject shared global nav and footer across pages
+// partials.js — inject skip link, global nav, sub-nav, and footer
 (function(){
+  const MARK = `<svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="currentColor"/><rect x="8" y="11" width="16" height="16" rx="3" fill="none" stroke="#000" stroke-width="1.6"/><circle cx="12" cy="15.2" r="1.15" fill="#000"/><circle cx="20" cy="15.2" r="1.15" fill="#000"/><circle cx="12" cy="22.8" r="1.15" fill="#000"/><circle cx="20" cy="22.8" r="1.15" fill="#000"/><rect x="11" y="6" width="10" height="2.2" rx="1.1" fill="#000"/><rect x="14.9" y="8.2" width="2.2" height="2.8" fill="#000"/></svg>`;
+
   const NAV = `
-<a href="/index.html" class="brand">Unique Scales</a>
-<button class="menu-btn-global" aria-label="Menu">☰</button>
-<div class="global-nav-links">
+<a href="/index.html" class="brand">${MARK}<span>Unique Scales</span></a>
+<button class="menu-btn-global" type="button" aria-label="Menu" aria-expanded="false" aria-controls="global-nav-links">☰</button>
+<div class="global-nav-links" id="global-nav-links">
   <a href="/index.html" data-nav="home" data-i18n="nav.home">Home</a>
   <a href="/products/8-electrode.html" data-nav="8" data-i18n="nav.eight">8-Electrode</a>
   <a href="/products/kitchen.html" data-nav="k" data-i18n="nav.kitchen">Kitchen Scales</a>
@@ -11,9 +13,20 @@
   <a href="/about.html" data-nav="about" data-i18n="nav.about">About</a>
   <a href="/capabilities.html" data-nav="cap" data-i18n="nav.cap">Capabilities</a>
   <a href="/contact.html" data-nav="contact" data-i18n="nav.contact">Contact</a>
-  <div class="lang-toggle lang-toggle-global">
-    <button data-lang="en">EN</button>
-    <button data-lang="zh">中文</button>
+  <div class="lang-toggle lang-toggle-global" role="group" aria-label="Language">
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="zh">中文</button>
+  </div>
+</div>`;
+
+  const SUB = `
+<div class="sub-nav-inner">
+  <div class="cat" data-i18n="subnav.title">Unique Scales</div>
+  <div class="sub-nav-links">
+    <a href="/products/8-electrode.html" data-nav="8" data-i18n="nav.eight">8-Electrode</a>
+    <a href="/products/kitchen.html" data-nav="k" data-i18n="nav.kitchen">Kitchen Scales</a>
+    <a href="/products/bathroom.html" data-nav="b" data-i18n="nav.bathroom">Bathroom Scales</a>
+    <a href="/contact.html" class="btn-pill" style="font-size:14px;padding:8px 18px" data-i18n="nav.cta">Request a Quote</a>
   </div>
 </div>`;
 
@@ -23,7 +36,7 @@
     <div>
       <h4>Shenzhen Unique Scales Co., Ltd.</h4>
       <p style="color:var(--ink-muted-48);font-size:14px;letter-spacing:-0.224px" data-i18n="footer.address">Longgang District, Shenzhen, China</p>
-      <p style="color:var(--ink-muted-48);font-size:14px;margin-top:6px;letter-spacing:-0.224px">hanhan@lefu.cc</p>
+      <p style="color:var(--ink-muted-48);font-size:14px;margin-top:6px;letter-spacing:-0.224px"><a href="mailto:hanhan@lefu.cc">hanhan@lefu.cc</a></p>
     </div>
     <div>
       <h4 data-i18n="nav.products">Products</h4>
@@ -32,35 +45,85 @@
       <p><a href="/products/bathroom.html" data-i18n="nav.bathroom">Bathroom Scales</a></p>
     </div>
     <div>
-      <h4>Company</h4>
+      <h4 data-i18n="footer.company">Company</h4>
       <p><a href="/about.html" data-i18n="nav.about">About</a></p>
       <p><a href="/capabilities.html" data-i18n="nav.cap">Capabilities</a></p>
       <p><a href="/contact.html" data-i18n="nav.contact">Contact</a></p>
     </div>
     <div>
-      <h4 data-i18n="footer.app">Unique Health App</h4>
+      <h4 data-i18n="footer.legal">Legal</h4>
+      <p><a href="/privacy.html" data-i18n="nav.privacy">Privacy</a></p>
+      <p style="color:var(--ink-muted-48);font-size:14px;letter-spacing:-0.224px" data-i18n="footer.app">Unique Health App</p>
       <p style="color:var(--ink-muted-48);font-size:14px;letter-spacing:-0.224px" data-i18n="footer.app.d">iOS / Android / HarmonyOS</p>
     </div>
   </div>
   <div class="foot-bottom" data-i18n="footer.copy">© 2026 Shenzhen Unique Scales Co., Ltd. All rights reserved.</div>
 </div>`;
 
+  function ensureSkip(){
+    if (document.querySelector(".skip-link")) return;
+    const a = document.createElement("a");
+    a.className = "skip-link";
+    a.href = "#main";
+    a.textContent = "Skip to content";
+    document.body.insertBefore(a, document.body.firstChild);
+  }
+
+  function ensureMain(){
+    if (document.getElementById("main")) return;
+    const first = document.querySelector("section, .tile, .page-hero");
+    if (first) first.id = "main";
+  }
+
+  function ensureSubnav(){
+    if (document.querySelector(".sub-nav")) return;
+    const nav = document.querySelector(".global-nav");
+    if (!nav) return;
+    const bar = document.createElement("div");
+    bar.className = "sub-nav";
+    bar.innerHTML = SUB;
+    nav.insertAdjacentElement("afterend", bar);
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
+    ensureSkip();
     const nav = document.getElementById("nav-mount");
     if (nav) nav.innerHTML = NAV;
+    ensureSubnav();
     const foot = document.getElementById("foot-mount");
     if (foot) foot.innerHTML = FOOT;
-    // active link
+    ensureMain();
+
     const cur = document.body.dataset.page;
+    const subKeys = { "8":"nav.eight", k:"nav.kitchen", b:"nav.bathroom", about:"nav.about", cap:"nav.cap", contact:"nav.contact", privacy:"nav.privacy" };
     if (cur) {
-      const a = document.querySelector(`.global-nav-links a[data-nav="${cur}"]`);
-      if (a) a.classList.add("active");
+      document.querySelectorAll(`.global-nav-links a[data-nav="${cur}"], .sub-nav-links a[data-nav="${cur}"]`).forEach(a => a.classList.add("active"));
+      const cat = document.querySelector(".sub-nav .cat");
+      if (cat && subKeys[cur]) cat.setAttribute("data-i18n", subKeys[cur]);
     }
-    // mobile menu
+
     const mb = document.querySelector(".menu-btn-global");
     const nl = document.querySelector(".global-nav-links");
-    if (mb && nl) mb.addEventListener("click", ()=> nl.classList.toggle("open"));
-    // Re-apply translations now that the nav/footer (with data-i18n attrs) are in the DOM.
+    function closeMenu(){
+      if (!nl || !mb) return;
+      nl.classList.remove("open");
+      mb.setAttribute("aria-expanded", "false");
+    }
+    if (mb && nl) {
+      mb.addEventListener("click", () => {
+        const open = nl.classList.toggle("open");
+        mb.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      nl.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
+    }
+
+    const og = document.querySelector('meta[property="og:image"]');
+    if (og) {
+      const src = og.getAttribute("content") || "";
+      if (src.startsWith("/")) og.setAttribute("content", location.origin + src);
+    }
+
     if (window.__us_apply) window.__us_apply();
   });
 })();

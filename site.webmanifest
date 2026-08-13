@@ -1,0 +1,16 @@
+{
+  "name": "Unique Scales",
+  "short_name": "Unique Scales",
+  "description": "OEM/ODM smart scale manufacturer in Shenzhen",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/assets/img/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

@@ -66,11 +66,35 @@
     const success = form.querySelector(".form-success");
     const EMAIL = "hanhan@lefu.cc";
 
+    const errBox = form.querySelector(".form-error");
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const sendingKey = "contact.sending";
+    const idleLabel = () => {
+      const lang = getLang();
+      const dict = window.__us_dict || {};
+      return (dict[lang] && dict[lang]["contact.submit"]) || "Send inquiry";
+    };
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (success) success.classList.remove("show");
+      if (errBox) errBox.classList.remove("show");
+      const honey = form.querySelector('[name="_honey"]');
+      if (honey && honey.value) return;
       const action = form.getAttribute("action") || "";
       const data = new FormData(form);
-      if (!action || action.indexOf("REPLACE") !== -1) { mailtoFallback(); return; }
+      data.delete("_honey");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        const lang = getLang();
+        const dict = window.__us_dict || {};
+        submitBtn.textContent = (dict[lang] && dict[lang][sendingKey]) || "Sending…";
+      }
+      if (!action || action.indexOf("REPLACE") !== -1) {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = idleLabel(); }
+        mailtoFallback();
+        return;
+      }
 
       try {
         const res = await fetch(action, {
@@ -85,13 +109,15 @@
         } catch (_) {}
         if (ok) {
           form.reset();
-          renderVolumes(); // re-render empty placeholder after reset
+          renderVolumes();
           if (success) { success.classList.add("show"); success.scrollIntoView({behavior:"smooth", block:"center"}); }
         } else {
           mailtoFallback();
         }
       } catch (err) {
         mailtoFallback();
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = idleLabel(); }
       }
     });
 
@@ -105,7 +131,10 @@
       );
       window.location.href = "mailto:" + EMAIL + "?subject=" +
         encodeURIComponent("Website inquiry — " + (val("interest") || "Smart scale")) + "&body=" + body;
-      if (success) success.classList.add("show");
+      if (errBox) {
+        errBox.classList.add("show");
+        errBox.scrollIntoView({behavior:"smooth", block:"center"});
+      }
     }
   });
 })();
