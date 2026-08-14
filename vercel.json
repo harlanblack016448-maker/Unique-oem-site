@@ -1,4 +1,12 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/8-electrode", "destination": "/products/8-electrode", "permanent": true },
+    { "source": "/8-electrode.html", "destination": "/products/8-electrode.html", "permanent": true },
+    { "source": "/kitchen", "destination": "/products/kitchen", "permanent": true },
+    { "source": "/kitchen.html", "destination": "/products/kitchen.html", "permanent": true },
+    { "source": "/bathroom", "destination": "/products/bathroom", "permanent": true },
+    { "source": "/bathroom.html", "destination": "/products/bathroom.html", "permanent": true }
+  ]
 }

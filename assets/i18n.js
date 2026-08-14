@@ -79,8 +79,8 @@
       "home.proof.dexa.l":"DEXA correlation",
       "home.proof.ip":"306",
       "home.proof.ip.l":"Patents held",
-      "home.proof.years":"16",
-      "home.proof.years.l":"Years on scales",
+      "home.proof.brands":"400+",
+      "home.proof.brands.l":"Hardware products",
 
       "home.services.eyebrow":"Services",
       "home.why.eyebrow":"Why us",
@@ -413,8 +413,8 @@
       "home.proof.dexa.l":"DEXA 相关系数",
       "home.proof.ip":"306",
       "home.proof.ip.l":"项专利",
-      "home.proof.years":"16",
-      "home.proof.years.l":"年专注衡器",
+      "home.proof.brands":"400+",
+      "home.proof.brands.l":"硬件产品",
 
       "home.services.eyebrow":"服务",
       "home.why.eyebrow":"优势",

@@ -1,58 +1,37 @@
-# Unique Scales — OEM/ODM Website
+# Unique Scales — OEM/ODM website
 
-A bilingual (English / 中文) static marketing site for Shenzhen Unique Scales Co., Ltd., focused on overseas OEM/ODM customer acquisition. Built as plain HTML/CSS/JS — no build step, no backend. UI follows Apple web design language: photography-first, alternating light/dark tiles, single Action Blue accent (#0066cc), SF Pro-style typography, pill-shaped CTAs.
+Bilingual (English / 中文) static site for **Shenzhen Unique Scales Co., Ltd.** (乐福衡器). For overseas OEM/ODM buyers. No build step, no backend.
 
-Launch extras: favicon, Open Graph image, `robots.txt`, `sitemap.xml`, `404.html`, privacy page, and `vercel.json` (`cleanUrls`). After you attach a production domain, replace the sitemap loc values with absolute URLs.
+**Live:** https://unique-oem-site.vercel.app  
+**Repo:** https://github.com/harlanblack016448-maker/Unique-oem-site
 
-## Structure
-
-```
-oem-landing/
-├── index.html              # Home (hero, products, services, why us, certs)
-├── about.html              # Company story + timeline + KPIs + IP/R&D/privacy
-├── capabilities.html       # Org chart + labs + production lines + partners
-├── contact.html            # Lead-collection form (FormSubmit → hanhan@lefu.cc)
-├── products/
-│   ├── 8-electrode.html    # Flagship 8-electrode body composition (DEXA 0.97)
-│   ├── kitchen.html        # Kitchen & nutrition scales + IoT
-│   └── bathroom.html       # Bathroom scales
-└── assets/
-    ├── style.css           # Design system
-    ├── i18n.js             # EN/中文 dictionary + toggle (localStorage)
-    ├── partials.js         # Shared nav + footer injection
-    ├── form.js             # Lead form handler + dynamic volume options
-    └── img/                # Product photos (catalog) + production-line photos (PPT)
+```bash
+python3 -m http.server 8090
 ```
 
-## Deploy to Vercel (beginner, no git commands)
+http://127.0.0.1:8090
 
-1. Create a GitHub account → New repository → name it `oem-site` → Public → Add a README → Create.
-2. In the repo: **Add file → Upload files** → drag the **contents** of this `oem-landing` folder in (keep the folder structure). Commit.
-3. Go to vercel.com → **Sign Up → Continue with GitHub**.
-4. **Add New → Project** → find `oem-site` → **Import**.
-5. Framework Preset: **Other** → **Deploy**. Done in ~30s.
+This folder is the working copy. Vercel serves the GitHub `main` tree (site root, not wrapped in `oem-landing/`). Upload or push file changes there to redeploy. Preset: **Other**.
 
-## Lead form: receive inquiries in your inbox (no signup needed)
+## Pages
 
-The contact form posts to [FormSubmit.co](https://formsubmit.co) — **free, no account, no registration**. It's already wired to `hanhan@lefu.cc`.
+`index.html` · `about.html` · `capabilities.html` · `contact.html` · `privacy.html` · `404.html` · `products/{8-electrode,kitchen,bathroom}.html`
 
-**First-time activation (do this once):**
-1. Open the live site → go to the Contact page → submit a test inquiry.
-2. FormSubmit sends a **confirmation email** to `hanhan@lefu.cc`. Open it and click the confirm link.
-3. Done. Every future submission lands directly in your inbox — no further setup.
+Shared: `assets/style.css`, `assets/i18n.js`, `assets/partials.js`, `assets/form.js`, `assets/img/`.
 
-To change the recipient email, edit the `action` URL in `contact.html` (and the `EMAIL` constant in `assets/form.js`). If the network call ever fails, the form automatically falls back to opening the visitor's email client addressed to `hanhan@lefu.cc`, so no lead is lost.
+LinkedIn Insight Tag partner `9831228` loads from `partials.js`; each page also has the official noscript pixel.
 
-## Customize
+## Edit
 
-- **Company contact:** the sales email `hanhan@lefu.cc` appears in `contact.html`, `assets/form.js`, `assets/partials.js`, and `assets/i18n.js`.
-- **Text:** every translatable string lives in `assets/i18n.js` under the `en` and `zh` dictionaries, keyed by `data-i18n`.
-- **Product photos:** replace files in `assets/img/` (keep the same filenames, or update the `src` paths).
-- **Language default:** `assets/i18n.js` defaults to English; the toggle remembers the visitor's choice.
+| What | Where |
+| --- | --- |
+| Visible copy (EN + 中文) | `assets/i18n.js` |
+| Photos | `assets/img/` (keep names or update `src`) |
+| Sales email | `contact.html`, `assets/form.js`, `assets/partials.js`, `assets/i18n.js` |
+| Language default | `assets/i18n.js` (`localStorage` key `us_lang`) |
 
-## Notes
+Lead form → FormSubmit → `hanhan@lefu.cc`. First live submit needs the confirmation email. Network failure opens `mailto:`.
 
-- Content sourced from two official documents: the product catalog "Shenzhen Unique Scales — all kinds of products (260414).pdf" and "Company Profile 20260422.pptx". Company facts (capacity, IP, DEXA correlation, global coverage) follow the PPT as the authoritative source.
-- Product emphasis: 8-electrode body composition (flagship) → kitchen & nutrition (core) → bathroom (volume).
-- Partners section is text-only by design — no third-party logos are shipped, to avoid trademark-usage issues. Add a logo only after written authorization from that brand.
-- Lead form posts to FormSubmit.co (`hanhan@lefu.cc`); first submission triggers a one-time confirmation email. `form.js` falls back to `mailto:` if the network call fails.
+Partners are text-only until you have written logo permission. Company numbers follow *Company Profile 20260422.pptx*.
+
+© 2026 Shenzhen Unique Scales Co., Ltd. All rights reserved.
