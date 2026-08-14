@@ -125,5 +125,31 @@
     }
 
     if (window.__us_apply) window.__us_apply();
+    injectLinkedIn();
   });
+
+  function injectLinkedIn(){
+    if (window._linkedin_partner_id) return;
+    window._linkedin_partner_id = "9806076";
+    window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+    window._linkedin_data_partner_ids.push(window._linkedin_partner_id);
+    (function(l){
+      if (!l){
+        window.lintrk = function(a,b){ window.lintrk.q.push([a,b]); };
+        window.lintrk.q = [];
+      }
+      var s = document.getElementsByTagName("script")[0];
+      var b = document.createElement("script");
+      b.type = "text/javascript";
+      b.async = true;
+      b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+      s.parentNode.insertBefore(b, s);
+    })(window.lintrk);
+    if (!document.getElementById("li-insight-noscript")) {
+      var ns = document.createElement("noscript");
+      ns.id = "li-insight-noscript";
+      ns.innerHTML = '<img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=9806076&fmt=gif" />';
+      document.body.appendChild(ns);
+    }
+  }
 })();

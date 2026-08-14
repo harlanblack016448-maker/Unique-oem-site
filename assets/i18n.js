@@ -328,6 +328,8 @@
       "privacy.3.text":"Inquiry records are kept as long as needed to support a sales conversation, then removed from active inboxes under our ordinary mail retention.",
       "privacy.4.title":"Your rights",
       "privacy.4.text":"Email hanhan@lefu.cc to access, correct, or delete an inquiry you sent. Device data from Unique Health products is governed by the app privacy notice, not this page.",
+      "privacy.5.title":"Advertising measurement",
+      "privacy.5.text":"This site uses the LinkedIn Insight Tag (partner 9806076) to measure B2B campaign visits. LinkedIn may set cookies or receive a page-view pixel. See LinkedIn's advertising privacy notice, or write to hanhan@lefu.cc if you want this site to stop sending your visits to LinkedIn.",
 
       "404.title":"This page is not on the factory floor.",
       "404.sub":"The link may be outdated. The catalog is still here.",
@@ -660,6 +662,8 @@
       "privacy.3.text":"询价记录在销售沟通所需期间内保存，之后按日常邮件留存规则从活动收件箱移除。",
       "privacy.4.title":"您的权利",
       "privacy.4.text":"如需查阅、更正或删除您提交的询价，请邮件联系 hanhan@lefu.cc。Unique Health 产品端数据适用 App 隐私说明，不在本页范围。",
+      "privacy.5.title":"广告效果统计",
+      "privacy.5.text":"本站使用 LinkedIn Insight Tag（合作伙伴编号 9806076）统计 B2B 广告带来的访问。LinkedIn 可能设置 cookie 或接收页面像素。详见 LinkedIn 广告隐私说明；如希望本站停止向 LinkedIn 发送您的访问记录，请邮件联系 hanhan@lefu.cc。",
 
       "404.title":"这条产线上没有该页面。",
       "404.sub":"链接可能已失效。产品目录还在。",
