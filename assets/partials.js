@@ -85,6 +85,15 @@
     nav.insertAdjacentElement("afterend", bar);
   }
 
+  function ensureStickyCta(){
+    if (document.querySelector(".sticky-cta")) return;
+    if (document.body.dataset.page === "contact") return;
+    const bar = document.createElement("div");
+    bar.className = "sticky-cta";
+    bar.innerHTML = `<a href="/contact.html" class="btn-pill" data-i18n="nav.cta">Request a Quote</a>`;
+    document.body.appendChild(bar);
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     ensureSkip();
     const nav = document.getElementById("nav-mount");
@@ -93,6 +102,7 @@
     const foot = document.getElementById("foot-mount");
     if (foot) foot.innerHTML = FOOT;
     ensureMain();
+    ensureStickyCta();
 
     const cur = document.body.dataset.page;
     const subKeys = { "8":"nav.eight", k:"nav.kitchen", b:"nav.bathroom", about:"nav.about", cap:"nav.cap", contact:"nav.contact", privacy:"nav.privacy" };
