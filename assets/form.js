@@ -95,9 +95,12 @@
         mailtoFallback();
         return;
       }
+      const ajaxUrl = action.indexOf("formsubmit.co/") !== -1 && action.indexOf("/ajax/") === -1
+        ? action.replace("https://formsubmit.co/", "https://formsubmit.co/ajax/")
+        : action;
 
       try {
-        const res = await fetch(action, {
+        const res = await fetch(ajaxUrl, {
           method: "POST",
           body: data,
           headers: { Accept: "application/json" }
@@ -126,7 +129,8 @@
       const body = encodeURIComponent(
         "Name: " + val("name") + "\nEmail: " + val("email") +
         "\nCompany: " + val("company") + "\nCountry: " + val("country") +
-        "\nPhone/WhatsApp: " + val("phone") + "\nInterest: " + val("interest") +
+        "\nPhone/WhatsApp: " + val("phone") + "\nInquiry type: " + val("inquiry_type") +
+        "\nInterest: " + val("interest") +
         "\nVolume: " + val("volume") + "\n\n" + val("message")
       );
       window.location.href = "mailto:" + EMAIL + "?subject=" +

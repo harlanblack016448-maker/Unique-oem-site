@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /privacy.html
 
-Sitemap: /sitemap.xml
+Sitemap: https://unique-oem-site.vercel.app/sitemap.xml

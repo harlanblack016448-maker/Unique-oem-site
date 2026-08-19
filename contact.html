@@ -11,35 +11,37 @@
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Request a Quote — Unique Scales" />
 <meta property="og:description" content="We respond within 1 business day." />
-<meta property="og:image" content="https://unique-oem-site.vercel.app/assets/img/og-share.jpg" />
+<meta property="og:image" content="https://unique-oem-site.vercel.app/assets/img/studio-hero.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="canonical" href="https://unique-oem-site.vercel.app/contact.html" />
-<link rel="stylesheet" href="/assets/style.css?v=3" />
+<link rel="stylesheet" href="/assets/style.css?v=16" />
 </head>
 <body data-page="contact">
 
 <div class="global-nav"><div class="global-nav-inner" id="nav-mount"></div></div>
 
-<section class="tile tile-light page-hero" id="main">
-  <div class="container">
-    <div class="tagline" style="color:var(--primary);margin-bottom:12px" data-i18n="contact.eyebrow">Contact</div>
+<section class="tile tile-light page-hero" id="main" data-design="apple" data-token="product-tile-light">
+  <div class="container-narrow">
+    <div class="tagline" style="color:var(--accent);margin-bottom:12px" data-i18n="contact.eyebrow">Contact</div>
     <h1 data-i18n="contact.title">Request a quote or a sample</h1>
-    <p class="lead" style="color:var(--ink-muted-48);max-width:600px;margin:16px auto 0" data-i18n="contact.sub">Tell us about your market, target volume, and target price. We respond within 1 business day.</p>
+    <p class="lead" style="color:var(--apple-ink-muted);max-width:600px;margin:16px auto 0" data-i18n="contact.sub">Tell us about your market, target volume, and target price. We respond within 1 business day.</p>
   </div>
 </section>
 
-<section class="tile tile-parchment">
+<section class="sec-ibm band-alt" data-design="ibm" data-token="text-input">
   <div class="container">
+    <div class="inquire-layout">
     <div class="form-wrap">
       <form id="lead-form" action="https://formsubmit.co/hanhan@lefu.cc" method="POST">
         <input type="hidden" name="_subject" value="Website inquiry — Unique Scales" />
         <input type="hidden" name="_template" value="table" />
         <input type="hidden" name="_captcha" value="false" />
         <input type="text" name="_honey" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <p class="form-note" data-i18n="contact.req.note">Name, email, inquiry type, product interest, and volume are required. Sales replies within one business day. We do not send marketing mail.</p>
         <div class="form-row">
           <div class="form-field">
-            <label for="f-name" data-i18n="contact.name">Your name</label>
-            <input id="f-name" type="text" name="name" required autocomplete="name" data-i18n-attr="placeholder:contact.name" />
+            <label for="f-name"><span data-i18n="contact.name">Your name</span><span class="req" aria-hidden="true">*</span></label>
+            <input id="f-name" type="text" name="name" required autocomplete="name" />
           </div>
           <div class="form-field">
             <label for="f-company" data-i18n="contact.company">Company</label>
@@ -48,21 +50,33 @@
         </div>
         <div class="form-row">
           <div class="form-field">
-            <label for="f-country" data-i18n="contact.country">Country / Region</label>
-            <input id="f-country" type="text" name="country" autocomplete="country-name" />
+            <label for="type-select"><span data-i18n="contact.type">Inquiry type</span><span class="req" aria-hidden="true">*</span></label>
+            <select name="inquiry_type" id="type-select" required>
+              <option value="" data-i18n="contact.type.opt">Select…</option>
+              <option value="quote" data-i18n="contact.type.quote">Quote</option>
+              <option value="sample" data-i18n="contact.type.sample">Sample</option>
+              <option value="catalog" data-i18n="contact.type.catalog">Catalog</option>
+              <option value="custom" data-i18n="contact.type.custom">Custom project</option>
+            </select>
           </div>
           <div class="form-field">
-            <label for="f-email" data-i18n="contact.email">Email</label>
-            <input id="f-email" type="email" name="email" required autocomplete="email" data-i18n-attr="placeholder:contact.email" />
+            <label for="f-email"><span data-i18n="contact.email">Email</span><span class="req" aria-hidden="true">*</span></label>
+            <input id="f-email" type="email" name="email" required autocomplete="email" />
           </div>
         </div>
         <div class="form-row">
           <div class="form-field">
+            <label for="f-country" data-i18n="contact.country">Country / Region</label>
+            <input id="f-country" type="text" name="country" autocomplete="country-name" />
+          </div>
+          <div class="form-field">
             <label for="f-phone" data-i18n="contact.phone">Phone / WhatsApp (optional)</label>
             <input id="f-phone" type="tel" name="phone" autocomplete="tel" />
           </div>
+        </div>
+        <div class="form-row">
           <div class="form-field">
-            <label for="interest-select" data-i18n="contact.interest">Product interest</label>
+            <label for="interest-select"><span data-i18n="contact.interest">Product interest</span><span class="req" aria-hidden="true">*</span></label>
             <select name="interest" id="interest-select" required>
               <option value="" data-i18n="contact.interest.opt">Select…</option>
               <option value="8-electrode" data-i18n="contact.interest.8">8-Electrode body composition</option>
@@ -72,32 +86,37 @@
               <option value="full" data-i18n="contact.interest.full">Full catalog</option>
             </select>
           </div>
-        </div>
-        <div class="form-field">
-          <label for="volume-select" data-i18n="contact.volume">Estimated annual volume</label>
-          <select name="volume" id="volume-select" required></select>
+          <div class="form-field">
+            <label for="volume-select"><span data-i18n="contact.volume">Estimated annual volume</span><span class="req" aria-hidden="true">*</span></label>
+            <select name="volume" id="volume-select" required></select>
+          </div>
         </div>
         <div class="form-field">
           <label for="f-msg" data-i18n="contact.msg">Project details (target market, must-have features, target price)</label>
-          <textarea id="f-msg" name="message" data-i18n-attr="placeholder:contact.msg"></textarea>
+          <textarea id="f-msg" name="message"></textarea>
         </div>
-        <button type="submit" class="btn-pill" data-i18n="contact.submit">Send inquiry</button>
+        <button type="submit" class="btn-ibm" data-i18n="contact.submit">Send inquiry</button>
+        <p class="form-note" data-i18n="contact.flow">After submit: FormSubmit emails hanhan@lefu.cc. If that fails, your mail app opens with the same fields.</p>
         <p class="form-note"><span data-i18n="contact.note">By submitting you agree to our processing your inquiry for sales purposes. We do not share your data with third parties.</span> <a href="/privacy.html" data-i18n="contact.privacy">Read how we handle inquiry data.</a></p>
         <div class="form-success" role="status" data-i18n="contact.success">Thank you — your inquiry has been sent. Our sales team will reply within 1 business day.</div>
         <div class="form-error" role="alert" data-i18n="contact.error">We couldn't reach the form server. Your email app should open with the inquiry. If it doesn't, write to hanhan@lefu.cc.</div>
       </form>
-      <p class="muted" style="margin-top:22px;font-size:14px">
-        <span data-i18n="contact.direct">Or reach us directly:</span>
-        <a href="mailto:hanhan@lefu.cc" data-i18n="contact.emailto">hanhan@lefu.cc</a>
-      </p>
+    </div>
+    <aside class="inquire-aside">
+      <p class="type-ibm-kicker" data-i18n="home.inquiry.aside.kicker">Response time</p>
+      <h3 data-i18n="home.inquiry.aside.title">1 business day</h3>
+      <p data-i18n="home.inquiry.aside.body">Sales reads every inquiry. Attach a target market, annual volume, and a price band if you have them.</p>
+      <p><span data-i18n="contact.direct">Or reach us directly:</span><br /><a href="mailto:hanhan@lefu.cc" data-i18n="contact.emailto">hanhan@lefu.cc</a></p>
+      <p data-i18n="home.inquiry.aside.moq">First-order volumes from 500 pcs (8-electrode, by negotiation) or 1,000 pcs on kitchen and bathroom lines.</p>
+    </aside>
     </div>
   </div>
 </section>
 
 <footer class="site-footer" id="foot-mount"></footer>
-<script src="/assets/i18n.js?v=5"></script>
-<script src="/assets/partials.js?v=4"></script>
-<script src="/assets/form.js?v=3"></script>
+<script src="/assets/i18n.js?v=15"></script>
+<script src="/assets/partials.js?v=10"></script>
+<script src="/assets/form.js?v=5"></script>
 <noscript>
 <img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=9831228&fmt=gif" />
 </noscript>

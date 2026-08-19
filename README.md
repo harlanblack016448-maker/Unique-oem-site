@@ -2,7 +2,9 @@
 
 Bilingual (English / 中文) static site for **Shenzhen Unique Scales Co., Ltd.** (乐福衡器). For overseas OEM/ODM buyers. No build step, no backend.
 
-**Live:** https://unique-oem-site.vercel.app  
+Visual system is a documented hybrid — **40% Apple** (product photography, whitespace, black nav, pill CTAs) + **40% IBM Carbon** (data, OEM process, certs, inquiry form) + **20% BMW** (factory / lab / material plates). Token map: [`design/TRACE.md`](design/TRACE.md). Specs live next to this folder: `DESIGN-apple.md`, `DESIGN-ibm.md`, `DESIGN-bmw.md`.
+
+**Production URL:** https://unique-oem-site.vercel.app — still the pre-hybrid site as of 2026-08-19. This folder is ahead of live.  
 **Repo:** https://github.com/harlanblack016448-maker/Unique-oem-site
 
 ```bash

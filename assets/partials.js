@@ -2,6 +2,16 @@
 (function(){
   const MARK = `<svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="currentColor"/><rect x="8" y="11" width="16" height="16" rx="3" fill="none" stroke="#000" stroke-width="1.6"/><circle cx="12" cy="15.2" r="1.15" fill="#000"/><circle cx="20" cy="15.2" r="1.15" fill="#000"/><circle cx="12" cy="22.8" r="1.15" fill="#000"/><circle cx="20" cy="22.8" r="1.15" fill="#000"/><rect x="11" y="6" width="10" height="2.2" rx="1.1" fill="#000"/><rect x="14.9" y="8.2" width="2.2" height="2.8" fill="#000"/></svg>`;
 
+  const UTIL = `
+<div class="utility-bar-inner">
+  <span data-i18n="util.place">Longgang, Shenzhen</span>
+  <span class="util-dot" aria-hidden="true"></span>
+  <span data-i18n="util.mode">OEM / ODM</span>
+  <span class="util-dot" aria-hidden="true"></span>
+  <span data-i18n="util.since">Est. 2010</span>
+  <a class="util-mail" href="mailto:hanhan@lefu.cc">hanhan@lefu.cc</a>
+</div>`;
+
   const NAV = `
 <a href="/index.html" class="brand">${MARK}<span>Unique Scales</span></a>
 <button class="menu-btn-global" type="button" aria-label="Menu" aria-expanded="false" aria-controls="global-nav-links">☰</button>
@@ -10,8 +20,6 @@
   <a href="/products/8-electrode.html" data-nav="8" data-i18n="nav.eight">8-Electrode</a>
   <a href="/products/kitchen.html" data-nav="k" data-i18n="nav.kitchen">Kitchen Scales</a>
   <a href="/products/bathroom.html" data-nav="b" data-i18n="nav.bathroom">Bathroom Scales</a>
-  <a href="/about.html" data-nav="about" data-i18n="nav.about">About</a>
-  <a href="/capabilities.html" data-nav="cap" data-i18n="nav.cap">Capabilities</a>
   <a href="/contact.html" data-nav="contact" data-i18n="nav.contact">Contact</a>
   <div class="lang-toggle lang-toggle-global" role="group" aria-label="Language">
     <button type="button" data-lang="en">EN</button>
@@ -35,8 +43,8 @@
   <div class="foot-grid">
     <div>
       <h4>Shenzhen Unique Scales Co., Ltd.</h4>
-      <p style="color:var(--ink-muted-48);font-size:14px;letter-spacing:-0.224px" data-i18n="footer.address">Longgang District, Shenzhen, China</p>
-      <p style="color:var(--ink-muted-48);font-size:14px;margin-top:6px;letter-spacing:-0.224px"><a href="mailto:hanhan@lefu.cc">hanhan@lefu.cc</a></p>
+      <p data-i18n="footer.address">Longgang District, Shenzhen, China</p>
+      <p style="margin-top:6px"><a href="mailto:hanhan@lefu.cc">hanhan@lefu.cc</a></p>
     </div>
     <div>
       <h4 data-i18n="nav.products">Products</h4>
@@ -53,8 +61,8 @@
     <div>
       <h4 data-i18n="footer.legal">Legal</h4>
       <p><a href="/privacy.html" data-i18n="nav.privacy">Privacy</a></p>
-      <p style="color:var(--ink-muted-48);font-size:14px;letter-spacing:-0.224px" data-i18n="footer.app">Unique Health App</p>
-      <p style="color:var(--ink-muted-48);font-size:14px;letter-spacing:-0.224px" data-i18n="footer.app.d">iOS / Android / HarmonyOS</p>
+      <p data-i18n="footer.app">Unique Health App</p>
+      <p data-i18n="footer.app.d">iOS / Android / HarmonyOS</p>
     </div>
   </div>
   <div class="foot-bottom" data-i18n="footer.copy">© 2026 Shenzhen Unique Scales Co., Ltd. All rights reserved.</div>
@@ -75,12 +83,30 @@
     if (first) first.id = "main";
   }
 
+  function ensureUtility(){
+    if (document.querySelector(".utility-bar")) return;
+    const page = document.body && document.body.dataset.page;
+    if (page === "8" || page === "k" || page === "b") return;
+    const nav = document.querySelector(".global-nav");
+    if (!nav) return;
+    const bar = document.createElement("div");
+    bar.className = "utility-bar";
+    bar.setAttribute("data-design", "ibm");
+    bar.setAttribute("data-token", "utility-bar");
+    bar.innerHTML = UTIL;
+    nav.parentNode.insertBefore(bar, nav);
+  }
+
   function ensureSubnav(){
     if (document.querySelector(".sub-nav")) return;
+    const page = document.body && document.body.dataset.page;
+    if (page !== "8" && page !== "k" && page !== "b") return;
     const nav = document.querySelector(".global-nav");
     if (!nav) return;
     const bar = document.createElement("div");
     bar.className = "sub-nav";
+    bar.setAttribute("data-design", "apple");
+    bar.setAttribute("data-token", "sub-nav-frosted");
     bar.innerHTML = SUB;
     nav.insertAdjacentElement("afterend", bar);
   }
@@ -92,10 +118,34 @@
     bar.className = "sticky-cta";
     bar.innerHTML = `<a href="/contact.html" class="btn-pill" data-i18n="nav.cta">Request a Quote</a>`;
     document.body.appendChild(bar);
+    const hero = document.getElementById("main");
+    const inquire = document.getElementById("inquire");
+    if (!hero || !("IntersectionObserver" in window)) {
+      bar.classList.add("is-visible");
+      return;
+    }
+    let heroOut = false;
+    let inquireIn = false;
+    const paint = () => bar.classList.toggle("is-visible", heroOut && !inquireIn);
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.target === hero) heroOut = !e.isIntersecting;
+        if (inquire && e.target === inquire) inquireIn = e.isIntersecting;
+      });
+      paint();
+    }, { threshold: 0.12 });
+    io.observe(hero);
+    if (inquire) io.observe(inquire);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     ensureSkip();
+    ensureUtility();
+    const navBar = document.querySelector(".global-nav");
+    if (navBar) {
+      navBar.setAttribute("data-design", "apple");
+      navBar.setAttribute("data-token", "global-nav");
+    }
     const nav = document.getElementById("nav-mount");
     if (nav) nav.innerHTML = NAV;
     ensureSubnav();
