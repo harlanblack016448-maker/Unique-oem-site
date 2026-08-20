@@ -1,7 +1,7 @@
 # Design TRACE — Unique Scales hybrid
 
 **Rollback:** `git checkout 8b68777 -- oem-landing/ CHANGELOG.md CLAUDE.md` then drop untracked `DESIGN-ibm.md`, `DESIGN-bmw.md`, `oem-landing/design/`.  
-**Publish (2026-08-19):** local working copy only. Production https://unique-oem-site.vercel.app is still pre-hybrid.  
+**Publish (2026-08-20):** sampled production files byte-match this folder. Local git HEAD is still booth `5a29edf`; do not roll this tree back to `8b68777` unless you intend to unpublish the hybrid.  
 **Specs (repo root, not the live site root):**
 
 | Weight | Spec | Path |
@@ -124,5 +124,5 @@ Company numbers follow *Company Profile 20260422.pptx* (same contract as `CLAUDE
 - Inquiry is a two-column IBM plate (form + response-time aside), not a 720px orphan on a gray field.
 - Homepage cert tiles are flex 12.5% so a 17th mark (JATE) does not open an empty eight-column row.
 - **IA (2026-08-19):** Home owns the OEM pitch (product, numbers, process, 3 factory frames, certs, inquire). Primary nav is Home / 8-Electrode / Kitchen / Bathroom / Contact. About = company identity (mission, timeline, 2024 ops, coverage). Capabilities = org + unified line/lab stills + station list + partners. Both depth pages are footer + in-page CTA only.
-- Factory / lab stills on Home and Capabilities are the same cool 16:9 set (`studio-line`, `studio-calibrate`, `studio-chamber`, `studio-drop`). Phone snapshots `prodline_*.jpg` are not shown in those bands.
+- Factory / lab stills on Home and Capabilities are the same cool 16:9 set (`studio-line`, `studio-calibrate`, `studio-chamber`, `studio-drop`). Phone snapshots `prodline_1.jpg`–`prodline_6.jpg` were removed 2026-08-20.
 - Accuracy: homepage **0.97** is the Company Profile / Beijing Sport University vs-DEXA figure. The CF597 / CF661 / CF625 file (`assets/docs/CF597_CF661_CF625_DEXA_Inbody_Correlation_EN.pdf`) is a separate comparison (overall r = 0.987 vs InBody 270 / 570 and hospital DEXA). Do not collapse the two into one unlabeled number.

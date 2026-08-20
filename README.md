@@ -2,9 +2,9 @@
 
 Bilingual (English / 中文) static site for **Shenzhen Unique Scales Co., Ltd.** (乐福衡器). For overseas OEM/ODM buyers. No build step, no backend.
 
-Visual system is a documented hybrid — **40% Apple** (product photography, whitespace, black nav, pill CTAs) + **40% IBM Carbon** (data, OEM process, certs, inquiry form) + **20% BMW** (factory / lab / material plates). Token map: [`design/TRACE.md`](design/TRACE.md). Specs live next to this folder: `DESIGN-apple.md`, `DESIGN-ibm.md`, `DESIGN-bmw.md`.
+Visual system is a documented hybrid — **40% Apple** (product photography, whitespace, black nav, pill CTAs) + **40% IBM Carbon** (data, OEM process, certs, inquiry form) + **20% BMW** (factory / lab plates). One typeface: **IBM Plex Sans** (`--font-primary`). Token map: [`design/TRACE.md`](design/TRACE.md). Specs live next to this folder: `DESIGN-apple.md`, `DESIGN-ibm.md`, `DESIGN-bmw.md`.
 
-**Production URL:** https://unique-oem-site.vercel.app — still the pre-hybrid site as of 2026-08-19. This folder is ahead of live.  
+**Production URL:** https://unique-oem-site.vercel.app — matches this folder on sampled files as of 2026-08-20.  
 **Repo:** https://github.com/harlanblack016448-maker/Unique-oem-site
 
 ```bash
@@ -19,7 +19,7 @@ This folder is the working copy. Vercel serves the GitHub `main` tree (site root
 
 `index.html` · `about.html` · `capabilities.html` · `contact.html` · `privacy.html` · `404.html` · `products/{8-electrode,kitchen,bathroom}.html`
 
-Shared: `assets/style.css`, `assets/i18n.js`, `assets/partials.js`, `assets/form.js`, `assets/img/`.
+Shared: `assets/style.css`, `assets/i18n.js`, `assets/partials.js`, `assets/form.js`, `assets/img/`, `assets/docs/` (DEXA/InBody PDF).
 
 LinkedIn Insight Tag partner `9831228` loads from `partials.js`; each page also has the official noscript pixel.
 
@@ -32,8 +32,8 @@ LinkedIn Insight Tag partner `9831228` loads from `partials.js`; each page also 
 | Sales email | `contact.html`, `assets/form.js`, `assets/partials.js`, `assets/i18n.js` |
 | Language default | `assets/i18n.js` (`localStorage` key `us_lang`) |
 
-Lead form → FormSubmit → `hanhan@lefu.cc`. First live submit needs the confirmation email. Network failure opens `mailto:`.
+Lead form → FormSubmit `/ajax/` → `hanhan@lefu.cc`. If that fails, `mailto:`.
 
-Partners are text-only until you have written logo permission. Company numbers follow *Company Profile 20260422.pptx*.
+Partners are text-only until you have written logo permission. Company numbers follow *Company Profile 20260422.pptx* (DEXA **0.97**). The CF597/CF661/CF625 comparison file is a separate **r = 0.987** vs InBody and hospital DEXA — details on `/products/8-electrode.html#accuracy`. Primary nav is Home + three platforms + Contact; About / Capabilities are footer and in-page CTAs.
 
 © 2026 Shenzhen Unique Scales Co., Ltd. All rights reserved.

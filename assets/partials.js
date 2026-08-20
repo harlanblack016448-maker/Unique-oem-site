@@ -1,7 +1,5 @@
 // partials.js — inject skip link, global nav, sub-nav, and footer
 (function(){
-  const MARK = `<svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="currentColor"/><rect x="8" y="11" width="16" height="16" rx="3" fill="none" stroke="#000" stroke-width="1.6"/><circle cx="12" cy="15.2" r="1.15" fill="#000"/><circle cx="20" cy="15.2" r="1.15" fill="#000"/><circle cx="12" cy="22.8" r="1.15" fill="#000"/><circle cx="20" cy="22.8" r="1.15" fill="#000"/><rect x="11" y="6" width="10" height="2.2" rx="1.1" fill="#000"/><rect x="14.9" y="8.2" width="2.2" height="2.8" fill="#000"/></svg>`;
-
   const UTIL = `
 <div class="utility-bar-inner">
   <span data-i18n="util.place">Longgang, Shenzhen</span>
@@ -13,7 +11,7 @@
 </div>`;
 
   const NAV = `
-<a href="/index.html" class="brand">${MARK}<span>Unique Scales</span></a>
+<a href="/index.html" class="brand">Unique Scales</a>
 <button class="menu-btn-global" type="button" aria-label="Menu" aria-expanded="false" aria-controls="global-nav-links">☰</button>
 <div class="global-nav-links" id="global-nav-links">
   <a href="/index.html" data-nav="home" data-i18n="nav.home">Home</a>

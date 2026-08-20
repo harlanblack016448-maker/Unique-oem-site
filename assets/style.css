@@ -196,7 +196,6 @@ h3{
 .global-nav a:hover{color:#fff;text-decoration:none}
 .global-nav .brand{color:#fff;font-weight:600;font-size:16px;letter-spacing:0.1px;display:flex;align-items:center;gap:8px}
 .global-nav .brand:hover{text-decoration:none}
-.brand-mark{width:18px;height:18px;flex:0 0 18px;display:block}
 .global-nav-links{display:flex;gap:28px;align-items:center}
 .global-nav-links a.active{color:#fff}
 .lang-toggle-global{display:flex;background:rgba(255,255,255,.12);border-radius:var(--apple-pill);overflow:hidden}
