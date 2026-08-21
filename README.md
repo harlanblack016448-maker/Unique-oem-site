@@ -2,9 +2,11 @@
 
 Bilingual (English / 中文) static site for **Shenzhen Unique Scales Co., Ltd.** (乐福衡器). For overseas OEM/ODM buyers. No build step, no backend.
 
-Visual system is a documented hybrid — **40% Apple** (product photography, whitespace, black nav, pill CTAs) + **40% IBM Carbon** (data, OEM process, certs, inquiry form) + **20% BMW** (factory / lab plates). One typeface: **IBM Plex Sans** (`--font-primary`). Token map: [`design/TRACE.md`](design/TRACE.md). Specs live next to this folder: `DESIGN-apple.md`, `DESIGN-ibm.md`, `DESIGN-bmw.md`.
+Visual system is a documented hybrid — **40% Apple** (product photography, whitespace, black nav, pill CTAs) + **40% IBM Carbon** (data, OEM process, certs, inquiry form) + **20% BMW** (factory / lab plates). One typeface: **IBM Plex Sans** (`--font-primary`). Token map: [`design/TRACE.md`](design/TRACE.md). Design specs live in the parent Workbuddy folder (`DESIGN-apple.md`, `DESIGN-ibm.md`, `DESIGN-bmw.md`) — they are not part of the GitHub site tree.
 
-**Production URL:** https://unique-oem-site.vercel.app — matches this folder on sampled files as of 2026-08-20.  
+Nav is **text-only** “Unique Scales” (no graphic logomark). Favicon is a black rounded square + white “U”.
+
+**Production URL:** https://unique-oem-site.vercel.app — sampled HTML/CSS/JS and chrome assets match this folder as of 2026-08-20 (`style.css?v=18`, `partials.js?v=12`).  
 **Repo:** https://github.com/harlanblack016448-maker/Unique-oem-site
 
 ```bash
@@ -34,6 +36,6 @@ LinkedIn Insight Tag partner `9831228` loads from `partials.js`; each page also 
 
 Lead form → FormSubmit `/ajax/` → `hanhan@lefu.cc`. If that fails, `mailto:`.
 
-Partners are text-only until you have written logo permission. Company numbers follow *Company Profile 20260422.pptx* (DEXA **0.97**). The CF597/CF661/CF625 comparison file is a separate **r = 0.987** vs InBody and hospital DEXA — details on `/products/8-electrode.html#accuracy`. Primary nav is Home + three platforms + Contact; About / Capabilities are footer and in-page CTAs.
+Partners are text-only until you have written logo permission. Company numbers follow *Company Profile 20260422.pptx* (DEXA **0.97**). The CF597/CF661/CF625 comparison file is a separate **r = 0.987** vs InBody and hospital DEXA — details on `/products/8-electrode.html#accuracy`. Primary nav is Home + three platforms + Contact; About / Capabilities are footer and in-page CTAs. Do not put `logo-unique-official.png` back in the header.
 
 © 2026 Shenzhen Unique Scales Co., Ltd. All rights reserved.
