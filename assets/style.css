@@ -1,1 +1,79 @@
-PLACEHOLDER_LOAD_FROM_DISK
+/* Unique Scales hybrid
+   TRACE: /design/TRACE.md
+   Apple 40% product · IBM 40% B2B IA · BMW 20% factory photography
+   Token names are source keys from DESIGN-apple / DESIGN-ibm / DESIGN-bmw. */
+
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600&display=swap");
+
+:root{
+  /* apple.colors */
+  --apple-primary:#0066cc;
+  --apple-primary-focus:#0071e3;
+  --apple-primary-on-dark:#2997ff;
+  --apple-ink:#1d1d1f;
+  --apple-ink-80:#333333;
+  --apple-ink-muted:#7a7a7a;
+  --apple-body-muted:#cccccc;
+  --apple-canvas:#ffffff;
+  --apple-parchment:#f5f5f7;
+  --apple-pearl:#fafafc;
+  --apple-tile-1:#272729;
+  --apple-tile-2:#2a2a2c;
+  --apple-tile-3:#252527;
+  --apple-black:#000000;
+  --apple-hairline:#e0e0e0;
+  --apple-divider:#f0f0f0;
+  --apple-pill:9999px;
+  --apple-r-sm:8px;
+  --apple-r-md:11px;
+  --apple-r-lg:18px;
+  --apple-product-shadow:0 3px 5px 0 rgba(0,0,0,.22), 0 5px 30px 0 rgba(0,0,0,.18);
+
+  /* ibm.colors — IBM Blue is NOT used; see TRACE */
+  --ibm-ink:#161616;
+  --ibm-ink-muted:#525252;
+  --ibm-ink-subtle:#8c8c8c;
+  --ibm-canvas:#ffffff;
+  --ibm-surface-1:#f4f4f4;
+  --ibm-surface-2:#e0e0e0;
+  --ibm-hairline:#e0e0e0;
+  --ibm-hairline-strong:#161616;
+  --ibm-inverse:#161616;
+  --ibm-inverse-1:#262626;
+  --ibm-inverse-ink:#ffffff;
+  --ibm-inverse-muted:#c6c6c6;
+  --ibm-error:#da1e28;
+  --ibm-success:#24a148;
+  --ibm-radius:0px;
+  --ibm-space:16px;
+
+  /* bmw.colors — BMW Blue / M stripe are NOT used; navy is factory-only */
+  --bmw-navy:#1a2129;
+  --bmw-navy-elev:#262e38;
+  --bmw-card:#fafafa;
+  --bmw-hairline:#e6e6e6;
+  --bmw-ink:#262626;
+  --bmw-body:#3c3c3c;
+  --bmw-muted:#6b6b6b;
+  --bmw-on-dark:#ffffff;
+  --bmw-on-dark-soft:#bbbbbb;
+
+  /* resolved aliases */
+  --accent:var(--apple-primary);
+  --accent-focus:var(--apple-primary-focus);
+  --accent-on-dark:var(--apple-primary-on-dark);
+  --on-accent:#ffffff;
+  --font-primary:"IBM Plex Sans","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --font-product:var(--font-primary);
+  --font-data:var(--font-primary);
+
+  /* compat aliases for inner pages still using v4 names */
+  --primary:var(--accent);
+  --primary-focus:var(--accent-focus);
+  --primary-on-dark:var(--accent-on-dark);
+  --ink:var(--apple-ink);
+  --ink-muted-48:var(--apple-ink-muted);
+  --ink-muted-80:var(--apple-ink-80);
+  --body-muted:var(--apple-body-muted);
+  --on-primary:var(--on-accent);
+}
