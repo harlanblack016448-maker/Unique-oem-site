@@ -46,7 +46,7 @@ window.__US_EN = {
       "home.proof.ip.note":"Patents held in the 2026 company profile, including 64 invention patents. Not a live register extract.",
       "home.proof.brands.note":"Hardware products delivered over the catalog life (programs / SKUs), not only models on this site.",
       "home.stats.countries.note":"Countries and regions served, Company Profile 22 Apr 2026.",
-      "home.stats.pass.note":"On the 2026 company profile. The measurement window is not broken out there.",
+      "home.stats.pass.note":"On-time delivery rate as stated in the 2026 company profile. The measurement window is not broken out there.",
 
       "home.products.title":"Product lines, engineered for your market",
       "home.products.sub":"Three core platforms — flagship 8-electrode body composition, kitchen & nutrition, and bathroom.",
