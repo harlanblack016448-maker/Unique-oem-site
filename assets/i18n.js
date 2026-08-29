@@ -69,21 +69,18 @@
   }
 
   Promise.all([
-    loadScript("/assets/i18n-en.js?v=18"),
-    loadScript("/assets/i18n-zh.js?v=18")
+    loadScript("/assets/i18n-en.js?v=19"),
+    loadScript("/assets/i18n-zh.js?v=19")
   ]).then(boot).catch(function(){ console.warn("i18n dictionaries missing"); });
 
   document.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-lang]");
     if (btn && btn.dataset.lang) setLang(btn.dataset.lang);
   });
-  const mb = document.querySelector(".menu-btn");
-  const nl = document.querySelector(".nav-links");
-  if (mb && nl) mb.addEventListener("click", ()=> nl.classList.toggle("open"));
   document.addEventListener("DOMContentLoaded", () => {
-    const mb2 = document.querySelector(".menu-btn");
-    const nl2 = document.querySelector(".nav-links");
-    if (mb2 && nl2) mb2.addEventListener("click", ()=> nl2.classList.toggle("open"));
+    const mb = document.querySelector(".menu-btn");
+    const nl = document.querySelector(".nav-links");
+    if (mb && nl) mb.addEventListener("click", ()=> nl.classList.toggle("open"));
     if (window.__us_dict) apply();
   });
 })();
