@@ -208,6 +208,9 @@
     chapterScrollSpy();
     countUpOnView();
     initHotspots();
+    initPanelSwitch("[data-seg-tabs]", "data-seg", "data-seg-panel");
+    initPanelSwitch("[data-swap]", "data-swap-btn", "data-swap-panel");
+    initPanelSwitch("[data-scene-rail]", "data-scene", "data-scene-panel");
     injectLinkedIn();
   });
 
@@ -309,6 +312,21 @@
     }));
     if (current) show(current);
     document.addEventListener("us:i18n", () => { if (current) show(current); });
+  }
+
+
+  function initPanelSwitch(rootSel, btnAttr, panelAttr){
+    document.querySelectorAll(rootSel).forEach((root) => {
+      const btns = root.querySelectorAll("[" + btnAttr + "]");
+      const panels = root.querySelectorAll("[" + panelAttr + "]");
+      if (!btns.length || !panels.length) return;
+      const show = (id) => {
+        btns.forEach((b) => b.setAttribute("aria-selected", b.getAttribute(btnAttr) === id ? "true" : "false"));
+        panels.forEach((p) => { p.hidden = p.getAttribute(panelAttr) !== id; });
+      };
+      btns.forEach((b) => b.addEventListener("click", () => show(b.getAttribute(btnAttr))));
+      show(btns[0].getAttribute(btnAttr));
+    });
   }
 
   function injectLinkedIn(){
