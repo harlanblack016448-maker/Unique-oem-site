@@ -509,7 +509,7 @@ window.__US_EN = {
       "8.var.fp.d":"CF658 adds fingerprint on a 3.36″ TFT body. Photo is the 3.36″ TFT platform (CF636); we do not have a CF658 packshot on this page.",
       "8.sc.kicker":"Programs",
       "8.sc.title":"Gym, clinic, retail, or your brand.",
-      "8.sc.sub":"Factory photography, not stock lifestyle. Four ways buyers spec the same floor.",
+      "8.sc.sub":"Four buyer programs on the same production floor.",
       "8.sc.gym":"Gym",
       "8.sc.clinic":"Clinic",
       "8.sc.retail":"Retail",
