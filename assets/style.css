@@ -813,6 +813,7 @@ html[lang="zh-CN"] .tagline{letter-spacing:0}
 .resource-bar a:hover{text-decoration:underline}
 .resource-bar .sep{color:var(--apple-ink-muted);user-select:none}
 
-.swap-frame,.scene-stage{position:relative}
-.scene-rail-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:32px;align-items:start}
-@media(max-width:820px){.scene-rail-grid{grid-template-columns:1fr}}
+.swap-frame{position:relative}
+.scene-copy{max-width:640px}
+.scene-copy .scene-note{margin-top:0}
+.scene-note[hidden]{display:none}
