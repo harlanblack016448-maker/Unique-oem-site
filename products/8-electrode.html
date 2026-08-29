@@ -14,7 +14,7 @@
 <meta property="og:image" content="https://unique-oem-site.vercel.app/assets/img/product-cf663.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="canonical" href="https://unique-oem-site.vercel.app/products/8-electrode.html" />
-<link rel="stylesheet" href="/assets/style.css?v=19" />
+<link rel="stylesheet" href="/assets/style.css?v=20" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -70,7 +70,18 @@
         <a href="/contact.html" class="btn-pill" style="margin-top:24px" data-i18n="nav.cta">Request a Quote</a>
       </div>
       <div>
-        <img src="/assets/img/eight-electrode-wide.jpg" width="1800" height="1182" alt="Lefu 8-electrode scale, three-quarter view" loading="lazy" />
+        <div class="hotspot-stage">
+          <img src="/assets/img/eight-electrode-wide.jpg" width="1800" height="1182" alt="Lefu 8-electrode scale, three-quarter view" loading="lazy" />
+          <button type="button" class="hotspot-dot" style="left:50%;top:38%" data-spot="deck" aria-expanded="false" aria-controls="hotspot-caption">1</button>
+          <button type="button" class="hotspot-dot" style="left:58%;top:70%" data-spot="screen" aria-expanded="false" aria-controls="hotspot-caption">2</button>
+          <button type="button" class="hotspot-dot" style="left:44%;top:84%" data-spot="handle" aria-expanded="false" aria-controls="hotspot-caption">3</button>
+        </div>
+        <div class="hotspot-caption" id="hotspot-caption"><p class="hint" data-i18n="8.spot.hint">Tap a point on the scale.</p></div>
+        <div hidden>
+          <div data-spot-copy="handle"><p class="k" data-i18n="8.spot.handle.k">Handle</p><p data-i18n="8.spot.handle">Hand electrodes close the 8-electrode circuit so each arm is measured separately.</p></div>
+          <div data-spot-copy="deck"><p class="k" data-i18n="8.spot.deck.k">Platform</p><p data-i18n="8.spot.deck">Foot electrodes in the glass platform. Four-electrode bathroom scales stop here.</p></div>
+          <div data-spot-copy="screen"><p class="k" data-i18n="8.spot.screen.k">Display</p><p data-i18n="8.spot.screen">Weight and composition on the device — 7″ TFT, LED, or VA depending on the model.</p></div>
+        </div>
       </div>
     </div>
   </div>
@@ -155,6 +166,52 @@
   </div>
 </section>
 
+<section class="sec-ibm" id="compare" data-design="ibm" data-token="spec-cell">
+  <div class="container">
+    <p class="type-ibm-kicker" data-i18n="8.compare.kicker">Platforms</p>
+    <h2 data-i18n="8.compare.title">4-electrode vs 8-electrode</h2>
+    <p class="lead" data-i18n="8.compare.sub">Bathroom volume platforms use four foot electrodes. The flagship analyzer adds a handle for segmental readings.</p>
+    <div class="table-scroll">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th data-i18n="8.compare.feature">Feature</th>
+            <th data-i18n="8.compare.4">4-electrode</th>
+            <th data-i18n="8.compare.8">8-electrode</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" data-i18n="8.compare.el">Electrodes</th>
+            <td data-i18n="8.compare.el.4">4 · platform only</td>
+            <td data-i18n="8.compare.el.8">8 · handle + platform</td>
+          </tr>
+          <tr>
+            <th scope="row" data-i18n="8.compare.meas">Measurement</th>
+            <td data-i18n="8.compare.meas.4">Whole-body estimate</td>
+            <td data-i18n="8.compare.meas.8">Segmental · arms, legs, trunk</td>
+          </tr>
+          <tr>
+            <th scope="row" data-i18n="8.compare.use">Typical program</th>
+            <td data-i18n="8.compare.use.4">Home / retail volume</td>
+            <td data-i18n="8.compare.use.8">Gym, clinic, brand flagship</td>
+          </tr>
+          <tr>
+            <th scope="row" data-i18n="8.compare.dexa">DEXA correlation</th>
+            <td data-i18n="8.compare.dexa.4">Not published on this site</td>
+            <td data-i18n="8.compare.dexa.8">0.97 (Beijing Sport University); r = 0.987 vs InBody and hospital DEXA</td>
+          </tr>
+          <tr>
+            <th scope="row" data-i18n="8.compare.moq">First-order volume</th>
+            <td data-i18n="8.compare.moq.4">1,000 minimum</td>
+            <td data-i18n="8.compare.moq.8">500, first order, by negotiation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
 <section class="tile tile-light" id="models">
   <div class="container">
     <h2 data-i18n="8.featured.title">In production now</h2>
@@ -214,7 +271,36 @@
   </div>
 </section>
 
-<section class="tile tile-dark-2" style="padding:64px 0">
+<section class="tile tile-parchment" id="faq">
+  <div class="container">
+    <p class="type-ibm-kicker" data-i18n="8.faq.kicker">Buying</p>
+    <h2 data-i18n="8.faq.title">Questions buyers ask first</h2>
+    <div class="faq-list">
+      <details>
+        <summary data-i18n="8.faq.1.q">What is the minimum order?</summary>
+        <p class="faq-a" data-i18n="8.faq.1.a">Bathroom and kitchen platforms start at 1,000 units. 8-electrode first orders can start at 500, by negotiation.</p>
+      </details>
+      <details>
+        <summary data-i18n="8.faq.2.q">Which certifications can you ship with?</summary>
+        <p class="faq-a" data-i18n="8.faq.2.a">CE, FCC, RoHS, RCM, ISO 9001 / 13485 / 14001 / 45001, SMETA, plus material files (LFGB, DGCCRF, MSDS, 21 CFR 1303). Regional packs are specified on the quote.</p>
+      </details>
+      <details>
+        <summary data-i18n="8.faq.3.q">Can you private-label?</summary>
+        <p class="faq-a" data-i18n="8.faq.3.a">Yes. OEM to your spec, or ODM from these platforms — branding, packaging, color IDs, and a custom Unique Health app if you need it.</p>
+      </details>
+      <details>
+        <summary data-i18n="8.faq.4.q">How soon do you reply?</summary>
+        <p class="faq-a" data-i18n="8.faq.4.a">We respond to inquiries within 1 business day. Production lead time is quoted per model and volume.</p>
+      </details>
+      <details>
+        <summary data-i18n="8.faq.5.q">When do I need 8-electrode vs 4?</summary>
+        <p class="faq-a" data-i18n="8.faq.5.a">Four foot electrodes are enough for a bathroom weight-and-estimate scale. Eight (handle + platform) is for segmental fat and muscle — the flagship body-composition line.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="tile tile-dark-2" id="inquire" style="padding:64px 0">
   <div class="container text-center">
     <h2 style="font-size:34px;margin-bottom:8px" data-i18n="8.cta.title">Specify this platform for your brand</h2>
     <p class="lead" style="color:var(--body-muted);margin-bottom:28px" data-i18n="contact.sub">Tell us about your market, target volume, and target price. We respond within 1 business day.</p>
@@ -223,8 +309,8 @@
 </section>
 
 <footer class="site-footer" id="foot-mount"></footer>
-<script src="/assets/i18n.js?v=15"></script>
-<script src="/assets/partials.js?v=13"></script>
+<script src="/assets/i18n.js?v=16"></script>
+<script src="/assets/partials.js?v=14"></script>
 <noscript>
 <img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=9831228&fmt=gif" />
 </noscript>
