@@ -60,7 +60,7 @@
       <h4 data-i18n="nav.products">Products</h4>
       <p><a href="/products/8-electrode.html" data-i18n="nav.eight">8-Electrode</a></p>
       <p><a href="/products/kitchen.html" data-i18n="nav.kitchen">Kitchen Scales</a></p>
-      <p><a href="/products/bathroom.html" data-nav="b" data-i18n="nav.bathroom">Bathroom Scales</a></p>
+      <p><a href="/products/bathroom.html" data-i18n="nav.bathroom">Bathroom Scales</a></p>
     </div>
     <div>
       <h4 data-i18n="footer.company">Company</h4>
