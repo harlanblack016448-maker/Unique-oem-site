@@ -64,7 +64,8 @@
     const form = document.getElementById("lead-form");
     if (!form) return;
     const success = form.querySelector(".form-success");
-    const EMAIL = "hanhan@lefu.cc";
+    // Email stored as base64 to reduce plain-text scraping while keeping mailto fallback functional.
+    const EMAIL = atob("aGFuaGFuQGxlZnUuY2M=");
 
     const errBox = form.querySelector(".form-error");
     const submitBtn = form.querySelector('button[type="submit"]');
@@ -79,11 +80,11 @@
       e.preventDefault();
       if (success) success.classList.remove("show");
       if (errBox) errBox.classList.remove("show");
-      const honey = form.querySelector('[name="_honey"]');
+      const honey = form.querySelector('[name="company_tax_id"]');
       if (honey && honey.value) return;
       const action = form.getAttribute("action") || "";
       const data = new FormData(form);
-      data.delete("_honey");
+      data.delete("company_tax_id");
       if (submitBtn) {
         submitBtn.disabled = true;
         const lang = getLang();

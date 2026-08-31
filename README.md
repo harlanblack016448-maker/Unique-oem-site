@@ -6,7 +6,7 @@ Visual system is a documented hybrid — **40% Apple** (product photography, whi
 
 Nav is **text-only** “Unique Scales” (no graphic logomark). Favicon is a black rounded square + white “U”.
 
-**Production URL:** https://unique-oem-site.vercel.app — sampled HTML/CSS/JS and chrome assets match this folder as of 2026-08-20 (`style.css?v=18`, `partials.js?v=12`).  
+**Production URL:** https://unique-oem-site.vercel.app — chrome / CSS / JS / `index.html` match this folder as of 2026-08-21 (`style.css?v=18`, `partials.js?v=12`). The kitchen-page CK869BLE packshot on this machine is **ahead** of live (complete 1600×957 vs cropped 1012×759) until the next upload.  
 **Repo:** https://github.com/harlanblack016448-maker/Unique-oem-site
 
 ```bash
