@@ -69,6 +69,99 @@
 
     const errBox = form.querySelector(".form-error");
     const submitBtn = form.querySelector('button[type="submit"]');
+
+    // ---- inline validation (apple-design §16: validate inline, not on submit) ----
+    // novalidate is set from JS only, so a no-JS client still gets native validation.
+    form.noValidate = true;
+
+    const t = (k, fallback) => {
+      const lang = getLang();
+      const dict = window.__us_dict || {};
+      return (dict[lang] && dict[lang][k]) || fallback;
+    };
+
+    const RULES = [
+      { el: document.getElementById("f-name"), msg: "contact.err.required" },
+      { el: document.getElementById("type-select"), msg: "contact.err.required" },
+      { el: document.getElementById("f-email"), msg: "contact.err.required", format: "email" },
+      { el: document.getElementById("interest-select"), msg: "contact.err.required" },
+      { el: document.getElementById("volume-select"), msg: "contact.err.required" }
+    ].filter((r) => r.el);
+
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function validateField(rule){
+      const el = rule.el;
+      const v = (el.value || "").trim();
+      let key = "";
+      if (!v) key = rule.msg;
+      else if (rule.format === "email" && !EMAIL_RE.test(v)) key = "contact.err.email";
+      el.setAttribute("aria-invalid", key ? "true" : "false");
+      const wrap = el.closest(".form-field");
+      let box = wrap && wrap.querySelector(".field-error");
+      if (key) {
+        if (!box) {
+          box = document.createElement("p");
+          box.className = "field-error";
+          box.id = (el.id || el.name) + "-err";
+          box.setAttribute("role", "alert");
+          wrap.appendChild(box);
+        }
+        box.setAttribute("data-err-key", key);
+        box.textContent = t(key, key === "contact.err.email" ? "Enter a valid email address." : "This field is required.");
+        el.setAttribute("aria-describedby", box.id);
+      } else if (box) {
+        box.remove();
+        el.removeAttribute("aria-describedby");
+      }
+      return !key;
+    }
+
+    RULES.forEach((rule) => {
+      const el = rule.el;
+      el.addEventListener("blur", () => {
+        el.dataset.touched = "1";
+        validateField(rule);
+      });
+      el.addEventListener(el.tagName === "SELECT" ? "change" : "input", () => {
+        if (el.dataset.touched) validateField(rule);
+      });
+    });
+
+    // Changing product interest re-renders the volume options — re-validate it too.
+    if (interest) {
+      interest.addEventListener("change", () => {
+        const vol = RULES.find((r) => r.el.id === "volume-select");
+        if (vol && vol.el.dataset.touched) validateField(vol);
+      });
+    }
+
+    function validateAll(){
+      let firstBad = null;
+      RULES.forEach((rule) => {
+        rule.el.dataset.touched = "1";
+        if (!validateField(rule) && !firstBad) firstBad = rule.el;
+      });
+      return firstBad;
+    }
+
+    function clearValidation(){
+      RULES.forEach((rule) => {
+        delete rule.el.dataset.touched;
+        rule.el.setAttribute("aria-invalid", "false");
+        rule.el.removeAttribute("aria-describedby");
+        const wrap = rule.el.closest(".form-field");
+        const box = wrap && wrap.querySelector(".field-error");
+        if (box) box.remove();
+      });
+    }
+
+    // Re-render visible error messages in the new language.
+    document.addEventListener("us:i18n", () => {
+      RULES.forEach((rule) => {
+        if (rule.el.getAttribute("aria-invalid") === "true") validateField(rule);
+      });
+    });
     const sendingKey = "contact.sending";
     const idleLabel = () => {
       const lang = getLang();
@@ -80,11 +173,16 @@
       e.preventDefault();
       if (success) success.classList.remove("show");
       if (errBox) errBox.classList.remove("show");
-      const honey = form.querySelector('[name="company_tax_id"]');
+      const honey = form.querySelector('[name="_honey"]');
       if (honey && honey.value) return;
+      const firstBad = validateAll();
+      if (firstBad) {
+        firstBad.focus();
+        return;
+      }
       const action = form.getAttribute("action") || "";
       const data = new FormData(form);
-      data.delete("company_tax_id");
+      data.delete("_honey");
       if (submitBtn) {
         submitBtn.disabled = true;
         const lang = getLang();
@@ -114,7 +212,13 @@
         if (ok) {
           form.reset();
           renderVolumes();
-          if (success) { success.classList.add("show"); success.scrollIntoView({behavior:"smooth", block:"center"}); }
+          clearValidation();
+          if (success) {
+            success.classList.add("show");
+            success.setAttribute("tabindex", "-1");
+            success.focus({ preventScroll: true });
+            success.scrollIntoView({behavior:"smooth", block:"center"});
+          }
         } else {
           mailtoFallback();
         }
