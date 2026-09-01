@@ -259,7 +259,7 @@
       "k.cta.title":"Build your kitchen or nutrition line",
       "k.models.831":"App-linked nutrition tracking with 3M-item food database.",
       "k.models.809":"Entry and mid-tier kitchen platforms, OEM-ready.",
-      "k.ck863":"2-in-1 smart coffee &amp; nutrition scale with knob food-type switching.",
+      "k.ck863":"2-in-1 smart coffee & nutrition scale with knob food-type switching.",
       "k.ck838":"Transparent weighing area, ring/hook design, IPX5 waterproof.",
       "k.ck858":"Magnetic split design with stainless-steel temperature probe.",
       "k.ck869":"VA color screen showing real-time nutrition content.",
