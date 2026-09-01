@@ -788,7 +788,7 @@ html[lang="zh-CN"] .tagline{letter-spacing:0}
 
 /* ===== seg tabs / scene rail / 4-8 swap (NVIDIA + SpaceX) ===== */
 .seg-tabs{
-  display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--ibm-hairline);margin:20px 0 24px
+  display:flex;justify-content:center;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--ibm-hairline);margin:20px 0 24px
 }
 .seg-tabs button{
   background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
@@ -830,8 +830,7 @@ html[lang="zh-CN"] .tagline{letter-spacing:0}
 .resource-bar .sep{color:var(--apple-ink-muted);user-select:none}
 
 .swap-frame,.scene-stage{position:relative}
-.scene-rail-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:32px;align-items:start}
-@media(max-width:820px){.scene-rail-grid{grid-template-columns:1fr}}
+.scene-rail-grid{display:flex;flex-direction:column;align-items:center}
 
 /* ===== panel switching: incoming panel fades in fast (apple-design §7 — same treatment both directions) ===== */
 .panel-in{animation:panel-in .22s ease-out}
