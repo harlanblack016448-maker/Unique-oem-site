@@ -315,16 +315,71 @@
   }
 
 
+  // Panel switcher (seg tabs / 4-8 swap / scene rail).
+  // - Incoming panel cross-fades in (apple-design §7; reduced-motion users get an instant swap)
+  // - Full tab semantics: role=tab/tabpanel, aria-controls/labelledby, roving tabindex, arrow keys
+  let panelSeq = 0;
   function initPanelSwitch(rootSel, btnAttr, panelAttr){
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     document.querySelectorAll(rootSel).forEach((root) => {
-      const btns = root.querySelectorAll("[" + btnAttr + "]");
-      const panels = root.querySelectorAll("[" + panelAttr + "]");
+      const btns = Array.from(root.querySelectorAll("[" + btnAttr + "]"));
+      const panels = Array.from(root.querySelectorAll("[" + panelAttr + "]"));
       if (!btns.length || !panels.length) return;
+      const rid = "tp" + (panelSeq++);
+      btns.forEach((b) => {
+        const val = b.getAttribute(btnAttr);
+        const tabId = rid + "-tab-" + val;
+        const controlled = [];
+        panels.forEach((p, i) => {
+          if (p.getAttribute(panelAttr) !== val) return;
+          const pid = rid + "-panel-" + val + (i ? "-" + i : "");
+          p.id = pid;
+          p.setAttribute("role", "tabpanel");
+          p.setAttribute("aria-labelledby", tabId);
+          controlled.push(pid);
+        });
+        b.id = tabId;
+        b.setAttribute("role", "tab");
+        if (controlled.length) b.setAttribute("aria-controls", controlled.join(" "));
+      });
       const show = (id) => {
-        btns.forEach((b) => b.setAttribute("aria-selected", b.getAttribute(btnAttr) === id ? "true" : "false"));
-        panels.forEach((p) => { p.hidden = p.getAttribute(panelAttr) !== id; });
+        btns.forEach((b) => {
+          const on = b.getAttribute(btnAttr) === id;
+          b.setAttribute("aria-selected", on ? "true" : "false");
+          b.tabIndex = on ? 0 : -1;
+        });
+        panels.forEach((p) => {
+          if (p.getAttribute(panelAttr) === id) {
+            const wasHidden = p.hidden;
+            p.hidden = false;
+            if (!reduce && wasHidden) {
+              p.classList.remove("panel-in");
+              void p.offsetWidth; // restart the fade when switching back
+              p.classList.add("panel-in");
+            }
+          } else {
+            p.hidden = true;
+          }
+        });
       };
-      btns.forEach((b) => b.addEventListener("click", () => show(b.getAttribute(btnAttr))));
+      const activate = (b, focus) => {
+        show(b.getAttribute(btnAttr));
+        if (focus) b.focus();
+      };
+      btns.forEach((b) => b.addEventListener("click", () => activate(b, false)));
+      root.addEventListener("keydown", (e) => {
+        const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+        if (keys.indexOf(e.key) === -1) return;
+        const i = btns.indexOf(document.activeElement);
+        if (i === -1) return;
+        e.preventDefault();
+        let j = i;
+        if (e.key === "ArrowRight") j = (i + 1) % btns.length;
+        else if (e.key === "ArrowLeft") j = (i - 1 + btns.length) % btns.length;
+        else if (e.key === "Home") j = 0;
+        else if (e.key === "End") j = btns.length - 1;
+        activate(btns[j], true);
+      });
       show(btns[0].getAttribute(btnAttr));
     });
   }

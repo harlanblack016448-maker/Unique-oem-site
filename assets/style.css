@@ -121,29 +121,30 @@ img{max-width:100%;display:block;height:auto}
 }
 
 /* ===== Type: IBM Plex Sans sitewide. Apple feel is whitespace + pills, not SF Pro. ===== */
+/* apple-design §15: tracking/leading are size-specific — display type tightens, body stays near 0.
+   Fluid sizes via clamp() replace stepped breakpoints; zh-CN overrides below zero all tracking. */
 .nowrap{white-space:nowrap}
 .type-hero,h1{
   font-family:var(--font-primary);
-  font-size:42px;font-weight:600;line-height:1.2;letter-spacing:-0.2px;color:inherit
+  font-size:clamp(1.625rem,1.125rem + 2.2vw,2.625rem);font-weight:600;line-height:1.1;letter-spacing:-0.02em;color:inherit
 }
 .hero-title{
   font-family:var(--font-primary);
-  font-size:30px;font-weight:600;line-height:1.22;letter-spacing:-0.2px;color:inherit
+  font-size:clamp(1.375rem,1.15rem + 1vw,1.875rem);font-weight:600;line-height:1.15;letter-spacing:-0.015em;color:inherit
 }
 h2{
   font-family:var(--font-primary);
-  font-size:40px;font-weight:600;line-height:1.1;letter-spacing:0;color:inherit
+  font-size:clamp(1.625rem,1.3rem + 1.5vw,2.5rem);font-weight:600;line-height:1.1;letter-spacing:-0.02em;color:inherit
 }
 h3{
   font-family:var(--font-primary);
-  font-size:21px;font-weight:600;line-height:1.19;letter-spacing:0;color:inherit
+  font-size:21px;font-weight:600;line-height:1.19;letter-spacing:-0.01em;color:inherit
 }
-.lead{font-size:24px;line-height:1.2;letter-spacing:0;font-weight:400}
+.lead{font-size:clamp(1.25rem,1.1rem + 0.6vw,1.5rem);line-height:1.25;letter-spacing:-0.01em;font-weight:400}
 .tagline{font-size:21px;line-height:1.19;letter-spacing:0.1px;font-weight:600}
 .caption{font-size:14px;line-height:1.43;letter-spacing:0}
-@media(max-width:1068px){h1,.type-hero,.hero-title{font-size:34px}}
-@media(max-width:640px){h1,.type-hero,.hero-title{font-size:30px}h2{font-size:28px}.lead{font-size:20px}}
-@media(max-width:419px){h1,.type-hero,.hero-title{font-size:26px}}
+/* stacked hero keeps its larger presence below 1068px (was a stepped 34px) */
+@media(max-width:1068px){.hero-title{font-size:clamp(1.625rem,1.2rem + 2vw,2.125rem)}}
 
 /* ===== IBM zone type (same family; weight/size still Carbon) ===== */
 .sec-ibm,.sec-ibm p,.ibm-card p,.process-d,.cert,.form-wrap,.scan-nav{
@@ -190,7 +191,12 @@ h3{
 @media(max-width:672px){.utility-bar{display:none}}
 
 /* ===== apple.global-nav ===== */
-.global-nav{position:sticky;top:0;z-index:100;background:var(--apple-black);height:56px;display:flex;align-items:center}
+/* apple-design §12: chrome is a translucent material layer — content scrolls under it */
+.global-nav{
+  position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center;
+  background:rgba(0,0,0,.8);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)
+}
 .global-nav-inner{display:flex;align-items:center;justify-content:space-between;height:100%;max-width:1312px;margin:0 auto;padding:0 24px;width:100%}
 .global-nav a{color:rgba(255,255,255,.8);font-size:13px;letter-spacing:0.1px;font-weight:400;transition:color .2s}
 .global-nav a:hover{color:#fff;text-decoration:none}
@@ -203,13 +209,29 @@ h3{
 .lang-toggle-global button.active{background:rgba(255,255,255,.2);color:#fff}
 .menu-btn-global{display:none;background:none;border:0;font-size:20px;color:#fff;cursor:pointer;width:44px;height:44px;place-items:center;flex:0 0 44px;line-height:1}
 @media(max-width:820px){
-  .global-nav-links{display:none;position:absolute;top:56px;left:0;right:0;background:var(--apple-black);flex-direction:column;padding:16px 24px;gap:16px;align-items:flex-start}
-  .global-nav-links.open{display:flex}
+  /* apple-design §7: the menu grows out of the bar that triggered it (anchored origin),
+     and visibility is transitioned so the open/close path is symmetric */
+  .global-nav-links{
+    display:flex;position:absolute;top:56px;left:0;right:0;background:var(--apple-black);
+    flex-direction:column;padding:16px 24px;gap:16px;align-items:flex-start;
+    transform-origin:top center;
+    opacity:0;transform:translateY(-8px);visibility:hidden;pointer-events:none;
+    transition:opacity .18s ease-out,transform .18s ease-out,visibility 0s linear .18s
+  }
+  .global-nav-links.open{
+    opacity:1;transform:none;visibility:visible;pointer-events:auto;
+    transition:opacity .18s ease-out,transform .18s ease-out,visibility 0s linear 0s
+  }
   .menu-btn-global{display:grid}
 }
 
 /* ===== apple.sub-nav-frosted (product pages) ===== */
-.sub-nav{position:sticky;top:56px;z-index:90;background:rgba(245,245,247,.82);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--apple-hairline);padding:10px 0}
+.sub-nav{position:sticky;top:56px;z-index:90;background:rgba(245,245,247,.82);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);padding:10px 0}
+/* apple-design §12: scroll edge effect under floating chrome, not a hard 1px divider */
+.sub-nav:after,.chapter-bar:after{
+  content:"";position:absolute;left:0;right:0;top:100%;height:10px;pointer-events:none;
+  background:linear-gradient(rgba(0,0,0,.05),rgba(0,0,0,0))
+}
 .sub-nav-inner{display:flex;align-items:center;justify-content:space-between;max-width:1312px;margin:0 auto;padding:0 24px;gap:16px}
 .sub-nav .cat{font-size:21px;font-weight:600;letter-spacing:0;color:var(--apple-ink);white-space:nowrap}
 .sub-nav-links{display:flex;gap:22px;align-items:center;overflow-x:auto}
@@ -272,14 +294,19 @@ h3{
   border:0;cursor:pointer;font-family:var(--font-primary);letter-spacing:0
 }
 .btn-pill:hover{text-decoration:none;background:var(--accent-focus)}
-.btn-pill:active{transform:scale(0.95)}
+/* apple-design §1/§10: feedback lives on the press, and it's instant (100ms ease-out) */
+.btn-pill,.btn-pill-secondary,.btn-ibm,.seg-tabs button,.menu-btn-global,.lang-toggle-global button{transition:transform 100ms ease-out}
+.hotspot-dot{transition:transform 100ms ease-out,box-shadow 150ms ease-out}
+.btn-pill:active,.btn-pill-secondary:active{transform:scale(0.95)}
+.btn-ibm:active,.seg-tabs button:active{transform:scale(0.94)}
+.menu-btn-global:active{transform:scale(0.9)}
+.lang-toggle-global button:active{transform:scale(0.92)}
 .btn-pill-secondary{
   display:inline-block;background:transparent;color:var(--accent);
   font-size:17px;padding:11px 22px;border-radius:var(--apple-pill);
   border:1px solid var(--accent);cursor:pointer;font-family:var(--font-product)
 }
 .btn-pill-secondary:hover{text-decoration:none;background:rgba(0,102,204,.06)}
-.btn-pill-secondary:active{transform:scale(0.95)}
 .btn-pill-secondary.btn-on-dark{border-color:var(--apple-body-muted);color:#fff}
 .btn-pill-secondary.btn-on-dark:hover{background:rgba(255,255,255,.08)}
 .bmw-band .btn-pill-secondary{border-color:#fff;color:#fff}
@@ -332,25 +359,17 @@ h3{
   .spec-num{font-size:32px}
 }
 
-/* ===== Apple product matrix cards ===== */
+/* ===== Apple product matrix cards (text-first, no packshots) ===== */
 .matrix{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 .matrix-card{
   background:var(--apple-canvas);border:1px solid var(--apple-hairline);
-  border-radius:var(--apple-r-lg);padding:24px 24px 28px;text-align:center;
+  border-radius:var(--apple-r-lg);padding:28px;text-align:left;
   display:flex;flex-direction:column
 }
-.matrix-card .shot{
-  background:var(--apple-parchment);border-radius:var(--apple-r-sm);margin-bottom:20px;
-  height:260px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:20px
-}
-.matrix-card .shot img{
-  width:100%;height:100%;object-fit:contain;object-position:center;
-  box-shadow:none;border-radius:0;max-height:none
-}
 .matrix-card h3{margin-bottom:8px}
-.matrix-card p{font-size:14px;color:var(--apple-ink-muted);margin-bottom:16px;letter-spacing:0;flex:1}
-.matrix-card .tag{font-size:12px;color:var(--apple-ink-muted);font-weight:600;margin-bottom:6px;letter-spacing:0.1px}
-.matrix-card .btn-pill{margin-top:auto;align-self:center}
+.matrix-card p{font-size:14px;color:var(--apple-ink-muted);margin-bottom:20px;letter-spacing:0;flex:1}
+.matrix-card .tag{font-size:12px;color:var(--accent);font-weight:600;margin-bottom:10px;letter-spacing:0.1px}
+.matrix-card .btn-pill{margin-top:auto;align-self:flex-start}
 a.matrix-card{
   color:inherit;text-decoration:none;
   transition:transform .45s ease, box-shadow .45s ease, border-color .45s ease
@@ -359,6 +378,7 @@ a.matrix-card:hover,a.matrix-card:focus-visible{
   text-decoration:none;transform:translateY(-6px);
   box-shadow:0 12px 32px rgba(0,0,0,.08);border-color:rgba(29,29,31,.16)
 }
+a.matrix-card:active{transform:translateY(-2px);transition-duration:100ms}
 a.matrix-card .matrix-arrow{
   display:inline-block;opacity:0;transform:translateX(-4px);
   transition:opacity .3s ease, transform .3s ease;margin-left:4px
@@ -644,8 +664,7 @@ input:focus,select:focus,textarea:focus{
 .chapter-bar{
   position:sticky;top:56px;z-index:91;
   background:rgba(255,255,255,.86);
-  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
-  border-bottom:1px solid var(--apple-hairline)
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)
 }
 .chapter-bar-inner{
   display:flex;align-items:center;justify-content:space-between;
@@ -686,7 +705,10 @@ input:focus,select:focus,textarea:focus{
   padding:0;cursor:pointer;transform:translate(-50%,-50%);z-index:2;
   box-shadow:0 0 0 8px rgba(0,102,204,.18)
 }
+/* apple-design §10: ~44px hit area without growing the visual dot */
+.hotspot-dot:before{content:"";position:absolute;inset:-8px;border-radius:50%}
 .hotspot-dot:hover,.hotspot-dot:focus-visible{box-shadow:0 0 0 10px rgba(0,102,204,.28);outline:none}
+.hotspot-dot:active{transform:translate(-50%,-50%) scale(0.9)}
 .hotspot-dot[aria-expanded="true"]{background:var(--apple-ink)}
 .hotspot-caption{
   margin-top:16px;min-height:4.5em;padding:16px 0 0;
@@ -739,6 +761,8 @@ input:focus,select:focus,textarea:focus{
 html[lang="zh-CN"] body{letter-spacing:0}
 html[lang="zh-CN"] p{line-height:1.65}
 html[lang="zh-CN"] h1,
+html[lang="zh-CN"] h2,
+html[lang="zh-CN"] h3,
 html[lang="zh-CN"] .type-hero,
 html[lang="zh-CN"] .hero-title,
 html[lang="zh-CN"] .lead,
@@ -748,10 +772,7 @@ html[lang="zh-CN"] .global-nav a,
 html[lang="zh-CN"] .global-nav .brand,
 html[lang="zh-CN"] .tagline{letter-spacing:0}
 
-@media(prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  *{transition:none!important;animation:none!important}
-}
+/* motion/preference media queries live at the END of this file so they win source order */
 
 
 /* ===== scroll reveal (NOW-style whileInView, no Framer) ===== */
@@ -763,11 +784,6 @@ html[lang="zh-CN"] .tagline{letter-spacing:0}
 .reveal-d1{transition-delay:.08s}
 .reveal-d2{transition-delay:.16s}
 .reveal-d3{transition-delay:.24s}
-@media (prefers-reduced-motion: reduce){
-  .reveal,.reveal-d1,.reveal-d2,.reveal-d3{opacity:1;transform:none;transition:none}
-  a.matrix-card,a.matrix-card .matrix-arrow{transition:none}
-  a.matrix-card:hover{transform:none}
-}
 
 
 /* ===== seg tabs / scene rail / 4-8 swap (NVIDIA + SpaceX) ===== */
@@ -816,3 +832,43 @@ html[lang="zh-CN"] .tagline{letter-spacing:0}
 .swap-frame,.scene-stage{position:relative}
 .scene-rail-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:32px;align-items:start}
 @media(max-width:820px){.scene-rail-grid{grid-template-columns:1fr}}
+
+/* ===== panel switching: incoming panel fades in fast (apple-design §7 — same treatment both directions) ===== */
+.panel-in{animation:panel-in .22s ease-out}
+@keyframes panel-in{from{opacity:0}to{opacity:1}}
+.faq-list details[open] .faq-a{animation:panel-in .2s ease-out}
+
+/* ===== inline field validation (apple-design §16 — validate inline, not on submit) ===== */
+.field-error{font-family:var(--font-data);font-size:12px;color:var(--ibm-error);margin-top:6px;letter-spacing:0.1px;line-height:1.4}
+input[aria-invalid="true"],select[aria-invalid="true"],textarea[aria-invalid="true"],
+input[aria-invalid="true"]:focus,select[aria-invalid="true"]:focus,textarea[aria-invalid="true"]:focus{
+  border-color:var(--ibm-error);border-bottom:2px solid var(--ibm-error)
+}
+
+/* ===== preference media queries — last in file so they win source order ===== */
+/* apple-design §14: reduced motion is a gentler equivalent, not a dead page —
+   movement is removed per component; content never depends on animation to appear */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reveal,.reveal-d1,.reveal-d2,.reveal-d3{opacity:1;transform:none;transition:none}
+  a.matrix-card,a.matrix-card .matrix-arrow{transition:none}
+  a.matrix-card:hover,a.matrix-card:active{transform:none}
+  .panel-in,.faq-list details[open] .faq-a{animation:none}
+  .global-nav-links{transition:none}
+  .sticky-cta{transform:none;transition:opacity .15s ease}
+  .btn-pill,.btn-pill-secondary,.btn-ibm,.seg-tabs button,.menu-btn-global,.lang-toggle-global button,.hotspot-dot{transition:none}
+}
+@media(prefers-reduced-transparency:reduce){
+  .global-nav{background:#000;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .sub-nav,.chapter-bar{background:var(--apple-parchment);-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media(max-width:820px) and (prefers-reduced-transparency:reduce){
+  .sticky-cta{background:#000;-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media(prefers-contrast:more){
+  .global-nav{background:#000}
+  .sub-nav,.chapter-bar{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .sub-nav:after,.chapter-bar:after{background:linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,0))}
+  input,select,textarea{border-color:var(--ibm-ink)}
+  .matrix-card,.utility-card,.shot-card{border-color:var(--apple-ink)}
+}
