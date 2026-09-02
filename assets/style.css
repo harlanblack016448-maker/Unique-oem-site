@@ -608,6 +608,23 @@ input:focus,select:focus,textarea:focus{
 @media(max-width:520px){.shot-grid{grid-template-columns:1fr}}
 .shot-card{background:var(--apple-canvas);border:1px solid var(--apple-hairline);border-radius:var(--apple-r-lg);overflow:hidden;text-align:left}
 .shot-card img{width:100%;aspect-ratio:4/5;object-fit:cover;background:var(--apple-parchment)}
+/* 8-electrode: full packshots, do not crop handle/platform */
+body[data-page="8"] .shot-card img{
+  aspect-ratio:3/4;
+  object-fit:contain;
+  object-position:center;
+  background:var(--apple-parchment)
+}
+body[data-page="8"] .hero-img-wrap{overflow:visible;align-items:center}
+body[data-page="8"] .hero-img-wrap img,
+body[data-page="8"] .overlay-stage>img{
+  max-height:none;
+  width:100%;
+  height:auto;
+  object-fit:contain;
+  object-position:center
+}
+body[data-page="8"] .hotspot-stage>img{object-fit:contain;max-height:none}
 .shot-card .pad{padding:16px 18px 20px}
 .shot-card h3{font-size:17px;margin-bottom:4px}
 .shot-card p{font-size:14px;color:var(--apple-ink-muted)}
