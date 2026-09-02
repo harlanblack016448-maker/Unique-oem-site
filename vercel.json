@@ -9,6 +9,9 @@
     { "source": "/bathroom", "destination": "/products/bathroom", "permanent": true },
     { "source": "/bathroom.html", "destination": "/products/bathroom.html", "permanent": true }
   ],
+  "rewrites": [
+    { "source": "/favicon.ico", "destination": "/assets/img/favicon.svg" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
