@@ -128,3 +128,21 @@ Company numbers follow *Company Profile 20260422.pptx* (same contract as `CLAUDE
 - **Chrome (2026-08-20):** `.brand` is the wordmark “Unique Scales” only. No SVG/PNG logomark in the nav. Favicon / apple-touch-icon are a black rounded square + white “U”. Official 4-color pinwheel was rejected; local copy `logo-unique-official.png` removed 2026-08-21 (GitHub may still host it).
 - **CK869BLE (2026-08-21):** kitchen lineup card uses the complete official 3/4 packshot (`kitchen-ck869.jpg`, 1600×957, `?v=3`) — full pan, VA color screen, three keys. The old 1012×759 crop is retired locally; live/GitHub still serve it until those two files are uploaded.
 - Accuracy: homepage **0.97** is the Company Profile / Beijing Sport University vs-DEXA figure. The CF597 / CF661 / CF625 file (`assets/docs/CF597_CF661_CF625_DEXA_Inbody_Correlation_EN.pdf`) is a separate comparison (overall r = 0.987 vs InBody 270 / 570 and hospital DEXA). Do not collapse the two into one unlabeled number.
+
+## Motion discipline (2026-09-01, apple-design from emilkowalski/skills)
+
+Source: `emilkowalski/skills` → `skills/apple-design/SKILL.md` (WWDC *Designing Fluid Interfaces* translated for the web). This section is the site's standing motion contract; keep it in sync with `assets/style.css` tokens.
+
+**Tokens (`:root`):**
+- `--ease-out: cubic-bezier(0.23,1,0.32,1)` — enter / interactive feedback. **Never use built-in `ease`/`ease-out` for UI.** Fast start = feels responsive.
+- `--ease-in-out: cubic-bezier(0.77,0,0.175,1)` — reserved for on-screen moves if ever needed (currently unused).
+- `--t-press: 100ms` · `--t-hover: 250ms` · `--t-enter: 500ms` — UI motion must stay ≤300ms; the 500ms enter is the one marketing exception (scroll reveal).
+
+**Rules:**
+1. Press feedback on `:active` (pointer-down feel), not hover: `scale(0.94–0.95)`, `--t-press`, `--ease-out`.
+2. Animate only `transform` / `opacity` (compositor-friendly). No width/height/margin animation.
+3. Enter/exit along the same path (mobile menu open/close symmetric), anchored origins.
+4. Reduced motion = gentler equivalent, not a dead page: `prefers-reduced-motion` (cross-fade only, `transform:none`), `prefers-reduced-transparency` (drop blur, solid bg), `prefers-contrast` (solid + borders). Content never depends on animation to appear.
+5. `html{scroll-behavior:smooth}` is intentional; disabled under reduced motion.
+6. Springs / damping / velocity handoff / momentum / rubber-banding / drag 1:1 (apple-design §2–§6, §9): **N/A on this site** — static marketing site, no gesture-driven UI. Do not add a motion library for it.
+7. Any new transition must use the tokens above; if a duration outside `--t-*` seems right, add a token with a comment, don't inline a magic number.
