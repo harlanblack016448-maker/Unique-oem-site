@@ -1,1 +1,1 @@
-PLACEHOLDER_JS
+FILE_FROM_/workspace/oem-i18n.js
