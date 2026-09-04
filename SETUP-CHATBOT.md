@@ -25,16 +25,22 @@
 代码推送后 Vercel 会自动部署一次（此时客服会显示"AI 助手准备中"的降级提示，属正常）。
 按下面三步配置完，再点一次 **Redeploy** 即全部生效。
 
-### 第 1 步：创建 KV 数据库（对话持久化）
+### 第 1 步：创建数据库（对话持久化）— 选 Upstash
 
-1. 打开 https://vercel.com → 进入项目 **unique-oem-site**
-2. 顶部标签 **Storage** → **Create Database** → 选 **KV**（Upstash 驱动）
-3. 名称随意（如 `chat-kv`），地区选离客户近的（欧美买家多选 `iad1` 华盛顿或 `fra1` 法兰克福）
-4. 创建后点 **Connect to Project** → 勾选 unique-oem-site → 确认
-5. 连接后 Vercel 自动注入 `KV_REST_API_URL` 和 `KV_REST_API_TOKEN` 两个环境变量
+> 注意：Vercel 的内置「Vercel KV」已下架，Storage 列表现在直接显示各家数据库。
+> **选 Upstash（Serverless DB），不要选「Redis」**——Redis 官方版走 TCP 直连，本系统用的是 Upstash 的 HTTP REST 协议。
 
-> 若你在 Storage 里看到的是"Marketplace"形式，也可选 Upstash 官方集成，效果相同
-> （环境变量名会是 `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`，代码两种都认）。
+1. 打开 https://vercel.com → 进入项目 **unique-oem-site** → 顶部标签 **Storage** → **Create Database**（或 Browse Storage）
+2. 在弹出的列表里选 **Upstash**（Serverless DB）→ **Continue**
+3. 首次会要求登录/授权 Upstash 账号（用 Google 或 GitHub 快捷注册即可，有免费额度：256MB / 每日 50 万次命令，本项目绰绰有余）
+4. 创建数据库：类型选 **Redis**；名称如 `chat-kv`；区域选离客户近的（欧美买家多选 `us-east-1` 美东或 `eu-west-1` 欧洲）
+5. 关联到项目 **unique-oem-site**（确认对 Production 环境生效）→ 保存
+6. Vercel 会自动注入环境变量：`UPSTASH_REDIS_REST_URL` 和 `UPSTASH_REDIS_REST_TOKEN`
+   （Settings → Environment Variables 里能看到；代码同时兼容旧的 `KV_REST_API_URL` / `KV_REST_API_TOKEN`，无需改代码）
+
+> 自检命令（配置完任意时刻可在终端验证存储模式）：
+> `curl -s -X POST https://unique-oem-site.vercel.app/api/chat -H 'Content-Type: application/json' -d '{"message":"hi"}' | grep storage`
+> 返回 `"storage":"kv"` 即持久化成功；`"storage":"memory"` 表示还没接上。
 
 ### 第 2 步：配置大模型接口（环境变量）
 

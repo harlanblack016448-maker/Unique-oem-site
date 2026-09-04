@@ -122,8 +122,8 @@
 
   <div id="dash" style="display:none">
     <div class="banner" id="memBanner">
-      ⚠️ 当前是内存临时存储（Vercel KV 未连接）：数据仅保存在当前函数实例，重启即丢。
-      到 Vercel Dashboard → Storage 创建 KV 并连接本项目后即转为持久存储。见 SETUP-CHATBOT.md。
+      ⚠️ 当前是内存临时存储（数据库未连接）：数据仅保存在当前函数实例，重启即丢。
+      到 Vercel Dashboard → Storage 选 <b>Upstash (Redis)</b> 创建并连接本项目后即转为持久存储。见 SETUP-CHATBOT.md。
     </div>
     <div class="cards" id="cards"></div>
     <div class="intent-box">
