@@ -220,7 +220,7 @@
   function loadChatWidget(){
     if (document.querySelector('script[data-us-chat]')) return;
     const s = document.createElement("script");
-    s.src = "/assets/chat-widget.js?v=1";
+    s.src = "/assets/chat-widget.js?v=2";
     s.defer = true;
     s.setAttribute("data-us-chat", "1");
     document.body.appendChild(s);

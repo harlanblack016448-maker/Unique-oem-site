@@ -73,12 +73,18 @@
 
   var SID = sessionId();
 
-  function ensureCss() {
-    if (document.querySelector('link[href="' + CSS_URL + '"]')) return;
+  function ensureCss(onReady) {
+    var existing = document.querySelector('link[href="' + CSS_URL + '"]');
+    if (existing) { onReady(); return; }
     var link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = CSS_URL;
+    var done = false;
+    var once = function () { if (!done) { done = true; onReady(); } };
+    link.onload = once;
+    link.onerror = once; // if CSS fails, show unstyled rather than invisible forever
     document.head.appendChild(link);
+    setTimeout(once, 1200); // safety net
   }
 
   function el(tag, cls, text) {
@@ -89,7 +95,22 @@
   }
 
   function build() {
-    ensureCss();
+    // Anti-FOUC: keep the widget invisible until its stylesheet is ready,
+    // then reveal with a soft fade. Never leave it hidden for long.
+    var booted = false;
+    function reveal() {
+      if (booted || !fab || !panel) return;
+      booted = true;
+      fab.style.visibility = "";
+      panel.style.visibility = "";
+      fab.style.opacity = "0";
+      if (window.requestAnimationFrame) {
+        requestAnimationFrame(function () { fab.style.opacity = ""; });
+      } else {
+        fab.style.opacity = "";
+      }
+    }
+    ensureCss(reveal);
     var t = function () { return T[lang()]; };
 
     var fab = el("button", "uschat-fab");
@@ -100,10 +121,12 @@
       '<path d="M12 3C6.9 3 3 6.6 3 11c0 2.2 1 4.2 2.7 5.6-.1 1-.5 2.4-1.6 3.4 1.8 0 3.4-.8 4.4-1.5 1.1.3 2.3.5 3.5.5 5.1 0 9-3.6 9-8S17.1 3 12 3z"/></svg>' +
       '<svg class="uschat-fab-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">' +
       '<path d="M6 6l12 12M18 6L6 18"/></svg>';
+    fab.style.visibility = "hidden"; // anti-FOUC: revealed by reveal()
 
     var panel = el("div", "uschat-panel");
     panel.setAttribute("role", "dialog");
     panel.setAttribute("aria-label", t().title);
+    panel.style.visibility = "hidden"; // anti-FOUC: revealed by reveal()
 
     var head = el("div", "uschat-head");
     var mark = el("div", "uschat-head-mark", "U");
