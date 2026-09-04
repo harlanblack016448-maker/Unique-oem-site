@@ -47,8 +47,8 @@ const KB = [
   {
     id: "certifications",
     intents: ["product", "order"],
-    keywords: ["certificate", "certification", "ce", "fcc", "rohs", "rcm", "iso", "smeta", "lfgb", "compliance", "认证", "证书"],
-    a: "We ship with CE, FCC, RoHS, RCM, ISO 9001 / 13485 / 14001 / 45001, SMETA, plus material files such as LFGB, DGCCRF, MSDS and 21 CFR 1303. Regional certification packs are specified on the quote. (We do not claim UL.)",
+    keywords: ["certificate", "certification", "certifications", "ce", "fcc", "rohs", "rcm", "iso", "iso9001", "smeta", "lfgb", "compliance", "认证", "证书"],
+    a: "Mainstream certifications such as CE, RoHS, FCC and ISO 9001 are fully in place, and for some markets we can assist with certification applications. The broader list includes RCM, ISO 13485 / 14001 / 45001, SMETA, plus material files (LFGB, DGCCRF, MSDS, 21 CFR 1303); regional certification packs are specified on the quote. (We do not claim UL.)",
   },
   {
     id: "moq",
@@ -71,8 +71,8 @@ const KB = [
   {
     id: "lead-time",
     intents: ["order"],
-    keywords: ["lead time", "how long", "delivery", "production time", "交期", "货期", "多久"],
-    a: "Production lead time is quoted per model and volume — I don't want to guess a number. Inquiries are answered within 1 business day; share your model and target volume and sales will give you the exact schedule.",
+    keywords: ["lead time", "leadtime", "how long", "delivery", "production time", "交期", "货期", "多久", "生产周期"],
+    a: "First orders generally take 45-50 days; repeat orders 30-35 days. The exact schedule is confirmed per model and volume on the order.",
   },
   {
     id: "response",

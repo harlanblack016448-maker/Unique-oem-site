@@ -35,13 +35,25 @@ function tokenize(text) {
 // keep the best ones (plus a guaranteed base set). The full text of the
 // selected entries becomes the model's only source of facts.
 function retrieveKB(message) {
-  const tokens = tokenize(message);
+  // Normalized full-text match. Handles multi-word keywords like "lead time"
+  // that token-by-token matching would miss (e.g. the "Lead time" quick chip).
+  const norm =
+    " " +
+    String(message || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\u4e00-\u9fff]+/g, " ")
+      .trim() +
+    " ";
+  const hit = (k) => {
+    if (/[\u4e00-\u9fff]/.test(k)) return norm.includes(k); // CJK: substring
+    if (k.length <= 4) return norm.includes(" " + k + " "); // short ASCII: whole word only
+    return norm.includes(k); // long ASCII: substring
+  };
   const scored = KB.map((entry) => {
     let score = 0;
     for (const kw of entry.keywords) {
-      const k = kw.toLowerCase();
-      if (tokens.some((t) => t === k || (k.length > 3 && t.includes(k)))) {
-        score += k.length > 4 ? 2 : 1;
+      if (hit(kw.toLowerCase())) {
+        score += kw.length > 4 ? 2 : 1;
       }
     }
     return { entry, score };
