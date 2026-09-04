@@ -212,7 +212,19 @@
     initPanelSwitch("[data-swap]", "data-swap-btn", "data-swap-panel");
     initPanelSwitch("[data-scene-rail]", "data-scene", "data-scene-panel");
     injectLinkedIn();
+    loadChatWidget();
   });
+
+  // AI chat assistant — one deferred script tag covers every page.
+  // Bump ?v= here when chat-widget.js changes.
+  function loadChatWidget(){
+    if (document.querySelector('script[data-us-chat]')) return;
+    const s = document.createElement("script");
+    s.src = "/assets/chat-widget.js?v=1";
+    s.defer = true;
+    s.setAttribute("data-us-chat", "1");
+    document.body.appendChild(s);
+  }
 
 
   function revealOnView(){

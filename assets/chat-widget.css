@@ -1,0 +1,171 @@
+/* chat-widget.css — Unique Scales assistant widget (floating, bottom-right).
+   Self-contained; black/white brand palette; IBM Plex Sans first in stack. */
+.uschat-root {
+  --uschat-font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: fixed;
+  z-index: 9999;
+  font-family: var(--uschat-font);
+  font-size: 15px;
+  line-height: 1.45;
+  color: #111;
+}
+
+/* floating action button */
+.uschat-fab {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  z-index: 10000;
+}
+.uschat-fab:hover { transform: scale(1.06); }
+.uschat-fab svg { width: 26px; height: 26px; }
+.uschat-fab .uschat-fab-close { display: none; }
+.uschat-open .uschat-fab .uschat-fab-chat { display: none; }
+.uschat-open .uschat-fab .uschat-fab-close { display: block; }
+
+/* panel */
+.uschat-panel {
+  position: fixed;
+  right: 18px;
+  bottom: 86px;
+  width: 360px;
+  max-width: calc(100vw - 24px);
+  height: 540px;
+  max-height: calc(100vh - 120px);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 10000;
+}
+.uschat-open .uschat-panel {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.uschat-head {
+  background: #000;
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+.uschat-head-mark {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: #fff; color: #000;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 15px; flex: none;
+}
+.uschat-head-title { font-weight: 600; font-size: 15px; }
+.uschat-head-sub { font-size: 12px; opacity: 0.7; }
+.uschat-head-close {
+  margin-left: auto;
+  background: none; border: none; color: #fff;
+  font-size: 20px; line-height: 1; cursor: pointer; padding: 4px;
+  opacity: 0.8;
+}
+.uschat-head-close:hover { opacity: 1; }
+
+.uschat-msgs {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f6f6f4;
+}
+.uschat-row { display: flex; flex-direction: column; max-width: 88%; }
+.uschat-row.user { align-self: flex-end; align-items: flex-end; }
+.uschat-row.bot { align-self: flex-start; align-items: flex-start; }
+.uschat-bubble {
+  padding: 10px 13px;
+  border-radius: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.uschat-row.user .uschat-bubble { background: #000; color: #fff; border-bottom-right-radius: 4px; }
+.uschat-row.bot .uschat-bubble { background: #fff; border: 1px solid #e4e4e0; border-bottom-left-radius: 4px; }
+.uschat-row.bot a { color: #000; text-decoration: underline; }
+
+/* feedback (thumbs) */
+.uschat-fb { display: flex; gap: 6px; margin-top: 5px; }
+.uschat-fb button {
+  border: 1px solid #d8d8d4; background: #fff; border-radius: 999px;
+  font-size: 12px; padding: 2px 9px; cursor: pointer; color: #444;
+}
+.uschat-fb button:hover { border-color: #000; color: #000; }
+.uschat-fb button.uschat-fb-on { background: #000; color: #fff; border-color: #000; }
+.uschat-fb-note { font-size: 11px; color: #888; margin-top: 3px; }
+
+/* CTA buttons under escalated replies */
+.uschat-ctas { display: flex; gap: 8px; margin-top: 7px; flex-wrap: wrap; }
+.uschat-ctas a {
+  font-size: 12.5px; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid #000; text-decoration: none; color: #000; background: #fff;
+}
+.uschat-ctas a.uschat-cta-solid { background: #000; color: #fff; }
+
+/* typing */
+.uschat-typing { display: inline-flex; gap: 4px; padding: 12px 14px; background: #fff; border: 1px solid #e4e4e0; border-radius: 14px; border-bottom-left-radius: 4px; }
+.uschat-typing i { width: 6px; height: 6px; border-radius: 50%; background: #999; animation: uschat-blink 1.2s infinite; }
+.uschat-typing i:nth-child(2) { animation-delay: 0.2s; }
+.uschat-typing i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes uschat-blink { 0%, 70%, 100% { opacity: 0.25; } 35% { opacity: 1; } }
+
+/* quick chips */
+.uschat-chips {
+  display: flex; gap: 6px; padding: 8px 12px 2px; flex-wrap: wrap;
+  background: #fff; border-top: 1px solid #eee; flex: none;
+}
+.uschat-chips button {
+  border: 1px solid #d8d8d4; background: #fff; color: #222;
+  border-radius: 999px; font-size: 12.5px; padding: 4px 11px; cursor: pointer;
+  font-family: inherit;
+}
+.uschat-chips button:hover { border-color: #000; color: #000; }
+
+/* input bar */
+.uschat-inputbar {
+  display: flex; gap: 8px; padding: 10px 12px 12px; background: #fff; flex: none;
+}
+.uschat-inputbar input {
+  flex: 1; border: 1px solid #d8d8d4; border-radius: 10px;
+  padding: 9px 12px; font-size: 14px; font-family: inherit; outline: none;
+}
+.uschat-inputbar input:focus { border-color: #000; }
+.uschat-inputbar button {
+  border: none; background: #000; color: #fff; border-radius: 10px;
+  padding: 0 14px; cursor: pointer; font-family: inherit; font-size: 14px;
+}
+.uschat-inputbar button:disabled { opacity: 0.4; cursor: default; }
+
+@media (max-width: 640px) {
+  .uschat-panel { right: 8px; left: 8px; width: auto; bottom: 96px; height: 62vh; }
+  .uschat-fab { right: 14px; bottom: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .uschat-panel, .uschat-fab { transition: none; }
+  .uschat-typing i { animation: none; opacity: 0.6; }
+}

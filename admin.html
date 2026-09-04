@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Chat Admin — Unique Scales</title>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #f4f4f2; color: #111;
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.5;
+  }
+  header {
+    background: #000; color: #fff; padding: 18px 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  header .mark {
+    width: 30px; height: 30px; border-radius: 8px; background: #fff; color: #000;
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
+  }
+  header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  header .sub { font-size: 12px; opacity: .65; }
+  header .spacer { flex: 1; }
+  header button {
+    background: #fff; color: #000; border: none; border-radius: 999px;
+    padding: 7px 16px; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 64px; }
+  .gate {
+    max-width: 420px; margin: 12vh auto 0; background: #fff; border-radius: 16px;
+    padding: 32px; box-shadow: 0 8px 32px rgba(0,0,0,.08); text-align: center;
+  }
+  .gate h2 { margin: 0 0 6px; font-size: 20px; }
+  .gate p { color: #666; font-size: 13.5px; margin: 0 0 18px; }
+  .gate input {
+    width: 100%; padding: 11px 13px; border: 1px solid #ccc; border-radius: 10px;
+    font-size: 14px; outline: none; margin-bottom: 12px;
+  }
+  .gate input:focus { border-color: #000; }
+  .gate button { width: 100%; padding: 11px; border: none; border-radius: 10px; background: #000; color: #fff; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .gate .err { color: #b00020; font-size: 13px; min-height: 18px; margin-top: 10px; }
+
+  .banner {
+    display: none; background: #fff7e0; border: 1px solid #e8d48a; color: #6b5200;
+    border-radius: 10px; padding: 10px 14px; font-size: 13.5px; margin-bottom: 16px;
+  }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+  .card .n { font-size: 26px; font-weight: 700; letter-spacing: -.5px; }
+  .card .l { font-size: 12px; color: #777; margin-top: 2px; }
+  .card.warn .n { color: #b00020; }
+
+  .intent-box { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 2px 10px rgba(0,0,0,.05); margin-bottom: 20px; }
+  .intent-box h3 { margin: 0 0 10px; font-size: 13px; color: #555; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+  .ibar { display: flex; align-items: center; gap: 10px; margin: 7px 0; font-size: 13px; }
+  .ibar .k { width: 90px; color: #444; }
+  .ibar .track { flex: 1; height: 8px; border-radius: 4px; background: #eee; overflow: hidden; }
+  .ibar .fill { height: 100%; border-radius: 4px; background: #000; width: 0; transition: width .4s ease; }
+  .ibar .v { width: 40px; text-align: right; color: #777; }
+
+  .filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .filters button {
+    border: 1px solid #ccc; background: #fff; border-radius: 999px; padding: 5px 14px;
+    font-size: 13px; cursor: pointer; font-family: inherit; color: #333;
+  }
+  .filters button.on { background: #000; color: #fff; border-color: #000; }
+
+  .conv {
+    background: #fff; border-radius: 12px; margin-bottom: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.05); overflow: hidden;
+  }
+  .conv-head {
+    display: flex; gap: 10px; align-items: center; padding: 12px 16px; cursor: pointer;
+    font-size: 13.5px; flex-wrap: wrap;
+  }
+  .conv-head:hover { background: #fafafa; }
+  .conv-head .who { font-weight: 600; }
+  .conv-head .meta { color: #888; font-size: 12px; }
+  .conv-head .right { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid #ddd; color: #555; }
+  .badge.esc { background: #b00020; color: #fff; border-color: #b00020; }
+  .badge.up { background: #e6f4ea; color: #137333; border-color: #b7e1c4; }
+  .badge.down { background: #fde8e8; color: #b00020; border-color: #f5c2c2; }
+  .badge.i { background: #f0f0ee; }
+  .conv-body { display: none; border-top: 1px solid #eee; padding: 14px 16px; background: #fafaf8; }
+  .conv.open .conv-body { display: block; }
+  .msg { margin-bottom: 10px; max-width: 92%; }
+  .msg .who2 { font-size: 11px; color: #999; margin-bottom: 2px; }
+  .msg .b { padding: 8px 12px; border-radius: 10px; white-space: pre-wrap; word-break: break-word; font-size: 13.5px; }
+  .msg.user .b { background: #000; color: #fff; margin-left: auto; }
+  .msg.user { display: flex; flex-direction: column; align-items: flex-end; }
+  .msg.ai .b { background: #fff; border: 1px solid #e4e4e0; }
+  .empty { text-align: center; color: #888; padding: 48px 0; font-size: 14px; }
+  .foot-note { text-align: center; color: #aaa; font-size: 12px; margin-top: 32px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="mark">U</div>
+  <div>
+    <h1>Chat Admin · Unique Scales</h1>
+    <div class="sub">对话记录与满意度统计</div>
+  </div>
+  <div class="spacer"></div>
+  <button id="logout" style="display:none">退出</button>
+  <button id="refresh" style="display:none">刷新</button>
+</header>
+
+<main>
+  <div class="gate" id="gate">
+    <h2>管理后台</h2>
+    <p>输入管理令牌（Vercel 环境变量 <code>ADMIN_TOKEN</code>）查看数据。</p>
+    <input id="token" type="password" placeholder="Admin token" autocomplete="current-password" />
+    <button id="enter">进入</button>
+    <div class="err" id="gateErr"></div>
+  </div>
+
+  <div id="dash" style="display:none">
+    <div class="banner" id="memBanner">
+      ⚠️ 当前是内存临时存储（Vercel KV 未连接）：数据仅保存在当前函数实例，重启即丢。
+      到 Vercel Dashboard → Storage 创建 KV 并连接本项目后即转为持久存储。见 SETUP-CHATBOT.md。
+    </div>
+    <div class="cards" id="cards"></div>
+    <div class="intent-box">
+      <h3>意图分布（按 AI 回复标注累计）</h3>
+      <div id="intents"></div>
+    </div>
+    <div class="filters" id="filters">
+      <button data-f="all" class="on">全部</button>
+      <button data-f="esc">待人工跟进</button>
+      <button data-f="up">好评</button>
+      <button data-f="down">差评</button>
+    </div>
+    <div id="list"></div>
+    <div class="foot-note">Unique Scales · chat admin · 数据来自 /api/admin</div>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var TOKEN_KEY = "us_admin_token";
+  var DATA = null;
+  var FILTER = "all";
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function esc(s) { return String(s == null ? "" : s); }
+
+  function timeStr(iso) {
+    if (!iso) return "-";
+    var d = new Date(iso);
+    if (isNaN(d)) return "-";
+    return d.toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+  }
+
+  function currentToken() {
+    var typed = $("token").value.trim();
+    if (typed && typed !== "(已保存)") return typed;
+    return sessionStorage.getItem(TOKEN_KEY) || "";
+  }
+
+  function load() {
+    var gateErr = $("gateErr");
+    gateErr.textContent = "";
+    return fetch("/api/admin", { headers: { "x-admin-token": currentToken() } })
+      .then(function (res) {
+        return res.json().then(function (j) { return { status: res.status, body: j }; });
+      })
+      .then(function (r) {
+        if (r.status === 401) {
+          gateErr.textContent = "令牌不正确。";
+          sessionStorage.removeItem(TOKEN_KEY);
+          $("token").value = "";
+          return;
+        }
+        if (r.status === 503) { gateErr.textContent = "后台未配置：请在 Vercel 环境变量里设置 ADMIN_TOKEN 并重新部署（见 SETUP-CHATBOT.md）。"; return; }
+        if (!r.body || !r.body.ok) { gateErr.textContent = "加载失败：" + (r.body && r.body.error || r.status); return; }
+        var typed = $("token").value.trim();
+        if (typed && typed !== "(已保存)") sessionStorage.setItem(TOKEN_KEY, typed);
+        DATA = r.body;
+        $("gate").style.display = "none";
+        $("dash").style.display = "block";
+        $("refresh").style.display = "";
+        $("logout").style.display = "";
+        render();
+      })
+      .catch(function (e) { gateErr.textContent = "网络错误：" + e; });
+  }
+
+  function card(n, l, warn) {
+    return '<div class="card' + (warn ? " warn" : "") + '"><div class="n">' + esc(n) + '</div><div class="l">' + esc(l) + "</div></div>";
+  }
+
+  function render() {
+    if (!DATA) return;
+    $("memBanner").style.display = DATA.storage === "memory" ? "block" : "none";
+    var s = DATA.stats;
+    $("cards").innerHTML =
+      card(s.sessions, "会话总数") +
+      card(s.messages, "消息总数") +
+      card(s.last7days.sessions, "近 7 天会话") +
+      card(s.escalated, "转人工", s.escalated > 0) +
+      card(s.satisfaction == null ? "—" : s.satisfaction + "%",
+        "满意度（好评 " + s.ratingsUp + " / 差评 " + s.ratingsDown + "）");
+
+    var intents = s.intents || {};
+    var total = 0;
+    Object.keys(intents).forEach(function (k) { total += intents[k]; });
+    var names = { product: "产品询问", order: "订单流程", technical: "技术支持", other: "其他" };
+    var html = "";
+    Object.keys(names).forEach(function (k) {
+      var v = intents[k] || 0;
+      var pct = total ? Math.round((v / total) * 100) : 0;
+      html += '<div class="ibar"><div class="k">' + names[k] + '</div>' +
+        '<div class="track"><div class="fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="v">' + v + "</div></div>";
+    });
+    $("intents").innerHTML = html;
+    renderList();
+  }
+
+  function matchFilter(c) {
+    if (FILTER === "esc") return c.escalated;
+    if (FILTER === "up") return c.rating === "up";
+    if (FILTER === "down") return c.rating === "down";
+    return true;
+  }
+
+  function ratingBadge(c) {
+    if (c.rating === "up") return '<span class="badge up">👍</span>';
+    if (c.rating === "down") return '<span class="badge down">👎</span>';
+    return "";
+  }
+
+  function renderList() {
+    var list = (DATA && DATA.conversations || []).filter(matchFilter);
+    var box = $("list");
+    if (!list.length) { box.innerHTML = '<div class="empty">暂无符合条件的会话。</div>'; return; }
+    var intentNames = { product: "产品", order: "订单", technical: "技术", other: "其他" };
+    box.innerHTML = "";
+    list.forEach(function (c) {
+      var conv = document.createElement("div");
+      conv.className = "conv";
+      var head = document.createElement("div");
+      head.className = "conv-head";
+      head.innerHTML =
+        '<span class="who">' + esc((c.messages && c.messages[0] && c.messages[0].content || "(无消息)").slice(0, 42)) + "</span>" +
+        '<span class="meta">' + esc(timeStr(c.lastActive)) + " · " + esc(c.page || "-") + " · " + esc((c.lang || "en") === "zh" ? "中文" : "EN") + " · " + c.messageCount + " 条</span>" +
+        '<span class="right">' +
+        '<span class="badge i">' + (intentNames[c.topIntent] || "其他") + "</span>" +
+        (c.escalated ? '<span class="badge esc">转人工</span>' : "") +
+        ratingBadge(c) +
+        "</span>";
+      var body = document.createElement("div");
+      body.className = "conv-body";
+      (c.messages || []).forEach(function (m) {
+        var msg = document.createElement("div");
+        msg.className = "msg " + (m.role === "user" ? "user" : "ai");
+        var who = document.createElement("div");
+        who.className = "who2";
+        who.textContent = (m.role === "user" ? "访客" : "AI") +
+          (m.intent ? " · " + (intentNames[m.intent] || m.intent) : "") +
+          " · " + timeStr(m.ts);
+        var b = document.createElement("div");
+        b.className = "b";
+        b.textContent = m.content; // textContent — 防 XSS
+        msg.appendChild(who);
+        msg.appendChild(b);
+        body.appendChild(msg);
+      });
+      head.addEventListener("click", function () { conv.classList.toggle("open"); });
+      conv.appendChild(head);
+      conv.appendChild(body);
+      box.appendChild(conv);
+    });
+  }
+
+  $("enter").addEventListener("click", function () {
+    var v = $("token").value.trim();
+    if (!v) { $("gateErr").textContent = "请输入管理令牌。"; return; }
+    sessionStorage.setItem(TOKEN_KEY, v);
+    load();
+  });
+  $("token").addEventListener("keydown", function (e) { if (e.key === "Enter") $("enter").click(); });
+  $("refresh").addEventListener("click", function () {
+    $("refresh").textContent = "刷新中…";
+    load().then(function () { $("refresh").textContent = "刷新"; });
+  });
+  $("logout").addEventListener("click", function () {
+    sessionStorage.removeItem(TOKEN_KEY);
+    location.reload();
+  });
+  $("filters").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    FILTER = b.getAttribute("data-f");
+    document.querySelectorAll("#filters button").forEach(function (x) { x.classList.toggle("on", x === b); });
+    renderList();
+  });
+
+  // 自动登录：本标签页已验证过则直接拉数据
+  if (sessionStorage.getItem(TOKEN_KEY)) {
+    $("token").value = "(已保存)";
+    load();
+  }
+})();
+</script>
+</body>
+</html>

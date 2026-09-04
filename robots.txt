@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /privacy.html
+Disallow: /admin.html
+Disallow: /api/
 
 Sitemap: https://unique-oem-site.vercel.app/sitemap.xml
