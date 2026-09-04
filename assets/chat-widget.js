@@ -6,7 +6,7 @@
   if (window.__usChatLoaded) return;
   window.__usChatLoaded = true;
 
-  var CSS_URL = "/assets/chat-widget.css?v=1";
+  var CSS_URL = "/assets/chat-widget.css?v=2";
   var SID_KEY = "us_chat_sid_v1";
 
   var T = {
@@ -74,8 +74,22 @@
   var SID = sessionId();
 
   function ensureCss(onReady) {
-    var existing = document.querySelector('link[href="' + CSS_URL + '"]');
-    if (existing) { onReady(); return; }
+    // partials.js pre-creates the stylesheet link (parallel prefetch) and
+    // flips data-us-chat-css to "done" on load/error. Support both paths.
+    var existing = document.querySelector('link[data-us-chat-css]');
+    if (existing) {
+      if (existing.getAttribute("data-us-chat-css") === "done") { onReady(); return; }
+      var once2 = function () {
+        if (existing.getAttribute("data-us-chat-css") !== "done") {
+          existing.setAttribute("data-us-chat-css", "done");
+          onReady();
+        }
+      };
+      existing.addEventListener("load", once2);
+      existing.addEventListener("error", once2);
+      setTimeout(once2, 1200); // safety net
+      return;
+    }
     var link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = CSS_URL;
@@ -103,12 +117,9 @@
       booted = true;
       fab.style.visibility = "";
       panel.style.visibility = "";
-      fab.style.opacity = "0";
-      if (window.requestAnimationFrame) {
-        requestAnimationFrame(function () { fab.style.opacity = ""; });
-      } else {
-        fab.style.opacity = "";
-      }
+      // CSS keyframe animation (uschat-pop) guarantees a smooth fade-in —
+      // immune to style-coalescing that made the rAF opacity trick pop.
+      fab.classList.add("uschat-in");
     }
     ensureCss(reveal);
     var t = function () { return T[lang()]; };

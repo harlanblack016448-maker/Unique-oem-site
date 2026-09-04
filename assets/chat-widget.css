@@ -30,6 +30,11 @@
   z-index: 10000;
 }
 .uschat-fab:hover { transform: scale(1.06); }
+.uschat-fab.uschat-in { animation: uschat-pop 0.22s ease-out both; }
+@keyframes uschat-pop {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
 .uschat-fab svg { width: 26px; height: 26px; }
 .uschat-fab .uschat-fab-close { display: none; }
 .uschat-open .uschat-fab .uschat-fab-chat { display: none; }
@@ -167,5 +172,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .uschat-panel, .uschat-fab { transition: none; }
+  .uschat-fab.uschat-in { animation: none; }
   .uschat-typing i { animation: none; opacity: 0.6; }
 }

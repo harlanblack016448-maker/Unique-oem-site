@@ -216,11 +216,21 @@
   });
 
   // AI chat assistant — one deferred script tag covers every page.
-  // Bump ?v= here when chat-widget.js changes.
+  // Preload the widget stylesheet in parallel so the widget never renders
+  // unstyled; bump ?v= here when chat-widget.js / chat-widget.css change.
   function loadChatWidget(){
     if (document.querySelector('script[data-us-chat]')) return;
+    if (!document.querySelector('link[data-us-chat-css]')) {
+      const l = document.createElement("link");
+      l.rel = "stylesheet";
+      l.href = "/assets/chat-widget.css?v=2";
+      l.setAttribute("data-us-chat-css", "loading");
+      l.addEventListener("load", function () { l.setAttribute("data-us-chat-css", "done"); });
+      l.addEventListener("error", function () { l.setAttribute("data-us-chat-css", "done"); });
+      document.head.appendChild(l);
+    }
     const s = document.createElement("script");
-    s.src = "/assets/chat-widget.js?v=2";
+    s.src = "/assets/chat-widget.js?v=3";
     s.defer = true;
     s.setAttribute("data-us-chat", "1");
     document.body.appendChild(s);
