@@ -6,7 +6,7 @@
   if (window.__usChatLoaded) return;
   window.__usChatLoaded = true;
 
-  var CSS_URL = "/assets/chat-widget.css?v=2";
+  var CSS_URL = "/assets/chat-widget.css?v=3";
   var SID_KEY = "us_chat_sid_v1";
 
   var T = {

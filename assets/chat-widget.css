@@ -14,7 +14,7 @@
 .uschat-fab {
   position: fixed;
   right: 18px;
-  bottom: 18px;
+  bottom: 84px; /* above the .sticky-cta "Request a Quote" pill (bottom:24px + ~48px) */
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -44,11 +44,11 @@
 .uschat-panel {
   position: fixed;
   right: 18px;
-  bottom: 86px;
+  bottom: 148px; /* above the raised FAB (84px + 56px + 8px gap) */
   width: 360px;
   max-width: calc(100vw - 24px);
   height: 540px;
-  max-height: calc(100vh - 120px);
+  max-height: calc(100vh - 172px);
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.28);
@@ -167,8 +167,8 @@
 .uschat-inputbar button:disabled { opacity: 0.4; cursor: default; }
 
 @media (max-width: 640px) {
-  .uschat-panel { right: 8px; left: 8px; width: auto; bottom: 96px; height: 62vh; }
-  .uschat-fab { right: 14px; bottom: 26px; }
+  .uschat-panel { right: 8px; left: 8px; width: auto; bottom: 148px; height: 62vh; }
+  .uschat-fab { right: 14px; bottom: 80px; } /* above the full-width mobile sticky bar */
 }
 @media (prefers-reduced-motion: reduce) {
   .uschat-panel, .uschat-fab { transition: none; }

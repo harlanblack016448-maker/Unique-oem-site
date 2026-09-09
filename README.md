@@ -6,7 +6,7 @@ Visual system is a documented hybrid — **40% Apple** (product photography, whi
 
 Nav is **text-only** “Unique Scales” (no graphic logomark). Favicon is a black rounded square + white “U”.
 
-**Production URL:** https://unique-oem-site.vercel.app — **chatbot files match live as of 2026-09-04** (`style.css?v=24`, `i18n.js?v=18`, `partials.js?v=20`, `form.js?v=6`, complete 1600×957 CK869BLE packshot). Motion follows the standing contract in [`design/TRACE.md`](design/TRACE.md) → "Motion discipline" (easing tokens only, UI ≤300ms).  
+**Production URL:** https://unique-oem-site.vercel.app — **chatbot files match live as of 2026-09-04** (`style.css?v=24`, `i18n.js?v=18`, `partials.js?v=21`, `form.js?v=6`, complete 1600×957 CK869BLE packshot). Motion follows the standing contract in [`design/TRACE.md`](design/TRACE.md) → "Motion discipline" (easing tokens only, UI ≤300ms).  
 **Repo:** https://github.com/harlanblack016448-maker/Unique-oem-site
 
 ## AI chat assistant (chatbot)
