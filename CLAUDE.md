@@ -23,7 +23,7 @@
 - 配置指南：`SETUP-CHATBOT.md`；设计规范：`design/TRACE.md`（动效 ≤300ms，easing tokens only）
 
 ## 当前状态（2026-09-09）
-- AI 客服已上线并验收：widget v3 / css v2 / partials v19；FOUC 防闪烁 = CSS 并行预载 + 关键帧淡入
+- AI 客服已上线并验收：widget v4 / css v2 / partials v20；FOUC 防闪烁 = CSS 并行预载 + 关键帧淡入
 - 知识库口径：认证 = CE/RoHS/FCC/ISO9001 等齐全、部分市场可配合申请；交期 = 首单 45-50 天、返单 30-35 天
 - 待办：oem-landing 内 2026-09-02 前的内容改动（i18n.js / style.css / vercel.json / sitemap.xml / 部分图片与文案）仍未同步线上，待用户确认后经 oem-site-git 推送
 
