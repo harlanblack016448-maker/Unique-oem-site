@@ -109,11 +109,14 @@
   }
 
   function build() {
-    // Anti-FOUC: keep the widget invisible until its stylesheet is ready,
-    // then reveal with a soft fade. Never leave it hidden for long.
-    var booted = false;
-    function reveal() {
-      if (booted || !fab || !panel) return;
+    // Anti-FOUC: keep the widget invisible until BOTH (a) the stylesheet is
+    // ready and (b) the DOM is built — whichever finishes last triggers the
+    // reveal. Order-independent: fixes the race where a cached stylesheet
+    // finished loading before this script ran and the early reveal was
+    // swallowed by the !fab guard (widget stayed hidden forever).
+    var booted = false, cssReady = false, built = false;
+    function tryReveal() {
+      if (booted || !cssReady || !built) return;
       booted = true;
       fab.style.visibility = "";
       panel.style.visibility = "";
@@ -121,7 +124,7 @@
       // immune to style-coalescing that made the rAF opacity trick pop.
       fab.classList.add("uschat-in");
     }
-    ensureCss(reveal);
+    ensureCss(function () { cssReady = true; tryReveal(); });
     var t = function () { return T[lang()]; };
 
     var fab = el("button", "uschat-fab");
@@ -344,6 +347,8 @@
     });
     document.addEventListener("us:i18n", paintLang);
     paintLang();
+    built = true; // DOM ready — reveal now if the stylesheet already arrived
+    tryReveal();
   }
 
   if (document.readyState === "loading") {
