@@ -23,9 +23,9 @@
 - 配置指南：`SETUP-CHATBOT.md`；设计规范：`design/TRACE.md`（动效 ≤300ms，easing tokens only）
 
 ## 当前状态（2026-09-10）
-- AI 客服已上线并验收：widget v5 / css v3 / partials v22；FOUC 防闪烁 = CSS 并行预载 + 关键帧淡入
+- AI 客服已上线并验收：widget v6 / css v3 / partials v23；FOUC 防闪烁 = CSS 并行预载 + 关键帧淡入
 - 知识库口径：认证 = CE/RoHS/FCC/ISO9001 等齐全、部分市场可配合申请；交期 = 首单 45-50 天、返单 30-35 天
-- 资源版本（本地待发布）：`style.css?v=26` · `i18n.js?v=22` · `partials.js?v=22` · `form.js?v=8`
+- 资源版本（本地待发布）：`style.css?v=26` · `i18n.js?v=23` · `partials.js?v=23` · `chat-widget.js?v=6` · `form.js?v=8`
 - **战略：站点只做「施工」（能被找到 / 能被测量 / 能被信任），不做「美化」。** 依据 = 2026-09-10 用户确认「无投流、实际无客户访问」→ 约束是流量，不是站点；零流量下站点优化的边际收益为 0。完整计划见上级目录 `GROWTH-PLAN.md`
 - 待办：**换掉 `unique-oem-site.vercel.app` 域名**（唯一硬阻塞）。一键脚本 = 上级目录 `set-domain.sh <新域名> [--apply]`，覆盖 36 处 / 16 个文件
 

@@ -101,12 +101,12 @@ function buildSystemPrompt(lang, page, kbEntries) {
 
 function fallbackReply(lang) {
   return lang === "zh"
-    ? "我们的 AI 助手正在准备中，暂时无法回答。请发邮件至 " +
+    ? "智能客服暂时无法回答。请发送邮件至 " +
         COMPANY.email + "，或使用报价表单 " + COMPANY.quoteForm +
-        "，我们会在 1 个工作日内回复。"
-    : "Our AI assistant is warming up and can't answer right now. Please email " +
+        "，销售团队将在 1 个工作日内回复。"
+    : "The AI assistant is temporarily unavailable. Please email " +
         COMPANY.email + " or use the quote form " + COMPANY.quoteForm +
-        " — we reply within 1 business day.";
+        ". Our sales team replies within 1 business day.";
 }
 
 // ---------------------------------------------------------------- handler ---
