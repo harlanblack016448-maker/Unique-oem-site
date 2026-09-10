@@ -181,6 +181,15 @@
       if (cat && subKeys[cur]) cat.setAttribute("data-i18n", subKeys[cur]);
     }
 
+    // Carry the product context into the inquiry form so a buyer starts with
+    // the right product selected after clicking a product-page CTA.
+    const inquiryInterest = { "8": "8-electrode", k: "kitchen", b: "bathroom" }[cur];
+    if (inquiryInterest) {
+      document.querySelectorAll('a[href="/contact.html"]').forEach(a => {
+        a.href = "/contact.html?interest=" + encodeURIComponent(inquiryInterest);
+      });
+    }
+
     const mb = document.querySelector(".menu-btn-global");
     const nl = document.querySelector(".global-nav-links");
     function closeMenu(){

@@ -39,6 +39,7 @@
     const vol = document.getElementById("volume-select");
     if (!vol) return;
     const interest = document.getElementById("interest-select");
+    const previous = vol.value;
     const lang = getLang();
     const dict = window.__us_dict || {};
     const set = VOL_SETS[interest && interest.value] || VOL_SETS._default;
@@ -58,7 +59,10 @@
       opt.textContent = (dict[lang] && dict[lang][item.k]) || "";
       vol.appendChild(opt);
     });
-    vol.value = ""; // reset selection
+    // Keep a valid selection when only the language changes. If the buyer
+    // changed product interest and the old range is no longer available,
+    // clear it so the form cannot submit a mismatched volume.
+    vol.value = set.some(item => item.v === previous) ? previous : "";
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -67,6 +71,14 @@
       // Ensure id exists (older contact.html didn't have one).
       interest.id = "interest-select";
       interest.addEventListener("change", renderVolumes);
+      // Product cards can link here with ?interest=8-electrode|kitchen|bathroom.
+      // Ignore unknown values so arbitrary query strings never alter the form.
+      try {
+        const requested = new URLSearchParams(window.location.search).get("interest");
+        if (requested && Array.from(interest.options).some(o => o.value === requested)) {
+          interest.value = requested;
+        }
+      } catch (_) {}
     }
     renderVolumes();
 
@@ -220,7 +232,11 @@
         let ok = res.ok;
         try {
           const j = await res.json();
-          if (j && (j.success === "true" || j.success === true)) ok = true;
+          // FormSubmit can return HTTP 2xx with a business-level failure.
+          // When a success field exists, it is authoritative.
+          if (j && Object.prototype.hasOwnProperty.call(j, "success")) {
+            ok = j.success === "true" || j.success === true;
+          }
         } catch (_) {}
         if (ok) {
           form.reset();

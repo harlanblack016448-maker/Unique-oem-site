@@ -265,6 +265,7 @@ h3{
 }
 .hero-copy{text-align:left}
 .hero-tile h1,.hero-tile .hero-title{max-width:none;margin:0 0 16px}
+.hero-tile .hero-title{font-size:clamp(2rem,1.25rem + 2.55vw,3.25rem);line-height:1.06}
 .hero-tile .lead{max-width:none;margin:0 0 24px;color:var(--apple-ink-muted)}
 .hero-tile .cta-group{justify-content:flex-start;margin-top:0}
 .hero-img-wrap{max-width:none;margin:0;display:flex;justify-content:center;background:var(--apple-parchment);padding:24px}
@@ -284,6 +285,7 @@ h3{
   .hero-tile .cta-group{justify-content:center}
   .hero-img-wrap{padding:16px}
   .hero-img-wrap img{max-height:52vh}
+  .hero-tile .hero-title{font-size:clamp(1.875rem,1.35rem + 2vw,2.625rem)}
 }
 .product-tile-img{max-width:720px;margin:36px auto 0}
 .product-tile-img img{box-shadow:var(--apple-product-shadow);border-radius:var(--apple-r-md);max-height:640px;width:auto;margin:0 auto}
