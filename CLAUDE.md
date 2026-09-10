@@ -32,10 +32,10 @@
 ## 变更（2026-09-10）
 - **修 `robots.txt`**：原 `Disallow: /privacy.html` / `/admin.html` 在 `cleanUrls: true` 下**实际不生效**（真实路径已变为 `/privacy`、`/admin`），已改为无后缀路径
 - **修 `sitemap.xml`**：原 8 条中 7 条是 `.html` 地址，但 cleanUrls 使其全部 308 跳转（实测 `/about.html` → `/about`）；已改为干净 URL，并移除与 robots 冲突的 privacy 条目
-- **统一 `i18n.js?v=`**：about / capabilities / contact / privacy / 404 / kitchen 原为 `v=18`，与其余页面不一致（同一文件被缓存两份），统一为 `v=21`
+- **统一 `i18n.js?v=`（当时）**：about / capabilities / contact / privacy / 404 / kitchen 原为 `v=18`，与其余页面不一致（同一文件被缓存两份），当时统一为 `v=21`；当前页面引用已统一为 `v=23`
 - **加埋点**：9 个公开页面注入 `<script defer src="/_vercel/insights/script.js">`（Vercel Web Analytics，无 Cookie → 免 GDPR 同意横幅）。**需在 Vercel 面板 Real Insights → Web Analytics 开启后才会真正采集**
 - **`assets/form.js`**：新增 `LI_CONVERSION_ID` 常量 + `trackLeadConversion()`，挂在提交成功分支。**留空即不触发**；填入 LinkedIn Campaign Manager 生成的转化 ID 即生效。注意它只在 FormSubmit 回执成功时触发，走 mailto 兜底的提交不计入转化（保守口径，避免污染投放优化信号）
-- 版本 bump：`form.js?v=6 → v=7`（index / contact 两页）
+- 版本 bump（当时）：`form.js?v=6 → v=7`（index / contact 两页）；当前页面引用已统一为 `v=8`
 
 ## 已知坑
 - Vercel 对脚本化客户端（curl/python/WebFetch）会下发 Security Checkpoint（即使防火墙全关）；远程验收优先浏览器侧，或预期间歇 403
