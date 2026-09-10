@@ -232,14 +232,14 @@
     if (!document.querySelector('link[data-us-chat-css]')) {
       const l = document.createElement("link");
       l.rel = "stylesheet";
-      l.href = "/assets/chat-widget.css?v=3";
+      l.href = "/assets/chat-widget.css?v=4";
       l.setAttribute("data-us-chat-css", "loading");
       l.addEventListener("load", function () { l.setAttribute("data-us-chat-css", "done"); });
       l.addEventListener("error", function () { l.setAttribute("data-us-chat-css", "done"); });
       document.head.appendChild(l);
     }
     const s = document.createElement("script");
-    s.src = "/assets/chat-widget.js?v=6";
+    s.src = "/assets/chat-widget.js?v=7";
     s.defer = true;
     s.setAttribute("data-us-chat", "1");
     document.body.appendChild(s);
