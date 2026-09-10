@@ -525,6 +525,6 @@
 - `assets/i18n.js`：新增正式中文改写层，保留现有 key，英文修订仅涉及明显不自然或容易误解的表述。
 - `assets/chat-widget.js` 与 `api/chat.js`：统一客服标题、欢迎语、快捷问题、离线提示和转人工措辞。
 - 九个页面的 `i18n.js` 与 `partials.js` 版本已升至 v23，客服脚本已升至 v6。
-- 需要通过 `python3 -m unittest discover -s tests -v`、`node --check` 以及 390/768/1440 像素浏览器回归后再发布。
+- `python3 -m unittest discover -s tests -v`、Node.js 语法检查、`git diff --check` 以及 390/768/1440 像素浏览器回归均已通过；commit `8a5ac77` 已推送到 GitHub `main`，canonical 生产 URL 已在线核验。
 
 语言风格与术语说明见 [TRANSLATION-STYLE.md](TRANSLATION-STYLE.md)。

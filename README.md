@@ -6,7 +6,7 @@ Visual system is a documented hybrid — **40% Apple** (product photography, whi
 
 Nav is **text-only** “Unique Scales” (no graphic logomark). Favicon is a black rounded square + white “U”.
 
-**Production URL:** https://unique-oem-site.vercel.app — **chatbot files match live as of 2026-09-04** (`style.css?v=24`, `i18n.js?v=18`, `partials.js?v=21`, `form.js?v=6`, complete 1600×957 CK869BLE packshot). Motion follows the standing contract in [`design/TRACE.md`](design/TRACE.md) → "Motion discipline" (easing tokens only, UI ≤300ms).
+**Production URL:** https://unique-oem-site.vercel.app — **commit `8a5ac77` was live-verified on 2026-09-10** (`style.css?v=26`, `i18n.js?v=23`, `partials.js?v=23`, `chat-widget.js?v=6`, `form.js?v=8`, catalog imagery). Motion follows the standing contract in [`design/TRACE.md`](design/TRACE.md) → "Motion discipline" (easing tokens only, UI ≤300ms).
 **Repo:** https://github.com/harlanblack016448-maker/Unique-oem-site
 
 ## AI chat assistant (chatbot)
@@ -19,7 +19,7 @@ python3 -m http.server 8090
 
 http://127.0.0.1:8090
 
-This folder is the working copy. Vercel serves the GitHub `main` tree (site root, not wrapped in `oem-landing/`). Upload or push file changes there to redeploy. Preset: **Other**.
+Vercel serves the GitHub `main` tree (site root, not wrapped in `oem-landing/`). In this workspace, `/Users/harlan/Workbuddy/2026-08-10-14-49-50/oem-landing` is the content source and `/Users/harlan/Workbuddy/2026-08-10-14-49-50/oem-site-git` is the designated push clone; sync reviewed changes into the clone before pushing. Preset: **Other**.
 
 ## Pages
 
@@ -37,6 +37,8 @@ LinkedIn Insight Tag partner `9831228` loads from `partials.js`; each page also 
 | Photos | `assets/img/` (keep names or update `src`) |
 | Sales email | `contact.html`, `assets/form.js`, `assets/partials.js`, `assets/i18n.js` |
 | Language default | `assets/i18n.js` (`localStorage` key `us_lang`) |
+| Translation review | `TRANSLATION-REVIEW.md` and `TRANSLATION-STYLE.md` |
+| Image provenance | `PHOTO-SOURCES.md` and `assets/catalog-manifest.json` |
 
 Lead form → FormSubmit `/ajax/` → `hanhan@lefu.cc`. If that fails, `mailto:`.
 

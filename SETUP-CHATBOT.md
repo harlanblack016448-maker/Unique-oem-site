@@ -4,6 +4,8 @@
 > 架构：Vercel Serverless Functions（`/api/*`，零 npm 依赖）+ 你的 KKAPI（OpenAI 兼容）接口 + Vercel KV 持久化  
 > 全程只需浏览器操作 Vercel 网页，约 10 分钟。
 
+当前线上版本（2026-09-10）：`chat-widget.js?v=6`、`partials.js?v=23`、`form.js?v=8`；页面已由 GitHub `main` 自动部署并在 canonical URL 浏览器核验。
+
 ---
 
 ## 一、这套系统包含什么
@@ -75,7 +77,7 @@
 | FAQ 知识库内容              | `api/kb.js`（只加站内公开事实；红线：不写 UL、不写价格、不写独家代理）                              |
 | 客服开场白/快捷提问/文案          | `assets/chat-widget.js` 顶部的 `T` 字典（en/zh 两份）                            |
 | 挂件样式                   | `assets/chat-widget.css`                                                |
-| 改了 `chat-widget.js` 之后 | 同步把 `assets/partials.js` 里的 `chat-widget.js?v=1` 升一位（如 `?v=2`），否则老访客拿缓存 |
+| 改了 `chat-widget.js` 之后 | 同步把 `assets/partials.js` 里的 `chat-widget.js?v=6` 升一位，否则老访客拿缓存 |
 | 改了系统提示词/红线             | `api/chat.js` 的 `buildSystemPrompt`                                     |
 
 ## 四、常见问题
@@ -96,6 +98,6 @@ api/feedback.js      POST /api/feedback  满意度 👍/👎
 api/admin.js         GET  /api/admin   后台数据（令牌校验）
 assets/chat-widget.js / .css          前端挂件
 admin.html           管理后台页面（noindex，robots 已屏蔽）
-assets/partials.js   全站注入挂件（loadChatWidget，v=17 起）
+assets/partials.js   全站注入挂件（loadChatWidget，当前页面引用 v=23）
 SETUP-CHATBOT.md     本文件
 ```
