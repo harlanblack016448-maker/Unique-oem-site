@@ -10,15 +10,11 @@
   color: #111;
 }
 
-/* floating action button
-   Default inset matches the desktop .sticky-cta pill (bottom:24px). The FAB
-   only rises when that pill is actually on screen — About / Contact / first-
-   viewport views inject .sticky-cta but keep it hidden until the hero leaves,
-   and a permanently raised FAB was covering About Values copy. */
+/* floating action button */
 .uschat-fab {
   position: fixed;
   right: 18px;
-  bottom: 24px;
+  bottom: 84px; /* above the .sticky-cta "Request a Quote" pill (bottom:24px + ~48px) */
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -30,7 +26,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
-  transition: transform 0.15s ease, opacity 0.15s ease, bottom 0.2s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease;
   z-index: 10000;
 }
 .uschat-fab:hover { transform: scale(1.06); }
@@ -48,11 +44,11 @@
 .uschat-panel {
   position: fixed;
   right: 18px;
-  bottom: 88px; /* 24px FAB inset + 56px FAB + 8px gap */
+  bottom: 148px; /* above the raised FAB (84px + 56px + 8px gap) */
   width: 360px;
   max-width: calc(100vw - 24px);
   height: 540px;
-  max-height: calc(100vh - 112px);
+  max-height: calc(100vh - 172px);
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.28);
@@ -62,15 +58,8 @@
   opacity: 0;
   transform: translateY(12px) scale(0.98);
   pointer-events: none;
-  transition: opacity 0.18s ease, transform 0.18s ease, bottom 0.2s ease;
+  transition: opacity 0.18s ease, transform 0.18s ease;
   z-index: 10000;
-}
-
-/* Rise above Request-a-Quote only while the pill/bar is visible. */
-body:has(.sticky-cta.is-visible) .uschat-fab { bottom: 84px; }
-body:has(.sticky-cta.is-visible) .uschat-panel {
-  bottom: 148px;
-  max-height: calc(100vh - 172px);
 }
 .uschat-open .uschat-panel {
   opacity: 1;
@@ -177,19 +166,9 @@ body:has(.sticky-cta.is-visible) .uschat-panel {
 }
 .uschat-inputbar button:disabled { opacity: 0.4; cursor: default; }
 
-@media (min-width: 821px) {
-  /* 8-electrode desktop hides .sticky-cta; do not raise the FAB for a display:none bar. */
-  body[data-page="8"] .uschat-fab { bottom: 24px; }
-  body[data-page="8"] .uschat-panel {
-    bottom: 88px;
-    max-height: calc(100vh - 112px);
-  }
-}
 @media (max-width: 640px) {
-  .uschat-panel { right: 8px; left: 8px; width: auto; bottom: 88px; height: 62vh; }
-  .uschat-fab { right: 14px; bottom: 24px; }
-  body:has(.sticky-cta.is-visible) .uschat-fab { bottom: 80px; } /* above the full-width mobile sticky bar */
-  body:has(.sticky-cta.is-visible) .uschat-panel { bottom: 148px; }
+  .uschat-panel { right: 8px; left: 8px; width: auto; bottom: 148px; height: 62vh; }
+  .uschat-fab { right: 14px; bottom: 80px; } /* above the full-width mobile sticky bar */
 }
 @media (prefers-reduced-motion: reduce) {
   .uschat-panel, .uschat-fab { transition: none; }

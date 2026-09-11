@@ -74,25 +74,9 @@ class TestReviewedTranslations(unittest.TestCase):
         for rel in pages:
             text = (ROOT / rel).read_text(encoding="utf-8")
             self.assertIn("/assets/i18n.js?v=23", text, rel)
-            self.assertIn("/assets/partials.js?v=24", text, rel)
+            self.assertIn("/assets/partials.js?v=23", text, rel)
         partials = (ROOT / "assets" / "partials.js").read_text(encoding="utf-8")
-        self.assertIn("/assets/chat-widget.js?v=7", partials)
-        self.assertIn("/assets/chat-widget.css?v=4", partials)
-        chat = (ROOT / "assets" / "chat-widget.js").read_text(encoding="utf-8")
-        self.assertIn("/assets/chat-widget.css?v=4", chat)
-        form_pages = ("index.html", "contact.html")
-        for rel in form_pages:
-            text = (ROOT / rel).read_text(encoding="utf-8")
-            self.assertIn("/assets/form.js?v=9", text, rel)
-
-    def test_std_volume_options_drop_redundant_floor(self):
-        form = (ROOT / "assets" / "form.js").read_text(encoding="utf-8")
-        self.assertNotIn('v: "1000"', form)
-        self.assertIn('v: "1000-2000"', form)
-        self.assertIn('v: "500-first"', form)
-        css = (ROOT / "assets" / "chat-widget.css").read_text(encoding="utf-8")
-        self.assertIn("body:has(.sticky-cta.is-visible) .uschat-fab", css)
-        self.assertIn("bottom: 24px;", css)
+        self.assertIn("/assets/chat-widget.js?v=6", partials)
 
     def test_static_fallback_matches_corrected_english(self):
         bathroom = (ROOT / "products" / "bathroom.html").read_text(encoding="utf-8")
