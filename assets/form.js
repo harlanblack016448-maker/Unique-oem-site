@@ -9,9 +9,9 @@
       { v: "2000-5000", k: "contact.volume.8.3" },
       { v: "5000+",     k: "contact.volume.8.4" }
     ],
-    // kitchen / bathroom / oem / full — body-fat-scale ranges (1000+)
+    // kitchen / bathroom / oem / full — first option is the 1,000 floor
+    // as a range (do not also offer a standalone "1,000 minimum").
     "_default": [
-      { v: "1000",      k: "contact.volume.std.0" },
       { v: "1000-2000", k: "contact.volume.std.1" },
       { v: "2000-5000", k: "contact.volume.std.2" },
       { v: "5000+",     k: "contact.volume.std.3" }
