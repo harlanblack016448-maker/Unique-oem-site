@@ -22,7 +22,7 @@
   // 取值：LinkedIn Campaign Manager → Measure → Conversions → 新建 "Lead" → 手动事件，
   // 把生成的 conversion_id 填进下面这个空字符串即可生效。留空 = 只记页面浏览，不报转化。
   // 详见 GROWTH-PLAN.md §3.2
-  const LI_CONVERSION_ID = "";
+  const LI_CONVERSION_ID = "28515124";
 
   function trackLeadConversion(){
     if (!LI_CONVERSION_ID) return;

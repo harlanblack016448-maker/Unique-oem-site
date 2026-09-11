@@ -83,7 +83,7 @@ class TestReviewedTranslations(unittest.TestCase):
         form_pages = ("index.html", "contact.html")
         for rel in form_pages:
             text = (ROOT / rel).read_text(encoding="utf-8")
-            self.assertIn("/assets/form.js?v=9", text, rel)
+            self.assertIn("/assets/form.js?v=10", text, rel)
 
     def test_std_volume_options_drop_redundant_floor(self):
         form = (ROOT / "assets" / "form.js").read_text(encoding="utf-8")
