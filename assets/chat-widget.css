@@ -178,9 +178,11 @@ body:has(.sticky-cta.is-visible) .uschat-panel {
 .uschat-inputbar button:disabled { opacity: 0.4; cursor: default; }
 
 @media (min-width: 821px) {
-  /* 8-electrode desktop hides .sticky-cta; do not raise the FAB for a display:none bar. */
-  body[data-page="8"] .uschat-fab { bottom: 24px; }
-  body[data-page="8"] .uschat-panel {
+  /* 8-electrode desktop hides .sticky-cta; beat body:has(.sticky-cta.is-visible) specificity. */
+  body[data-page="8"] .uschat-fab,
+  body[data-page="8"]:has(.sticky-cta.is-visible) .uschat-fab { bottom: 24px; }
+  body[data-page="8"] .uschat-panel,
+  body[data-page="8"]:has(.sticky-cta.is-visible) .uschat-panel {
     bottom: 88px;
     max-height: calc(100vh - 112px);
   }

@@ -232,7 +232,7 @@
     if (!document.querySelector('link[data-us-chat-css]')) {
       const l = document.createElement("link");
       l.rel = "stylesheet";
-      l.href = "/assets/chat-widget.css?v=4";
+      l.href = "/assets/chat-widget.css?v=5";
       l.setAttribute("data-us-chat-css", "loading");
       l.addEventListener("load", function () { l.setAttribute("data-us-chat-css", "done"); });
       l.addEventListener("error", function () { l.setAttribute("data-us-chat-css", "done"); });

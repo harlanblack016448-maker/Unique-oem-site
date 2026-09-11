@@ -74,12 +74,12 @@ class TestReviewedTranslations(unittest.TestCase):
         for rel in pages:
             text = (ROOT / rel).read_text(encoding="utf-8")
             self.assertIn("/assets/i18n.js?v=23", text, rel)
-            self.assertIn("/assets/partials.js?v=24", text, rel)
+            self.assertIn("/assets/partials.js?v=25", text, rel)
         partials = (ROOT / "assets" / "partials.js").read_text(encoding="utf-8")
         self.assertIn("/assets/chat-widget.js?v=7", partials)
-        self.assertIn("/assets/chat-widget.css?v=4", partials)
+        self.assertIn("/assets/chat-widget.css?v=5", partials)
         chat = (ROOT / "assets" / "chat-widget.js").read_text(encoding="utf-8")
-        self.assertIn("/assets/chat-widget.css?v=4", chat)
+        self.assertIn("/assets/chat-widget.css?v=5", chat)
         form_pages = ("index.html", "contact.html")
         for rel in form_pages:
             text = (ROOT / rel).read_text(encoding="utf-8")
