@@ -28,6 +28,8 @@ if command -v rg >/dev/null 2>&1; then
 else
   if grep -R -n --include='*.html' 'data-page-node-id=' "$SITE_DIR" "$PUSH_DIR"; then
     echo 'Editor markup found. Review and remove it explicitly before release.' >&2; exit 1
+  else
+    result=$?; [[ "$result" == 1 ]] || exit "$result"
   fi
 fi
 DIFF=$(rsync -rcn --delete --itemize-changes --exclude='.git/' --exclude='.DS_Store' --exclude='__pycache__/' "$SITE_DIR/" "$PUSH_DIR/")
@@ -52,7 +54,7 @@ LOCAL_HEAD=$(git -C "$PUSH_DIR" rev-parse HEAD)
 [[ -z "$(git -C "$PUSH_DIR" ls-files --others --exclude-standard)" ]] || { echo 'Untracked files found. Review and stage intended files explicitly.' >&2; exit 1; }
 git -C "$PUSH_DIR" diff --quiet || { echo 'Unstaged changes found. Review and stage them explicitly.' >&2; exit 1; }
 git -C "$PUSH_DIR" diff --cached --quiet && { echo 'No staged changes to publish.'; exit 0; }
-(cd "$PUSH_DIR" && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v && node --test tests/*.test.cjs && node --check assets/i18n.js && node --check assets/form.js && node --check assets/partials.js)
+(cd "$PUSH_DIR" && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v && node --test tests/*.test.cjs && node --check assets/i18n.js && node --check assets/form.js && node --check assets/inquiry-request.js && node --check assets/partials.js)
 git -C "$PUSH_DIR" diff --cached --stat
 git -C "$PUSH_DIR" commit -m "$2"
 git -C "$PUSH_DIR" push origin HEAD:main

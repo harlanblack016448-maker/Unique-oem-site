@@ -187,7 +187,11 @@
         if (rule.el.getAttribute("aria-invalid") === "true") validateField(rule);
       });
     });
+    let submitting = false;
     const sendingKey = "contact.sending";
+    document.addEventListener("us:i18n", () => {
+      if (submitting && submitBtn) submitBtn.textContent = t(sendingKey, "Sending…");
+    });
     const idleLabel = () => {
       const lang = getLang();
       const dict = window.__us_dict || {};
@@ -196,6 +200,7 @@
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (submitting) return;
       if (success) success.classList.remove("show");
       if (errBox) errBox.classList.remove("show");
       const honey = form.querySelector('[name="_honey"]');
@@ -223,38 +228,23 @@
         ? action.replace("https://formsubmit.co/", "https://formsubmit.co/ajax/")
         : action;
 
+      submitting = true;
       try {
-        const res = await fetch(ajaxUrl, {
-          method: "POST",
-          body: data,
-          headers: { Accept: "application/json" }
-        });
-        let ok = res.ok;
-        try {
-          const j = await res.json();
-          // FormSubmit can return HTTP 2xx with a business-level failure.
-          // When a success field exists, it is authoritative.
-          if (j && Object.prototype.hasOwnProperty.call(j, "success")) {
-            ok = j.success === "true" || j.success === true;
-          }
-        } catch (_) {}
-        if (ok) {
-          form.reset();
-          renderVolumes();
-          clearValidation();
-          trackLeadConversion();
-          if (success) {
-            success.classList.add("show");
-            success.setAttribute("tabindex", "-1");
-            success.focus({ preventScroll: true });
-            success.scrollIntoView({behavior:"smooth", block:"center"});
-          }
-        } else {
-          mailtoFallback();
+        await window.__us_sendInquiry(ajaxUrl, data);
+        form.reset();
+        renderVolumes();
+        clearValidation();
+        trackLeadConversion();
+        if (success) {
+          success.classList.add("show");
+          success.setAttribute("tabindex", "-1");
+          success.focus({ preventScroll: true });
+          success.scrollIntoView({behavior:"smooth", block:"center"});
         }
       } catch (err) {
         mailtoFallback();
       } finally {
+        submitting = false;
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = idleLabel(); }
       }
     });
