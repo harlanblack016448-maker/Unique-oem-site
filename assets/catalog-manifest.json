@@ -525,9 +525,9 @@
       "format": "jpg",
       "width": 900,
       "height": 900,
-      "bytes": 53130,
-      "derivedFrom": "all-p49-i6.jpg",
-      "notes": "Corrected from previous black-glass image; ring/hook scene."
+      "bytes": 74672,
+      "derivedFrom": "all-p49-i7.jpg",
+      "notes": "Corrected from previous black-glass image; ring/hook scene. 2026-09-20 swapped with CK831 card binaries so filename matches ring/hook product."
     },
     {
       "model": "CK838",
@@ -539,9 +539,9 @@
       "format": "webp",
       "width": 900,
       "height": 900,
-      "bytes": 25858,
-      "derivedFrom": "all-p49-i6.jpg",
-      "notes": "Corrected from previous black-glass image; ring/hook scene."
+      "bytes": 36492,
+      "derivedFrom": "all-p49-i7.jpg",
+      "notes": "Corrected from previous black-glass image; ring/hook scene. 2026-09-20 swapped with CK831 card binaries so filename matches ring/hook product."
     },
     {
       "model": "CK831",
@@ -553,9 +553,9 @@
       "format": "jpg",
       "width": 900,
       "height": 900,
-      "bytes": 74672,
-      "derivedFrom": "all-p49-i7.jpg",
-      "notes": ""
+      "bytes": 53130,
+      "derivedFrom": "all-p49-i6.jpg",
+      "notes": "2026-09-20 swapped with CK838 card binaries so filename matches square multi-color kitchen scales."
     },
     {
       "model": "CK831",
@@ -567,9 +567,9 @@
       "format": "webp",
       "width": 900,
       "height": 900,
-      "bytes": 36492,
-      "derivedFrom": "all-p49-i7.jpg",
-      "notes": ""
+      "bytes": 25858,
+      "derivedFrom": "all-p49-i6.jpg",
+      "notes": "2026-09-20 swapped with CK838 card binaries so filename matches square multi-color kitchen scales."
     },
     {
       "model": "CK829",
