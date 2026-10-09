@@ -71,7 +71,6 @@
     <div>
       <h4 data-i18n="footer.legal">Legal</h4>
       <p><a href="/privacy.html" data-i18n="nav.privacy">Privacy</a></p>
-      <p><button type="button" class="privacy-settings" data-ads-settings data-i18n="ads.settings">Privacy settings</button></p>
       <p data-i18n="footer.app">Unique Health App</p>
       <p data-i18n="footer.app.d">iOS / Android / HarmonyOS</p>
     </div>

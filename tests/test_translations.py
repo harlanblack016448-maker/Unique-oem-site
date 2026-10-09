@@ -73,8 +73,8 @@ class TestReviewedTranslations(unittest.TestCase):
         ]
         for rel in pages:
             text = (ROOT / rel).read_text(encoding="utf-8")
-            self.assertIn("/assets/i18n.js?v=24", text, rel)
-            self.assertIn("/assets/partials.js?v=26", text, rel)
+            self.assertIn("/assets/i18n.js?v=25", text, rel)
+            self.assertIn("/assets/partials.js?v=27", text, rel)
         partials = (ROOT / "assets" / "partials.js").read_text(encoding="utf-8")
         self.assertIn("/assets/chat-widget.js?v=7", partials)
         self.assertIn("/assets/chat-widget.css?v=5", partials)

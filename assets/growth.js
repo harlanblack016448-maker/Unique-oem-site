@@ -87,7 +87,7 @@
     const panel = w.document.createElement("aside");
     panel.id = "ads-consent"; panel.className = "ads-consent";
     panel.setAttribute("role", "region"); panel.setAttribute("aria-labelledby", "ads-consent-title");
-    panel.innerHTML = '<h2 id="ads-consent-title" data-i18n="ads.title">Advertising privacy</h2><p data-i18n="ads.text">Allow LinkedIn to measure visits and successful inquiries? Your choice does not affect inquiry submission.</p><div class="ads-actions"><button type="button" data-ads-choice="granted" data-i18n="ads.accept">Accept advertising tracking</button><button type="button" data-ads-choice="denied" data-i18n="ads.reject">Reject</button><a href="/privacy.html" data-i18n="nav.privacy">Privacy</a></div><p class="ads-small" data-i18n="ads.withdraw">Change your choice in Privacy settings. Withdrawal stops future tracking, but cannot recall data already sent.</p>';
+    panel.innerHTML = '<h2 id="ads-consent-title" data-i18n="ads.title">Advertising privacy</h2><p data-i18n="ads.text">Allow LinkedIn to measure visits and successful inquiries? Your choice does not affect inquiry submission.</p><div class="ads-actions"><button type="button" data-ads-choice="granted" data-i18n="ads.accept">Accept advertising tracking</button><button type="button" data-ads-choice="denied" data-i18n="ads.reject">Reject</button><a href="/privacy.html" data-i18n="nav.privacy">Privacy</a></div><p class="ads-small" data-i18n="ads.withdraw">Change your choice on the Privacy page. Withdrawal stops future tracking, but cannot recall data already sent.</p>';
     panel.hidden = choice() !== null;
     w.document.body.appendChild(panel);
     w.document.addEventListener("click", function(e){

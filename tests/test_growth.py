@@ -10,7 +10,7 @@ class GrowthChecks(unittest.TestCase):
   for p in ROOT.rglob('*.html'):
    text=p.read_text()
    self.assertNotIn('px.ads.linkedin.com',text,str(p))
-   if '/assets/partials.js' in text:self.assertIn('/assets/growth.js?v=1',text,str(p))
+   if '/assets/partials.js' in text:self.assertIn('/assets/growth.js?v=2',text,str(p))
   self.assertNotIn('injectLinkedIn', (ROOT/'assets/partials.js').read_text())
  def test_ad_form_fields_links_assets_and_language_keys(self):
   text=(ROOT/'solutions/8-electrode-oem.html').read_text();parsed=Tags();parsed.feed(text)
