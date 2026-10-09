@@ -45,3 +45,7 @@ Lead form → FormSubmit `/ajax/` → `hanhan@lefu.cc`. If that fails, `mailto:`
 Partners are text-only until you have written logo permission. Company numbers follow *Company Profile 20260422.pptx* (DEXA **0.97**). The CF597/CF661/CF625 comparison file is a separate **r = 0.987** vs InBody and hospital DEXA — details on `/products/8-electrode.html#accuracy`. Primary nav is Home + three platforms + Contact; About / Capabilities are footer and in-page CTAs. Do not put `logo-unique-official.png` back in the header.
 
 © 2026 Shenzhen Unique Scales Co., Ltd. All rights reserved.
+
+## 领英广告专页（2026-10-09）
+
+八电极系列专页、追踪同意、来源字段、测试入口及上线待办见 [GROWTH-IMPLEMENTATION.md](GROWTH-IMPLEMENTATION.md)。本轮为本地验收，未发布。

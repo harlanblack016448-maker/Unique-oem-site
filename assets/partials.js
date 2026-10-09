@@ -71,6 +71,7 @@
     <div>
       <h4 data-i18n="footer.legal">Legal</h4>
       <p><a href="/privacy.html" data-i18n="nav.privacy">Privacy</a></p>
+      <p><button type="button" class="privacy-settings" data-ads-settings data-i18n="ads.settings">Privacy settings</button></p>
       <p data-i18n="footer.app">Unique Health App</p>
       <p data-i18n="footer.app.d">iOS / Android / HarmonyOS</p>
     </div>
@@ -136,8 +137,11 @@
     const bar = document.createElement("div");
     bar.className = "sticky-cta";
     bar.innerHTML = `<a href="/contact.html" class="btn-pill" data-i18n="nav.cta">Request a Quote</a>`;
+    if (document.body.dataset.page === "lead") {
+      bar.innerHTML = '<a href="#inquire" class="btn-pill" data-ad-request="specs" data-i18n="ad.cta">Request Specs & OEM Options</a>';
+    }
     document.body.appendChild(bar);
-    const hero = document.getElementById("main");
+    const hero = document.body.dataset.page === "lead" ? document.querySelector(".ad-section") : document.getElementById("main");
     const inquire = document.getElementById("inquire");
     if (!hero || !("IntersectionObserver" in window)) {
       bar.classList.add("is-visible");
@@ -220,7 +224,6 @@
     initPanelSwitch("[data-seg-tabs]", "data-seg", "data-seg-panel");
     initPanelSwitch("[data-swap]", "data-swap-btn", "data-swap-panel");
     initPanelSwitch("[data-scene-rail]", "data-scene", "data-scene-panel");
-    injectLinkedIn();
     loadChatWidget();
   });
 
@@ -415,28 +418,4 @@
     });
   }
 
-  function injectLinkedIn(){
-    if (window._linkedin_partner_id) return;
-    window._linkedin_partner_id = "9831228";
-    window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
-    window._linkedin_data_partner_ids.push(window._linkedin_partner_id);
-    (function(l){
-      if (!l){
-        window.lintrk = function(a,b){ window.lintrk.q.push([a,b]); };
-        window.lintrk.q = [];
-      }
-      var s = document.getElementsByTagName("script")[0];
-      var b = document.createElement("script");
-      b.type = "text/javascript";
-      b.async = true;
-      b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
-      s.parentNode.insertBefore(b, s);
-    })(window.lintrk);
-    if (!document.getElementById("li-insight-noscript")) {
-      var ns = document.createElement("noscript");
-      ns.id = "li-insight-noscript";
-      ns.innerHTML = '<img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=9831228&fmt=gif" />';
-      document.body.appendChild(ns);
-    }
-  }
 })();

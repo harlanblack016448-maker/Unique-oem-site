@@ -73,8 +73,8 @@ class TestReviewedTranslations(unittest.TestCase):
         ]
         for rel in pages:
             text = (ROOT / rel).read_text(encoding="utf-8")
-            self.assertIn("/assets/i18n.js?v=23", text, rel)
-            self.assertIn("/assets/partials.js?v=25", text, rel)
+            self.assertIn("/assets/i18n.js?v=24", text, rel)
+            self.assertIn("/assets/partials.js?v=26", text, rel)
         partials = (ROOT / "assets" / "partials.js").read_text(encoding="utf-8")
         self.assertIn("/assets/chat-widget.js?v=7", partials)
         self.assertIn("/assets/chat-widget.css?v=5", partials)
@@ -83,7 +83,7 @@ class TestReviewedTranslations(unittest.TestCase):
         form_pages = ("index.html", "contact.html")
         for rel in form_pages:
             text = (ROOT / rel).read_text(encoding="utf-8")
-            self.assertIn("/assets/form.js?v=12", text, rel)
+            self.assertIn("/assets/form.js?v=13", text, rel)
 
     def test_std_volume_options_drop_redundant_floor(self):
         form = (ROOT / "assets" / "form.js").read_text(encoding="utf-8")

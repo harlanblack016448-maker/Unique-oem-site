@@ -1427,9 +1427,151 @@
   Object.assign(DICT.zh, ZH_REFINED);
   Object.assign(DICT.en, EN_REFINED);
 
+  // Advertising additions; historical translation review remains a dated baseline.
+  Object.assign(DICT.en, {
+  "ads.title": "Advertising privacy",
+  "ads.text": "Allow LinkedIn to measure visits and successful inquiries? Your choice does not affect inquiry submission.",
+  "ads.accept": "Accept advertising tracking",
+  "ads.reject": "Reject",
+  "ads.settings": "Privacy settings",
+  "ads.withdraw": "Change your choice in Privacy settings. Withdrawal stops future tracking, but cannot recall data already sent.",
+  "privacy.1.text": "The standard quote form requires name, email, inquiry type, product interest and annual volume. The advertising page requires name, company, email and request type. Other fields are optional. Inquiries may include campaign source fields, page paths, a submission time and an inquiry ID. We use these to reply and assess our B2B campaigns.",
+  "privacy.5.text": "LinkedIn advertising tracking is off until you accept. Your choice (version and expiry) is saved for 180 days. When accepted, LinkedIn may receive page visits and successful inquiry events, and campaign source is retained for this browser session. Without acceptance, no advertising source is stored; source parameters explicitly on the form page may still accompany that inquiry. Rejecting does not affect the form. Use Privacy settings to change your choice. Withdrawal clears our saved campaign source and stops future tracking after reload; data already sent cannot be recalled. The LinkedIn partner ID is 9831228. We do not send inquiry field values to LinkedIn.",
+  "doc.title.lead": "8-Electrode Smart Scales for Your Brand — Unique Scales",
+  "doc.desc.lead": "Explore CF658, CF689 and CF625 OEM/ODM platforms. Request model specifications, samples and customization options.",
+  "ad.tag": "8-ELECTRODE · OEM / ODM",
+  "ad.title": "Smart scales. Built for your brand.",
+  "ad.sub": "Explore 8-electrode body composition platforms with different displays and fingerprint options. Work with our Shenzhen team on hardware, packaging and software requirements.",
+  "ad.cta": "Request Specs & OEM Options",
+  "ad.models": "Choose a platform for your market",
+  "ad.models.sub": "Start with these three production models. Confirm the exact configuration and target-market requirements with our team.",
+  "ad.cf658": "CF658 · Fingerprint recognition",
+  "ad.cf658.d": "3.5″ TFT display with a fingerprint handle. For projects seeking a distinctive multi-user experience.",
+  "ad.cf689": "CF689 · Color display",
+  "ad.cf689.d": "4.3″ TFT color display. Discuss the hardware and software configuration for your brand.",
+  "ad.cf625": "CF625 · Slim platform",
+  "ad.cf625.d": "4.25″ VA display in the standard catalog version. Explore a different display and platform option.",
+  "ad.select": "Discuss this model",
+  "ad.custom": "Your brand, from product to software",
+  "ad.custom.1": "Brand & packaging",
+  "ad.custom.1.d": "Discuss logo placement, colors and packaging. Availability and tooling depend on the chosen platform.",
+  "ad.custom.2": "Hardware configuration",
+  "ad.custom.2.d": "Choose a production platform, then confirm displays, connectivity and required functions for your project.",
+  "ad.custom.3": "App & cloud",
+  "ad.custom.3.d": "Discuss custom app and cloud requirements with our team. Scope and supported integrations are confirmed per project.",
+  "ad.proof": "A factory behind your product",
+  "ad.proof.d": "See our Longgang production facility, model specifications and the certification scope relevant to your target market.",
+  "ad.factory": "See the factory",
+  "ad.specs": "View model specifications",
+  "ad.comparison": "Download comparison report",
+  "ad.evidence": "The comparison file covers CF597, CF661 and CF625. It does not verify CF658, CF689 or every model in this series. Confirm the applicable configuration before relying on a result.",
+  "ad.process": "From selection to production",
+  "ad.process.1": "Define your project",
+  "ad.process.1.d": "Share your market, product requirements and preferred platform.",
+  "ad.process.2": "Evaluate a sample",
+  "ad.process.2.d": "Confirm the sample configuration, costs and evaluation steps with sales.",
+  "ad.process.3": "Confirm production",
+  "ad.process.3.d": "Agree customization, certification requirements and the production schedule before ordering.",
+  "ad.faq": "Before you start",
+  "ad.faq.1": "What is the minimum order?",
+  "ad.faq.1.d": "Eight-electrode first orders can start from 500 units by negotiation. Ask about the selected model and customization scope.",
+  "ad.faq.2": "Can I start with a sample?",
+  "ad.faq.2.d": "Select Sample in the form. Sales will confirm availability, configuration and the sample process.",
+  "ad.faq.3": "Which certifications apply?",
+  "ad.faq.3.d": "Certification depends on the exact model, BOM and market. Request the applicable documentation for your project.",
+  "ad.form.title": "Let’s find your platform",
+  "ad.form.sub": "Request specifications, a quote or a sample. We reply within one business day.",
+  "ad.form.note": "Name, company, email and request type are required. Model, volume and project details are optional.",
+  "ad.type": "Request type",
+  "ad.type.specs": "Specifications & OEM options",
+  "ad.model": "Preferred model (optional)",
+  "ad.unknown": "Not sure yet",
+  "ad.volume": "Estimated annual volume (optional)",
+  "ad.message": "Your project (optional)",
+  "ad.success": "Thank you. Our form service has accepted your inquiry. Our sales team will reply within one business day.",
+  "ad.again": "Send another inquiry"
+});
+  Object.assign(DICT.zh, {
+  "ads.title": "广告追踪设置",
+  "ads.text": "是否允许领英统计访问和成功询盘？你的选择不影响询盘提交。",
+  "ads.accept": "接受广告追踪",
+  "ads.reject": "拒绝",
+  "ads.settings": "隐私设置",
+  "ads.withdraw": "可在隐私设置中更改选择。撤回后将停止后续追踪，已发送的数据无法撤回。",
+  "privacy.1.text": "标准询盘表单必填姓名、邮箱、询盘类型、产品意向和年采购量；广告专页必填姓名、公司、邮箱和需求类型。其他字段选填。询盘可能包含广告来源字段、页面路径、提交时间和询盘编号，用于回复需求及评估 B 端广告效果。",
+  "privacy.5.text": "接受之前不启用领英广告追踪。你的选择（含版本和有效期）保存 180 天。接受后，领英可能收到页面访问和成功询盘事件，广告来源在当前浏览器会话中保存。未接受时不存储广告来源；表单当前网址中明确存在的来源参数仍可能随该次询盘提交。拒绝不影响表单使用。可通过隐私设置更改选择。撤回后清除本站保存的广告来源，刷新页面后停止后续追踪；已发送的数据无法撤回。领英合作伙伴 ID 为 9831228。本站不会将询盘字段内容发送给领英。",
+  "doc.title.lead": "为你的品牌打造八电极智能秤｜乐福衡器",
+  "doc.desc.lead": "了解 CF658、CF689 和 CF625 八电极 OEM/ODM 产品方案，获取型号规格、样品及定制选项。",
+  "ad.tag": "八电极产品系列 · OEM / ODM",
+  "ad.title": "智能秤，为你的品牌而造。",
+  "ad.sub": "多种显示与指纹识别配置，满足不同人体成分产品需求。与深圳团队共同确认硬件、包装和软件方案。",
+  "ad.cta": "获取规格与定制方案",
+  "ad.models": "为你的市场选择产品方案",
+  "ad.models.sub": "从三款在产型号开始，具体配置与目标市场要求由销售团队逐项确认。",
+  "ad.cf658": "CF658 · 指纹识别",
+  "ad.cf658.d": "3.5 英寸 TFT 显示屏与指纹手柄，适用于重视多用户识别体验的产品项目。",
+  "ad.cf689": "CF689 · 彩色显示",
+  "ad.cf689.d": "4.3 英寸 TFT 彩色显示屏，可按品牌需求沟通硬件与软件配置。",
+  "ad.cf625": "CF625 · 纤薄设计",
+  "ad.cf625.d": "画册标准版采用 4.25 英寸 VA 显示屏，提供不同的显示与秤体方案。",
+  "ad.select": "咨询这款型号",
+  "ad.custom": "从产品到软件，融入你的品牌",
+  "ad.custom.1": "品牌与包装",
+  "ad.custom.1.d": "沟通标志、配色与包装方案；适用范围及开模需求取决于所选产品。",
+  "ad.custom.2": "硬件配置",
+  "ad.custom.2.d": "基于在产产品，确认项目所需的显示、连接方式及功能。",
+  "ad.custom.3": "App 与云端",
+  "ad.custom.3.d": "与团队沟通定制 App 与云端需求，具体范围及支持的对接能力按项目确认。",
+  "ad.proof": "产品背后，是制造实力。",
+  "ad.proof.d": "了解龙岗生产基地、型号规格，以及目标市场所需的认证适用范围。",
+  "ad.factory": "查看工厂",
+  "ad.specs": "查看型号规格",
+  "ad.comparison": "下载对比报告",
+  "ad.evidence": "对比文件覆盖 CF597、CF661 和 CF625，不用于验证 CF658、CF689 或整个系列。引用结果前，请核实适用配置。",
+  "ad.process": "从选型到量产",
+  "ad.process.1": "确认需求",
+  "ad.process.1.d": "告知目标市场、产品要求与意向型号。",
+  "ad.process.2": "评估样品",
+  "ad.process.2.d": "与销售确认样品配置、费用及评估流程。",
+  "ad.process.3": "确认量产",
+  "ad.process.3.d": "下单前确认定制范围、认证要求与生产计划。",
+  "ad.faq": "开始前，你可能想知道",
+  "ad.faq.1": "起订量是多少？",
+  "ad.faq.1.d": "八电极首单可从 500 台协商，具体按型号及定制范围确认。",
+  "ad.faq.2": "可以先申请样品吗？",
+  "ad.faq.2.d": "在表单中选择申请样品，销售将确认可用配置及样品流程。",
+  "ad.faq.3": "适用哪些认证？",
+  "ad.faq.3.d": "认证取决于具体型号、物料配置及目标市场，请按项目索取对应资料。",
+  "ad.form.title": "一起找到适合你的产品方案",
+  "ad.form.sub": "获取规格、报价或样品。我们将在 1 个工作日内回复。",
+  "ad.form.note": "姓名、公司、邮箱和需求类型必填；型号、采购量与项目详情选填。",
+  "ad.type": "需求类型",
+  "ad.type.specs": "规格与定制方案",
+  "ad.model": "意向型号（选填）",
+  "ad.unknown": "尚未确定",
+  "ad.volume": "预计年采购量（选填）",
+  "ad.message": "项目详情（选填）",
+  "ad.success": "感谢提交，表单服务已接收你的询盘。销售团队将在 1 个工作日内回复。",
+  "ad.again": "再次提交询盘"
+});
+
+  Object.assign(DICT.en, {"ad.alt.hero": "Eight-electrode product collection from the latest catalog", "ad.alt.cf658": "CF658 scale with fingerprint handle", "ad.alt.cf689": "CF689 scale with 4.3 inch TFT display", "ad.alt.cf625": "CF625 standard version with 4.25 inch VA display", "ad.alt.factory": "Longgang production line"});
+  Object.assign(DICT.zh, {"ad.alt.hero": "最新画册中的八电极产品组合", "ad.alt.cf658": "配备指纹手柄的 CF658 八电极秤", "ad.alt.cf689": "配备 4.3 英寸 TFT 显示屏的 CF689 八电极秤", "ad.alt.cf625": "配备 4.25 英寸 VA 显示屏的 CF625 标准版", "ad.alt.factory": "龙岗生产线"});
   const KEY = "us_lang";
-  function getLang(){ return localStorage.getItem(KEY) || "en"; }
-  function setLang(l){ localStorage.setItem(KEY, l); apply(); }
+  let leadLang;
+  function getLang(){
+    if (document.body && document.body.dataset.page === "lead") {
+      if (!leadLang) { const requested = new URLSearchParams(window.location.search).get("lang"); leadLang = requested === "zh" ? "zh" : "en"; }
+      return leadLang;
+    }
+    try { return localStorage.getItem(KEY) === "zh" ? "zh" : "en"; } catch (_) { return "en"; }
+  }
+  function setLang(l){
+    if (!["en", "zh"].includes(l)) return;
+    if (document.body && document.body.dataset.page === "lead") leadLang = l;
+    else { try { localStorage.setItem(KEY, l); } catch (_) {} }
+    apply();
+  }
 
   // Expose the dictionary and a re-apply event so other scripts (e.g. dynamic form options) can react to language changes.
   window.__us_dict = DICT;

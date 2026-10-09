@@ -18,17 +18,13 @@
     ]
   };
 
-  // LinkedIn 转化事件（用于付费投放按「询盘」而非「点击」优化）
-  // 取值：LinkedIn Campaign Manager → Measure → Conversions → 新建 "Lead" → 手动事件，
-  // 把生成的 conversion_id 填进下面这个空字符串即可生效。留空 = 只记页面浏览，不报转化。
-  // 详见 GROWTH-PLAN.md §3.2
+  // Existing Lead conversion: keep account configuration separate from local verification.
+  // Campaign Manager must associate this ID with the ad set before production reporting.
+  // Consent and per-inquiry deduplication are enforced by growth.js.
   const LI_CONVERSION_ID = "28515124";
 
-  function trackLeadConversion(){
-    if (!LI_CONVERSION_ID) return;
-    try {
-      if (window.lintrk) window.lintrk("track", { conversion_id: LI_CONVERSION_ID });
-    } catch (_) {}
+  function trackLeadConversion(id, allowed){
+    try { if (window.__us_growth) window.__us_growth.trackLead(LI_CONVERSION_ID, id, allowed); } catch (_) { /* Analytics must not affect a received inquiry. */ }
   }
 
   function getLang(){
@@ -39,10 +35,12 @@
     const vol = document.getElementById("volume-select");
     if (!vol) return;
     const interest = document.getElementById("interest-select");
+    const adForm = document.getElementById("lead-form");
+    const isAd = adForm && adForm.getAttribute("data-form-mode") === "ad";
     const previous = vol.value;
     const lang = getLang();
     const dict = window.__us_dict || {};
-    const set = VOL_SETS[interest && interest.value] || VOL_SETS._default;
+    const set = isAd ? [{v:"unknown", k:"ad.unknown"}, ...VOL_SETS["8-electrode"]] : (VOL_SETS[interest && interest.value] || VOL_SETS._default);
 
     const placeholderLabel = (dict[lang] && dict[lang]["contact.volume.opt"]) || "Select…";
 
@@ -51,7 +49,7 @@
     ph.value = "";
     ph.textContent = placeholderLabel;
     ph.setAttribute("data-i18n", "contact.volume.opt");
-    vol.appendChild(ph);
+    if (!isAd) vol.appendChild(ph);
 
     set.forEach(item => {
       const opt = document.createElement("option");
@@ -62,7 +60,7 @@
     // Keep a valid selection when only the language changes. If the buyer
     // changed product interest and the old range is no longer available,
     // clear it so the form cannot submit a mismatched volume.
-    vol.value = set.some(item => item.v === previous) ? previous : "";
+    vol.value = set.some(item => item.v === previous) ? previous : (isAd ? "unknown" : "");
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -88,6 +86,9 @@
     // ---- form submission ----
     const form = document.getElementById("lead-form");
     if (!form) return;
+    const isAd = form.getAttribute("data-form-mode") === "ad";
+    const growth = window.__us_growth;
+    let inquiryId, submissionMeta = {};
     const success = form.querySelector(".form-success");
     // Email stored as base64 to reduce plain-text scraping while keeping mailto fallback functional.
     const EMAIL = atob("aGFuaGFuQGxlZnUuY2M=");
@@ -111,7 +112,8 @@
       { el: document.getElementById("f-email"), msg: "contact.err.required", format: "email" },
       { el: document.getElementById("interest-select"), msg: "contact.err.required" },
       { el: document.getElementById("volume-select"), msg: "contact.err.required" }
-    ].filter((r) => r.el);
+    ].filter((r) => r.el && (!isAd || !["interest-select", "volume-select"].includes(r.el.id)));
+    if (isAd) RULES.push({el:document.getElementById("f-company"), msg:"contact.err.required"});
 
     const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -211,7 +213,11 @@
         return;
       }
       const action = form.getAttribute("action") || "";
+      if (growth && !inquiryId) inquiryId = growth.id();
+      submissionMeta = growth ? growth.metadata(inquiryId) : {};
+      const allowedAtSubmit = !!(growth && growth.choice() === "granted");
       const data = new FormData(form);
+      Object.entries(submissionMeta).forEach(([key,value]) => data.set(key, value));
       data.delete("_honey");
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -234,7 +240,8 @@
         form.reset();
         renderVolumes();
         clearValidation();
-        trackLeadConversion();
+        trackLeadConversion(inquiryId, allowedAtSubmit);
+        inquiryId = undefined;
         if (success) {
           success.classList.add("show");
           success.setAttribute("tabindex", "-1");
@@ -256,7 +263,8 @@
         "\nCompany: " + val("company") + "\nCountry: " + val("country") +
         "\nPhone/WhatsApp: " + val("phone") + "\nInquiry type: " + val("inquiry_type") +
         "\nInterest: " + val("interest") +
-        "\nVolume: " + val("volume") + "\n\n" + val("message")
+        "\nModel: " + val("model") + "\nVolume: " + val("volume") + "\n\n" + val("message") +
+        "\n\n" + Object.entries(submissionMeta).map(([k,v]) => k + ": " + v).join("\n")
       );
       window.location.href = "mailto:" + EMAIL + "?subject=" +
         encodeURIComponent("Website inquiry — " + (val("interest") || "Smart scale")) + "&body=" + body;
