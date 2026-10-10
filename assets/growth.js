@@ -74,12 +74,22 @@
     else { storage("sessionStorage", "removeItem", SOURCE); if (w.lintrk && w.lintrk.q) w.lintrk.q.length = 0; }
     const panel = w.document && w.document.getElementById("ads-consent");
     if (panel) panel.hidden = true;
+    fit();
     if (value === "denied" && (loaded || previous === "granted")) w.location.reload();
+  }
+  // Reserve page space under the fixed consent panel while it is visible, so it never hides content.
+  function fit(){
+    const d = w.document, panel = d && d.getElementById && d.getElementById("ads-consent");
+    if (!d || !d.body || !d.documentElement) return;
+    const open = !!panel && !panel.hidden;
+    if (open) d.documentElement.style.setProperty("--ads-consent-space", Math.max(0, Math.ceil(w.innerHeight - panel.getBoundingClientRect().top)) + "px");
+    d.body.classList.toggle("ads-consent-open", open);
   }
   function show(){
     const panel = w.document.getElementById("ads-consent");
     if (!panel) return;
     panel.hidden = false;
+    fit();
     panel.querySelector("button").focus({preventScroll:true});
   }
   function init(){
@@ -87,7 +97,7 @@
     const panel = w.document.createElement("aside");
     panel.id = "ads-consent"; panel.className = "ads-consent";
     panel.setAttribute("role", "region"); panel.setAttribute("aria-labelledby", "ads-consent-title");
-    panel.innerHTML = '<h2 id="ads-consent-title" data-i18n="ads.title">Advertising privacy</h2><p data-i18n="ads.text">Allow LinkedIn to measure visits and successful inquiries? Your choice does not affect inquiry submission.</p><div class="ads-actions"><button type="button" data-ads-choice="granted" data-i18n="ads.accept">Accept advertising tracking</button><button type="button" data-ads-choice="denied" data-i18n="ads.reject">Reject</button><a href="/privacy.html" data-i18n="nav.privacy">Privacy</a></div><p class="ads-small" data-i18n="ads.withdraw">Change your choice on the Privacy page. Withdrawal stops future tracking, but cannot recall data already sent.</p>';
+    panel.innerHTML = '<h2 id="ads-consent-title" data-i18n="ads.title">Advertising privacy</h2><p data-i18n="ads.text">Allow LinkedIn to measure visits and successful inquiries? Your choice does not affect inquiry submission.</p><div class="ads-actions"><button type="button" data-ads-choice="granted" data-i18n="ads.accept">Accept</button><button type="button" data-ads-choice="denied" data-i18n="ads.reject">Reject</button><a href="/privacy.html" data-i18n="nav.privacy">Privacy</a></div><p class="ads-small" data-i18n="ads.withdraw">Change your choice on the Privacy page. Withdrawal stops future tracking, but cannot recall data already sent.</p>';
     panel.hidden = choice() !== null;
     w.document.body.appendChild(panel);
     w.document.addEventListener("click", function(e){
@@ -97,13 +107,16 @@
       if (settings) show();
     });
     if (w.__us_apply) w.__us_apply();
+    fit();
+    if (typeof w.ResizeObserver === "function") new w.ResizeObserver(fit).observe(panel);
+    w.addEventListener("resize", fit);
     // Another tab can revoke consent. Reload unloads already active third-party code.
     w.addEventListener("storage", function(e){
       if (e.key !== CONSENT && e.key !== null) return;
       memoryConsent = undefined;
       if (choice() !== "granted") {
         storage("sessionStorage", "removeItem", SOURCE);
-        if (loaded) w.location.reload(); else panel.hidden = choice() !== null;
+        if (loaded) w.location.reload(); else { panel.hidden = choice() !== null; fit(); }
       }
     });
   }

@@ -1431,7 +1431,7 @@
   Object.assign(DICT.en, {
   "ads.title": "Advertising privacy",
   "ads.text": "Allow LinkedIn to measure visits and successful inquiries? Your choice does not affect inquiry submission.",
-  "ads.accept": "Accept advertising tracking",
+  "ads.accept": "Accept",
   "ads.reject": "Reject",
   "ads.settings": "Privacy settings",
   "ads.withdraw": "Change your choice on the Privacy page. Withdrawal stops future tracking, but cannot recall data already sent.",
@@ -1494,7 +1494,7 @@
   Object.assign(DICT.zh, {
   "ads.title": "广告追踪设置",
   "ads.text": "是否允许领英统计访问和成功询盘？你的选择不影响询盘提交。",
-  "ads.accept": "接受广告追踪",
+  "ads.accept": "接受",
   "ads.reject": "拒绝",
   "ads.settings": "隐私设置",
   "ads.withdraw": "可在隐私页面中更改选择。撤回后将停止后续追踪，已发送的数据无法撤回。",
