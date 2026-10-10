@@ -10,6 +10,8 @@
   color: #111;
 }
 
+/* --ads-lift is set by growth.js/growth.css while the ad-consent panel is visible,
+   so the FAB, panel and Request-a-Quote pill sit above it; 0 otherwise. */
 /* floating action button
    Default inset matches the desktop .sticky-cta pill (bottom:24px). The FAB
    only rises when that pill is actually on screen — About / Contact / first-
@@ -18,7 +20,7 @@
 .uschat-fab {
   position: fixed;
   right: 18px;
-  bottom: 24px;
+  bottom: calc(24px + var(--ads-lift, 0px));
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -48,11 +50,11 @@
 .uschat-panel {
   position: fixed;
   right: 18px;
-  bottom: 88px; /* 24px FAB inset + 56px FAB + 8px gap */
+  bottom: calc(88px + var(--ads-lift, 0px)); /* 24px FAB inset + 56px FAB + 8px gap */
   width: 360px;
   max-width: calc(100vw - 24px);
   height: 540px;
-  max-height: calc(100vh - 112px);
+  max-height: calc(100vh - 112px - var(--ads-lift, 0px));
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.28);
@@ -67,10 +69,10 @@
 }
 
 /* Rise above Request-a-Quote only while the pill/bar is visible. */
-body:has(.sticky-cta.is-visible) .uschat-fab { bottom: 84px; }
+body:has(.sticky-cta.is-visible) .uschat-fab { bottom: calc(84px + var(--ads-lift, 0px)); }
 body:has(.sticky-cta.is-visible) .uschat-panel {
-  bottom: 148px;
-  max-height: calc(100vh - 172px);
+  bottom: calc(148px + var(--ads-lift, 0px));
+  max-height: calc(100vh - 172px - var(--ads-lift, 0px));
 }
 .uschat-open .uschat-panel {
   opacity: 1;
@@ -180,18 +182,18 @@ body:has(.sticky-cta.is-visible) .uschat-panel {
 @media (min-width: 821px) {
   /* 8-electrode desktop hides .sticky-cta; beat body:has(.sticky-cta.is-visible) specificity. */
   body[data-page="8"] .uschat-fab,
-  body[data-page="8"]:has(.sticky-cta.is-visible) .uschat-fab { bottom: 24px; }
+  body[data-page="8"]:has(.sticky-cta.is-visible) .uschat-fab { bottom: calc(24px + var(--ads-lift, 0px)); }
   body[data-page="8"] .uschat-panel,
   body[data-page="8"]:has(.sticky-cta.is-visible) .uschat-panel {
-    bottom: 88px;
-    max-height: calc(100vh - 112px);
+    bottom: calc(88px + var(--ads-lift, 0px));
+    max-height: calc(100vh - 112px - var(--ads-lift, 0px));
   }
 }
 @media (max-width: 640px) {
-  .uschat-panel { right: 8px; left: 8px; width: auto; bottom: 88px; height: 62vh; }
-  .uschat-fab { right: 14px; bottom: 24px; }
-  body:has(.sticky-cta.is-visible) .uschat-fab { bottom: 80px; } /* above the full-width mobile sticky bar */
-  body:has(.sticky-cta.is-visible) .uschat-panel { bottom: 148px; }
+  .uschat-panel { right: 8px; left: 8px; width: auto; bottom: calc(88px + var(--ads-lift, 0px)); height: 62vh; max-height: calc(100vh - 112px - var(--ads-lift, 0px)); }
+  .uschat-fab { right: 14px; bottom: calc(24px + var(--ads-lift, 0px)); }
+  body:has(.sticky-cta.is-visible) .uschat-fab { bottom: calc(80px + var(--ads-lift, 0px)); } /* above the full-width mobile sticky bar */
+  body:has(.sticky-cta.is-visible) .uschat-panel { bottom: calc(148px + var(--ads-lift, 0px)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .uschat-panel, .uschat-fab { transition: none; }

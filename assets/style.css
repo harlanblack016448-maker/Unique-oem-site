@@ -769,7 +769,7 @@ body[data-page="8"] .hotspot-stage img{display:block;width:100%;height:auto;obje
 .sticky-cta{display:none}
 @media(max-width:820px){
   .sticky-cta{
-    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:95;
+    display:flex;position:fixed;left:0;right:0;bottom:var(--ads-lift, 0px);z-index:95;
     background:rgba(0,0,0,.92);-webkit-backdrop-filter:saturate(180%) blur(16px);backdrop-filter:saturate(180%) blur(16px);
     padding:10px 16px calc(10px + env(safe-area-inset-bottom));justify-content:center;
     transform:translateY(110%);opacity:0;pointer-events:none;transition:transform .2s var(--ease-out),opacity .2s var(--ease-out)
@@ -780,7 +780,7 @@ body[data-page="8"] .hotspot-stage img{display:block;width:100%;height:auto;obje
 }
 @media(min-width:821px){
   .sticky-cta{
-    display:flex;position:fixed;right:24px;bottom:24px;left:auto;z-index:95;
+    display:flex;position:fixed;right:24px;bottom:calc(24px + var(--ads-lift, 0px));left:auto;z-index:95;
     background:transparent;padding:0;justify-content:flex-end;
     transform:translateY(12px);opacity:0;pointer-events:none;
     transition:transform .2s var(--ease-out),opacity .2s var(--ease-out)

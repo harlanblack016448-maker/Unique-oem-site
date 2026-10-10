@@ -73,13 +73,13 @@ class TestReviewedTranslations(unittest.TestCase):
         ]
         for rel in pages:
             text = (ROOT / rel).read_text(encoding="utf-8")
-            self.assertIn("/assets/i18n.js?v=25", text, rel)
-            self.assertIn("/assets/partials.js?v=27", text, rel)
+            self.assertIn("/assets/i18n.js?v=26", text, rel)
+            self.assertIn("/assets/partials.js?v=28", text, rel)
         partials = (ROOT / "assets" / "partials.js").read_text(encoding="utf-8")
-        self.assertIn("/assets/chat-widget.js?v=7", partials)
-        self.assertIn("/assets/chat-widget.css?v=5", partials)
+        self.assertIn("/assets/chat-widget.js?v=8", partials)
+        self.assertIn("/assets/chat-widget.css?v=6", partials)
         chat = (ROOT / "assets" / "chat-widget.js").read_text(encoding="utf-8")
-        self.assertIn("/assets/chat-widget.css?v=5", chat)
+        self.assertIn("/assets/chat-widget.css?v=6", chat)
         form_pages = ("index.html", "contact.html")
         for rel in form_pages:
             text = (ROOT / rel).read_text(encoding="utf-8")
@@ -92,7 +92,7 @@ class TestReviewedTranslations(unittest.TestCase):
         self.assertIn('v: "500-first"', form)
         css = (ROOT / "assets" / "chat-widget.css").read_text(encoding="utf-8")
         self.assertIn("body:has(.sticky-cta.is-visible) .uschat-fab", css)
-        self.assertIn("bottom: 24px;", css)
+        self.assertIn("bottom: calc(24px + var(--ads-lift, 0px));", css)
 
     def test_static_fallback_matches_corrected_english(self):
         bathroom = (ROOT / "products" / "bathroom.html").read_text(encoding="utf-8")
