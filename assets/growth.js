@@ -74,12 +74,22 @@
     else { storage("sessionStorage", "removeItem", SOURCE); if (w.lintrk && w.lintrk.q) w.lintrk.q.length = 0; }
     const panel = w.document && w.document.getElementById("ads-consent");
     if (panel) panel.hidden = true;
+    fit();
     if (value === "denied" && (loaded || previous === "granted")) w.location.reload();
+  }
+  // Reserve page space under the fixed consent panel while it is visible, so it never hides content.
+  function fit(){
+    const d = w.document, panel = d && d.getElementById && d.getElementById("ads-consent");
+    if (!d || !d.body || !d.documentElement) return;
+    const open = !!panel && !panel.hidden;
+    if (open) d.documentElement.style.setProperty("--ads-consent-space", Math.max(0, Math.ceil(w.innerHeight - panel.getBoundingClientRect().top)) + "px");
+    d.body.classList.toggle("ads-consent-open", open);
   }
   function show(){
     const panel = w.document.getElementById("ads-consent");
     if (!panel) return;
     panel.hidden = false;
+    fit();
     panel.querySelector("button").focus({preventScroll:true});
   }
   function init(){
@@ -97,13 +107,16 @@
       if (settings) show();
     });
     if (w.__us_apply) w.__us_apply();
+    fit();
+    if (typeof w.ResizeObserver === "function") new w.ResizeObserver(fit).observe(panel);
+    w.addEventListener("resize", fit);
     // Another tab can revoke consent. Reload unloads already active third-party code.
     w.addEventListener("storage", function(e){
       if (e.key !== CONSENT && e.key !== null) return;
       memoryConsent = undefined;
       if (choice() !== "granted") {
         storage("sessionStorage", "removeItem", SOURCE);
-        if (loaded) w.location.reload(); else panel.hidden = choice() !== null;
+        if (loaded) w.location.reload(); else { panel.hidden = choice() !== null; fit(); }
       }
     });
   }
