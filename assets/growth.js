@@ -81,9 +81,17 @@
   function fit(){
     const d = w.document, panel = d && d.getElementById && d.getElementById("ads-consent");
     if (!d || !d.body || !d.documentElement) return;
-    const open = !!panel && !panel.hidden;
-    if (open) d.documentElement.style.setProperty("--ads-consent-space", Math.max(0, Math.ceil(w.innerHeight - panel.getBoundingClientRect().top)) + "px");
+    const de = d.documentElement, open = !!panel && !panel.hidden;
+    const before = d.body.classList.contains("ads-consent-open") ? parseFloat(de.style.getPropertyValue("--ads-consent-space")) || 0 : 0;
+    const atBottom = w.scrollY > 0 && de.scrollHeight - w.innerHeight - w.scrollY <= 4;
+    const space = open ? Math.max(0, Math.ceil(w.innerHeight - panel.getBoundingClientRect().top)) : 0;
+    if (open) de.style.setProperty("--ads-consent-space", space + "px");
     d.body.classList.toggle("ads-consent-open", open);
+    // If the panel opens or grows while the reader is at the page end, stay at the end so the footer stays above it.
+    if (atBottom && space > before) {
+      try { w.scrollTo({top:de.scrollHeight, left:w.scrollX, behavior:"instant"}); }
+      catch (_) { w.scrollTo(w.scrollX, de.scrollHeight); }
+    }
   }
   function show(){
     const panel = w.document.getElementById("ads-consent");
