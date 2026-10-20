@@ -1,0 +1,13 @@
+# Keep internal-only files in the repo but out of Vercel deployments.
+# The site is static HTML/CSS/JS + api/ functions; none of these paths are referenced by pages.
+
+# QA evidence, screenshots, CSVs
+/qa
+
+# Internal docs and notes (all Markdown, any depth: CLAUDE.md, README.md, design/TRACE.md, ...)
+*.md
+/design
+
+# Dev tooling and tests (not used at runtime)
+/scripts
+/tests
