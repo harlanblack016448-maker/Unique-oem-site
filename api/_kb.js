@@ -1,4 +1,5 @@
-// api/kb.js — FAQ knowledge base for the Unique Scales assistant.
+// api/_kb.js — FAQ knowledge base for the Unique Scales assistant.
+// Underscore prefix: Vercel does not expose this as a route (it is a data module required by api/chat.js).
 // Every fact below is sourced from the public site (index / capabilities /
 // products / contact / privacy) or the official FAQ copy in assets/i18n.js.
 // EDIT RULE: only add facts that are already public on the site or confirmed
