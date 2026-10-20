@@ -17,7 +17,7 @@ const {
   parseAgentOutput,
   sendEscalationEmail,
 } = require("./_lib.js");
-const { COMPANY, KB } = require("./kb.js");
+const { COMPANY, KB } = require("./_kb.js");
 
 const SID_RE = /^[A-Za-z0-9_-]{8,64}$/;
 const HISTORY_TURNS = 10; // messages (user+assistant) sent to the model

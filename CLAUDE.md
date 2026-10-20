@@ -19,7 +19,7 @@
 
 ## 目录与约定
 - `assets/partials.js` 全站注入导航/页脚/挂件；**改任何 js/css 必须同步升 `?v=` 版本号**：partials 自身变化 → 9 个页面全升；挂件/样式变化 → 升 partials 里的引用
-- `api/kb.js` 知识库：只写站内公开事实；**红线：不宣称 UL、不报价、不谈独家代理**
+- `api/_kb.js` 知识库：只写站内公开事实；**红线：不宣称 UL、不报价、不谈独家代理**
 - 配置指南：`SETUP-CHATBOT.md`；设计规范：`design/TRACE.md`（动效 ≤300ms，easing tokens only）
 
 ## 当前状态（2026-09-10）

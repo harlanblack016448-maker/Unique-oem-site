@@ -11,7 +11,7 @@ Nav is **text-only** “Unique Scales” (no graphic logomark). Favicon is a bla
 
 ## AI chat assistant (chatbot)
 
-Floating assistant on every page (`/api/chat`, `/api/feedback`, `/api/admin`) + admin dashboard at `/admin.html` (token-protected). Zero npm dependencies; LLM via OpenAI-compatible env keys; persistence via **Upstash Redis** (Vercel Storage integration — `KV_REST_API_URL` / `KV_REST_API_TOKEN`, connected 2026-09-04). **Setup guide: [`SETUP-CHATBOT.md`](SETUP-CHATBOT.md)** — env vars, KV connection, acceptance checklist. Edit FAQ knowledge base in `api/kb.js` (site-public facts only — no UL / prices / exclusivity claims). Bump `chat-widget.js?v=` inside `assets/partials.js` when the widget changes (and bump `partials.js?v=` on all 9 pages when partials.js itself changes).
+Floating assistant on every page (`/api/chat`, `/api/feedback`, `/api/admin`) + admin dashboard at `/admin.html` (token-protected). Zero npm dependencies; LLM via OpenAI-compatible env keys; persistence via **Upstash Redis** (Vercel Storage integration — `KV_REST_API_URL` / `KV_REST_API_TOKEN`, connected 2026-09-04). **Setup guide: [`SETUP-CHATBOT.md`](SETUP-CHATBOT.md)** — env vars, KV connection, acceptance checklist. Edit FAQ knowledge base in `api/_kb.js` (site-public facts only — no UL / prices / exclusivity claims). Bump `chat-widget.js?v=` inside `assets/partials.js` when the widget changes (and bump `partials.js?v=` on all 9 pages when partials.js itself changes).
 
 ```bash
 python3 -m http.server 8090
