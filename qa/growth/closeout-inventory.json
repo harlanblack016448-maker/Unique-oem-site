@@ -1,0 +1,1009 @@
+{
+  "date": "2026-10-09",
+  "scope": "OEM site and direct session evidence only",
+  "source": "/Users/harlan/Workbuddy/2026-08-10-14-49-50/oem-landing",
+  "push_clone": "/Users/harlan/Workbuddy/2026-08-10-14-49-50/oem-site-git",
+  "source_has_own_git": false,
+  "git_head": "b809b6a78c00ba1398412af51f7be7d2b54381d3",
+  "entries": [
+    {
+      "path": ".DS_Store",
+      "type": "file",
+      "bytes": 6148
+    },
+    {
+      "path": "404.html",
+      "type": "file",
+      "bytes": 1525
+    },
+    {
+      "path": "CLAUDE.md",
+      "type": "file",
+      "bytes": 3520
+    },
+    {
+      "path": "GROWTH-IMPLEMENTATION.md",
+      "type": "file",
+      "bytes": 8210
+    },
+    {
+      "path": "OPTIMIZATION-2026-09-12.md",
+      "type": "file",
+      "bytes": 3984
+    },
+    {
+      "path": "PHOTO-SOURCES.md",
+      "type": "file",
+      "bytes": 2504
+    },
+    {
+      "path": "README.md",
+      "type": "file",
+      "bytes": 4378
+    },
+    {
+      "path": "SETUP-CHATBOT.md",
+      "type": "file",
+      "bytes": 8831
+    },
+    {
+      "path": "TRANSLATION-REVIEW.md",
+      "type": "file",
+      "bytes": 96512
+    },
+    {
+      "path": "TRANSLATION-STYLE.md",
+      "type": "file",
+      "bytes": 2444
+    },
+    {
+      "path": "about.html",
+      "type": "file",
+      "bytes": 8602
+    },
+    {
+      "path": "admin.html",
+      "type": "file",
+      "bytes": 13720
+    },
+    {
+      "path": "api",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "api/_lib.js",
+      "type": "file",
+      "bytes": 7861
+    },
+    {
+      "path": "api/admin.js",
+      "type": "file",
+      "bytes": 3314
+    },
+    {
+      "path": "api/chat.js",
+      "type": "file",
+      "bytes": 7962
+    },
+    {
+      "path": "api/feedback.js",
+      "type": "file",
+      "bytes": 2004
+    },
+    {
+      "path": "api/kb.js",
+      "type": "file",
+      "bytes": 9282
+    },
+    {
+      "path": "assets",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "assets/.DS_Store",
+      "type": "file",
+      "bytes": 6148
+    },
+    {
+      "path": "assets/ad-page.js",
+      "type": "file",
+      "bytes": 1022
+    },
+    {
+      "path": "assets/catalog-manifest.json",
+      "type": "file",
+      "bytes": 22813
+    },
+    {
+      "path": "assets/chat-widget.css",
+      "type": "file",
+      "bytes": 7102
+    },
+    {
+      "path": "assets/chat-widget.js",
+      "type": "file",
+      "bytes": 12735
+    },
+    {
+      "path": "assets/docs",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "assets/docs/CF597_CF661_CF625_DEXA_Inbody_Correlation_EN.pdf",
+      "type": "file",
+      "bytes": 6025
+    },
+    {
+      "path": "assets/form.js",
+      "type": "file",
+      "bytes": 11254
+    },
+    {
+      "path": "assets/growth.css",
+      "type": "file",
+      "bytes": 2469
+    },
+    {
+      "path": "assets/growth.js",
+      "type": "file",
+      "bytes": 6261
+    },
+    {
+      "path": "assets/i18n.js",
+      "type": "file",
+      "bytes": 111141
+    },
+    {
+      "path": "assets/img",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "assets/img/apple-touch-icon.png",
+      "type": "file",
+      "bytes": 1179
+    },
+    {
+      "path": "assets/img/bathroom-champagne.jpg",
+      "type": "file",
+      "bytes": 188702
+    },
+    {
+      "path": "assets/img/bathroom-glass.jpg",
+      "type": "file",
+      "bytes": 114683
+    },
+    {
+      "path": "assets/img/catalog",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf577-card.jpg",
+      "type": "file",
+      "bytes": 47297
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf577-card.webp",
+      "type": "file",
+      "bytes": 21198
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf586-card.jpg",
+      "type": "file",
+      "bytes": 45372
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf586-card.webp",
+      "type": "file",
+      "bytes": 20080
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf625-card.jpg",
+      "type": "file",
+      "bytes": 53418
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf625-card.webp",
+      "type": "file",
+      "bytes": 24184
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf636-card.jpg",
+      "type": "file",
+      "bytes": 46307
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf636-card.webp",
+      "type": "file",
+      "bytes": 15692
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf650-card.jpg",
+      "type": "file",
+      "bytes": 46926
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf650-card.webp",
+      "type": "file",
+      "bytes": 20954
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf658-card.jpg",
+      "type": "file",
+      "bytes": 56759
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf658-card.webp",
+      "type": "file",
+      "bytes": 23678
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf658-feature.jpg",
+      "type": "file",
+      "bytes": 51615
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf658-feature.webp",
+      "type": "file",
+      "bytes": 27316
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf658-hero.jpg",
+      "type": "file",
+      "bytes": 216646
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf658-hero.webp",
+      "type": "file",
+      "bytes": 136638
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf661-card.jpg",
+      "type": "file",
+      "bytes": 57403
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf661-card.webp",
+      "type": "file",
+      "bytes": 26788
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf669-card.jpg",
+      "type": "file",
+      "bytes": 47549
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf669-card.webp",
+      "type": "file",
+      "bytes": 15594
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf687-card.jpg",
+      "type": "file",
+      "bytes": 57838
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf687-card.webp",
+      "type": "file",
+      "bytes": 26418
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf689-card.jpg",
+      "type": "file",
+      "bytes": 49640
+    },
+    {
+      "path": "assets/img/catalog/catalog-8-cf689-card.webp",
+      "type": "file",
+      "bytes": 19342
+    },
+    {
+      "path": "assets/img/catalog/catalog-bathroom-cf596-feature.jpg",
+      "type": "file",
+      "bytes": 133274
+    },
+    {
+      "path": "assets/img/catalog/catalog-bathroom-cf596-feature.webp",
+      "type": "file",
+      "bytes": 101080
+    },
+    {
+      "path": "assets/img/catalog/catalog-bathroom-cf596-hero.jpg",
+      "type": "file",
+      "bytes": 117909
+    },
+    {
+      "path": "assets/img/catalog/catalog-bathroom-cf596-hero.webp",
+      "type": "file",
+      "bytes": 102472
+    },
+    {
+      "path": "assets/img/catalog/catalog-home-8-electrode-hero.jpg",
+      "type": "file",
+      "bytes": 47147
+    },
+    {
+      "path": "assets/img/catalog/catalog-home-8-electrode-hero.webp",
+      "type": "file",
+      "bytes": 27956
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck775-card.jpg",
+      "type": "file",
+      "bytes": 126559
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck775-card.webp",
+      "type": "file",
+      "bytes": 85286
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck799-card.jpg",
+      "type": "file",
+      "bytes": 34366
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck799-card.webp",
+      "type": "file",
+      "bytes": 18572
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck809-card.jpg",
+      "type": "file",
+      "bytes": 58598
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck809-card.webp",
+      "type": "file",
+      "bytes": 27860
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck821-card.jpg",
+      "type": "file",
+      "bytes": 55815
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck821-card.webp",
+      "type": "file",
+      "bytes": 27706
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck829-card.jpg",
+      "type": "file",
+      "bytes": 98218
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck829-card.webp",
+      "type": "file",
+      "bytes": 54966
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck831-card.jpg",
+      "type": "file",
+      "bytes": 53130
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck831-card.webp",
+      "type": "file",
+      "bytes": 25858
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck838-card.jpg",
+      "type": "file",
+      "bytes": 74672
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck838-card.webp",
+      "type": "file",
+      "bytes": 36492
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck858-card.jpg",
+      "type": "file",
+      "bytes": 146711
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck858-card.webp",
+      "type": "file",
+      "bytes": 144404
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck863-card.jpg",
+      "type": "file",
+      "bytes": 110574
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck863-card.webp",
+      "type": "file",
+      "bytes": 64670
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck863-hero.jpg",
+      "type": "file",
+      "bytes": 96161
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck863-hero.webp",
+      "type": "file",
+      "bytes": 65712
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck869-card.jpg",
+      "type": "file",
+      "bytes": 75621
+    },
+    {
+      "path": "assets/img/catalog/catalog-kitchen-ck869-card.webp",
+      "type": "file",
+      "bytes": 40688
+    },
+    {
+      "path": "assets/img/eight-electrode-wide.jpg",
+      "type": "file",
+      "bytes": 73592
+    },
+    {
+      "path": "assets/img/favicon.svg",
+      "type": "file",
+      "bytes": 266
+    },
+    {
+      "path": "assets/img/hero-analyzer.jpg",
+      "type": "file",
+      "bytes": 105050
+    },
+    {
+      "path": "assets/img/kitchen-black-glass.jpg",
+      "type": "file",
+      "bytes": 61178
+    },
+    {
+      "path": "assets/img/kitchen-ck863-top.jpg",
+      "type": "file",
+      "bytes": 225672
+    },
+    {
+      "path": "assets/img/kitchen-ck863.jpg",
+      "type": "file",
+      "bytes": 151283
+    },
+    {
+      "path": "assets/img/kitchen-ck869.jpg",
+      "type": "file",
+      "bytes": 89433
+    },
+    {
+      "path": "assets/img/kitchen-coffee.jpg",
+      "type": "file",
+      "bytes": 100342
+    },
+    {
+      "path": "assets/img/kitchen-nutrition-app.jpg",
+      "type": "file",
+      "bytes": 169449
+    },
+    {
+      "path": "assets/img/kitchen-stainless.jpg",
+      "type": "file",
+      "bytes": 109395
+    },
+    {
+      "path": "assets/img/model-cf586.jpg",
+      "type": "file",
+      "bytes": 59533
+    },
+    {
+      "path": "assets/img/model-cf597.jpg",
+      "type": "file",
+      "bytes": 252275
+    },
+    {
+      "path": "assets/img/model-cf636.jpg",
+      "type": "file",
+      "bytes": 242817
+    },
+    {
+      "path": "assets/img/model-cf661.jpg",
+      "type": "file",
+      "bytes": 81190
+    },
+    {
+      "path": "assets/img/product-cf663.jpg",
+      "type": "file",
+      "bytes": 140924
+    },
+    {
+      "path": "assets/img/shot-cf577.jpg",
+      "type": "file",
+      "bytes": 121535
+    },
+    {
+      "path": "assets/img/shot-cf586.jpg",
+      "type": "file",
+      "bytes": 186372
+    },
+    {
+      "path": "assets/img/shot-cf625.jpg",
+      "type": "file",
+      "bytes": 117587
+    },
+    {
+      "path": "assets/img/shot-cf650.jpg",
+      "type": "file",
+      "bytes": 131899
+    },
+    {
+      "path": "assets/img/shot-cf658.jpg",
+      "type": "file",
+      "bytes": 140924
+    },
+    {
+      "path": "assets/img/shot-cf661.jpg",
+      "type": "file",
+      "bytes": 171343
+    },
+    {
+      "path": "assets/img/shot-cf669.jpg",
+      "type": "file",
+      "bytes": 302013
+    },
+    {
+      "path": "assets/img/shot-cf687.jpg",
+      "type": "file",
+      "bytes": 160717
+    },
+    {
+      "path": "assets/img/studio-8.jpg",
+      "type": "file",
+      "bytes": 120790
+    },
+    {
+      "path": "assets/img/studio-bathroom.jpg",
+      "type": "file",
+      "bytes": 129745
+    },
+    {
+      "path": "assets/img/studio-calibrate.jpg",
+      "type": "file",
+      "bytes": 222860
+    },
+    {
+      "path": "assets/img/studio-chamber.jpg",
+      "type": "file",
+      "bytes": 219686
+    },
+    {
+      "path": "assets/img/studio-drop.jpg",
+      "type": "file",
+      "bytes": 193119
+    },
+    {
+      "path": "assets/img/studio-hero.jpg",
+      "type": "file",
+      "bytes": 177359
+    },
+    {
+      "path": "assets/img/studio-kitchen.jpg",
+      "type": "file",
+      "bytes": 121831
+    },
+    {
+      "path": "assets/img/studio-line.jpg",
+      "type": "file",
+      "bytes": 254781
+    },
+    {
+      "path": "assets/inquiry-request.js",
+      "type": "file",
+      "bytes": 950
+    },
+    {
+      "path": "assets/partials.js",
+      "type": "file",
+      "bytes": 17586
+    },
+    {
+      "path": "assets/style.css",
+      "type": "file",
+      "bytes": 49366
+    },
+    {
+      "path": "capabilities.html",
+      "type": "file",
+      "bytes": 7422
+    },
+    {
+      "path": "contact.html",
+      "type": "file",
+      "bytes": 8041
+    },
+    {
+      "path": "design",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "design/TRACE.md",
+      "type": "file",
+      "bytes": 11486
+    },
+    {
+      "path": "index.html",
+      "type": "file",
+      "bytes": 23737
+    },
+    {
+      "path": "privacy.html",
+      "type": "file",
+      "bytes": 4158
+    },
+    {
+      "path": "products",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "products/8-electrode.html",
+      "type": "file",
+      "bytes": 23127
+    },
+    {
+      "path": "products/bathroom.html",
+      "type": "file",
+      "bytes": 6527
+    },
+    {
+      "path": "products/kitchen.html",
+      "type": "file",
+      "bytes": 9118
+    },
+    {
+      "path": "qa",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "qa/growth",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "qa/growth/ad-en-1440.jpg",
+      "type": "file",
+      "bytes": 419298
+    },
+    {
+      "path": "qa/growth/ad-en-390.jpg",
+      "type": "file",
+      "bytes": 321136
+    },
+    {
+      "path": "qa/growth/ad-en-768.jpg",
+      "type": "file",
+      "bytes": 322873
+    },
+    {
+      "path": "qa/growth/ad-zh-1440.jpg",
+      "type": "file",
+      "bytes": 352293
+    },
+    {
+      "path": "qa/growth/ad-zh-390.jpg",
+      "type": "file",
+      "bytes": 259663
+    },
+    {
+      "path": "qa/growth/ad-zh-768.jpg",
+      "type": "file",
+      "bytes": 260211
+    },
+    {
+      "path": "qa/growth/bilingual-copy.csv",
+      "type": "file",
+      "bytes": 9318
+    },
+    {
+      "path": "qa/growth/closeout-2026-10-09.md",
+      "type": "file",
+      "bytes": 8552
+    },
+    {
+      "path": "qa/growth/closeout-inventory.json",
+      "type": "file",
+      "bytes": null
+    },
+    {
+      "path": "qa/growth/consent-en-390.jpg",
+      "type": "file",
+      "bytes": 47565
+    },
+    {
+      "path": "qa/growth/consent-zh-390.jpg",
+      "type": "file",
+      "bytes": 37320
+    },
+    {
+      "path": "qa/growth/hero-en-1440.jpg",
+      "type": "file",
+      "bytes": 114415
+    },
+    {
+      "path": "qa/growth/live-consent-mobile-en.jpg",
+      "type": "file",
+      "bytes": 66880
+    },
+    {
+      "path": "qa/growth/live-footer-desktop.jpg",
+      "type": "file",
+      "bytes": 68330
+    },
+    {
+      "path": "qa/growth/privacy-footer-desktop.jpg",
+      "type": "file",
+      "bytes": 71684
+    },
+    {
+      "path": "qa/growth/privacy-settings-mobile.jpg",
+      "type": "file",
+      "bytes": 63990
+    },
+    {
+      "path": "qa/growth/sales-followup.csv",
+      "type": "file",
+      "bytes": 164
+    },
+    {
+      "path": "qa/screenshots",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "qa/screenshots/index-1440.png",
+      "type": "file",
+      "bytes": 235507
+    },
+    {
+      "path": "qa/screenshots/index-390.png",
+      "type": "file",
+      "bytes": 121994
+    },
+    {
+      "path": "qa/screenshots/index-768.png",
+      "type": "file",
+      "bytes": 278536
+    },
+    {
+      "path": "qa/screenshots/products-8-electrode-1440.png",
+      "type": "file",
+      "bytes": 251394
+    },
+    {
+      "path": "qa/screenshots/products-8-electrode-390.png",
+      "type": "file",
+      "bytes": 117362
+    },
+    {
+      "path": "qa/screenshots/products-8-electrode-768.png",
+      "type": "file",
+      "bytes": 187218
+    },
+    {
+      "path": "qa/screenshots/products-8-electrode-models-1440.png",
+      "type": "file",
+      "bytes": 424633
+    },
+    {
+      "path": "qa/screenshots/products-8-electrode-models-390.png",
+      "type": "file",
+      "bytes": 145644
+    },
+    {
+      "path": "qa/screenshots/products-bathroom-1440.png",
+      "type": "file",
+      "bytes": 437786
+    },
+    {
+      "path": "qa/screenshots/products-bathroom-390.png",
+      "type": "file",
+      "bytes": 196544
+    },
+    {
+      "path": "qa/screenshots/products-bathroom-768.png",
+      "type": "file",
+      "bytes": 365840
+    },
+    {
+      "path": "qa/screenshots/products-kitchen-1440.png",
+      "type": "file",
+      "bytes": 478881
+    },
+    {
+      "path": "qa/screenshots/products-kitchen-390.png",
+      "type": "file",
+      "bytes": 228549
+    },
+    {
+      "path": "qa/screenshots/products-kitchen-768.png",
+      "type": "file",
+      "bytes": 351993
+    },
+    {
+      "path": "qa/screenshots/products-kitchen-models-1440.png",
+      "type": "file",
+      "bytes": 581884
+    },
+    {
+      "path": "qa/screenshots/products-kitchen-models-390.png",
+      "type": "file",
+      "bytes": 210007
+    },
+    {
+      "path": "robots.txt",
+      "type": "file",
+      "bytes": 132
+    },
+    {
+      "path": "scripts",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "scripts/prepush.sh",
+      "type": "file",
+      "bytes": 3549
+    },
+    {
+      "path": "scripts/preview-test.py",
+      "type": "file",
+      "bytes": 3031
+    },
+    {
+      "path": "scripts/qa-growth-server.py",
+      "type": "file",
+      "bytes": 3532
+    },
+    {
+      "path": "scripts/read-dictionary.cjs",
+      "type": "file",
+      "bytes": 649
+    },
+    {
+      "path": "scripts/responsive-images.py",
+      "type": "file",
+      "bytes": 2929
+    },
+    {
+      "path": "scripts/sync-copy.cjs",
+      "type": "file",
+      "bytes": 3596
+    },
+    {
+      "path": "site.webmanifest",
+      "type": "file",
+      "bytes": 364
+    },
+    {
+      "path": "sitemap.xml",
+      "type": "file",
+      "bytes": 692
+    },
+    {
+      "path": "solutions",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "solutions/8-electrode-oem.html",
+      "type": "file",
+      "bytes": 11609
+    },
+    {
+      "path": "tests",
+      "type": "directory",
+      "bytes": null
+    },
+    {
+      "path": "tests/form-behavior.test.cjs",
+      "type": "file",
+      "bytes": 2716
+    },
+    {
+      "path": "tests/growth.test.cjs",
+      "type": "file",
+      "bytes": 3901
+    },
+    {
+      "path": "tests/inquiry-request.test.cjs",
+      "type": "file",
+      "bytes": 1456
+    },
+    {
+      "path": "tests/test_8electrode_photos.py",
+      "type": "file",
+      "bytes": 11657
+    },
+    {
+      "path": "tests/test_growth.py",
+      "type": "file",
+      "bytes": 1904
+    },
+    {
+      "path": "tests/test_release_check.py",
+      "type": "file",
+      "bytes": 2094
+    },
+    {
+      "path": "tests/test_translations.py",
+      "type": "file",
+      "bytes": 5445
+    },
+    {
+      "path": "vercel.json",
+      "type": "file",
+      "bytes": 1770
+    }
+  ],
+  "memory": "generated-read-only; not modified",
+  "cleanup": "completed after post-report user approval; QA service retained",
+  "inventory_self_bytes": "omitted to avoid recursive metadata",
+  "cleanup_approval": {
+    "date": "2026-10-09",
+    "user_message": "确认删除"
+  },
+  "deleted": [
+    {
+      "path": "/Users/harlan/Documents/Codex/2026-09-10/zhes/growth-qa",
+      "files": 9,
+      "bytes": 2134774
+    },
+    {
+      "path": "/Users/harlan/Documents/Codex/2026-09-10/zhes/privacy-display",
+      "files": 2,
+      "bytes": 135674
+    },
+    {
+      "path": "/Users/harlan/Documents/Codex/2026-09-10/zhes/vercel-check",
+      "files": 3,
+      "bytes": 142545
+    },
+    {
+      "path": "/var/folders/wc/sdm_27b502xgjrlt6x6cltzc0000gn/T/oem-reviewed-release-d73pw1br",
+      "files": 167,
+      "bytes": 15489672
+    },
+    {
+      "path": "/Users/harlan/Workbuddy/2026-08-10-14-49-50/oem-landing/tests/__pycache__",
+      "files": 2,
+      "bytes": 31846
+    },
+    {
+      "path": "/tmp/oem-reviewed-release-path.txt",
+      "files": 1,
+      "bytes": 78
+    },
+    {
+      "path": "/tmp/oem-publish-manifest.json",
+      "files": 1,
+      "bytes": 923
+    },
+    {
+      "path": "/tmp/oem-site-git-index-lock-20261009.backup",
+      "files": 1,
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/oem-neat-docs.py",
+      "files": 1,
+      "bytes": 16598
+    },
+    {
+      "path": "/tmp/oem-neat-receipt.py",
+      "files": 1,
+      "bytes": 7305
+    }
+  ]
+}
