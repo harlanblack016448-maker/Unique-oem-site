@@ -133,8 +133,10 @@
   // Desktop floating quote pill is position:fixed at the bottom-right, so any
   // photo that scrolls under it gets covered (kitchen/bathroom feature photos,
   // capabilities factory photos). Instead of padding individual grids, fade the
-  // pill out while it would sit on top of media, and bring it back once clear.
-  const CTA_MEDIA = "main img, main picture, main video, main svg.figure, main .model-chip";
+  // pill out while it would sit on top of section media, and bring it back once clear.
+  // Use section/… not main/…: pages only set id="main" on the hero; factory
+  // and feature photos live in later sibling sections (capabilities labs).
+  const CTA_MEDIA = "section img, section picture, section video, section svg.figure, .model-chip";
   function ctaOverlapsMedia(cta, rects, gap){
     const g = gap || 0;
     for (let i = 0; i < rects.length; i++){
@@ -155,9 +157,9 @@
       queued = false;
       let hide = false;
       if (mq && mq.matches && bar.classList.contains("is-visible")) {
-        // offset* ignore CSS transforms, so the 12px slide used by the
-        // show/hide transition cannot move the test rect and cause flapping.
-        const cta = { left: bar.offsetLeft, top: bar.offsetTop, right: bar.offsetLeft + bar.offsetWidth, bottom: bar.offsetTop + bar.offsetHeight };
+        // is-visible sets transform:none (occluding no longer slides), so
+        // getBoundingClientRect is stable and still tracks fixed + --ads-lift.
+        const cta = bar.getBoundingClientRect();
         const rects = Array.prototype.map.call(document.querySelectorAll(CTA_MEDIA), el => el.getBoundingClientRect());
         // Never hide the pill out from under keyboard focus.
         hide = !bar.contains(document.activeElement) && ctaOverlapsMedia(cta, rects, 8);
