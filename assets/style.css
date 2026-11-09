@@ -788,6 +788,8 @@ body[data-page="8"] .hotspot-stage img{display:block;width:100%;height:auto;obje
   .sticky-cta.is-visible{transform:none;opacity:1;pointer-events:auto}
   .sticky-cta a{box-shadow:0 8px 24px rgba(0,0,0,.16)}
   body[data-page="8"] .sticky-cta{display:none}
+  /* Fade out while a photo scrolls under the pill (see partials.js). */
+  .sticky-cta.is-visible.is-occluding{opacity:0;transform:translateY(12px);pointer-events:none}
   /* Keep fixed Request-a-Quote pill (right:24px, ~180px wide) from covering
      rightmost bathroom .model-chip / kitchen .grid-3 cards on laptop widths
      where the 1312px container reaches the viewport edge. */
