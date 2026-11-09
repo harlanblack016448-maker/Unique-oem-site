@@ -155,9 +155,12 @@
       queued = false;
       let hide = false;
       if (mq && mq.matches && bar.classList.contains("is-visible")) {
-        const cta = bar.getBoundingClientRect();
+        // offset* ignore CSS transforms, so the 12px slide used by the
+        // show/hide transition cannot move the test rect and cause flapping.
+        const cta = { left: bar.offsetLeft, top: bar.offsetTop, right: bar.offsetLeft + bar.offsetWidth, bottom: bar.offsetTop + bar.offsetHeight };
         const rects = Array.prototype.map.call(document.querySelectorAll(CTA_MEDIA), el => el.getBoundingClientRect());
-        hide = ctaOverlapsMedia(cta, rects, 8);
+        // Never hide the pill out from under keyboard focus.
+        hide = !bar.contains(document.activeElement) && ctaOverlapsMedia(cta, rects, 8);
       }
       bar.classList.toggle("is-occluding", hide);
       if (link) {
@@ -170,6 +173,7 @@
     window.addEventListener("resize", queue);
     window.addEventListener("load", queue);
     if (mq && mq.addEventListener) mq.addEventListener("change", queue);
+    bar.addEventListener("focusout", queue);
     new MutationObserver(queue).observe(bar, { attributes: true, attributeFilter: ["class"] });
     queue();
   }

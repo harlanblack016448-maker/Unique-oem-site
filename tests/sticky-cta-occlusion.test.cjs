@@ -15,6 +15,6 @@ test('clear media, hidden media, and text-only areas do not hide the pill',()=>{
 test('css fades only the desktop pill and keeps mobile bar untouched',()=>{
  const css=fs.readFileSync(path.join(__dirname,'../assets/style.css'),'utf8');
  const desk=css.slice(css.indexOf('@media(min-width:821px){\n  .sticky-cta{'));
- assert.match(desk.slice(0,desk.indexOf('\n}\n')),/\.sticky-cta\.is-visible\.is-occluding\{opacity:0;[^}]*pointer-events:none\}/);
+ assert.match(desk.slice(0,desk.indexOf('\n}\n')),/\.sticky-cta\.is-visible\.is-occluding\{opacity:0;pointer-events:none\}/);
  const mob=css.slice(css.indexOf('@media(max-width:820px){\n  .sticky-cta{'));assert.doesNotMatch(mob.slice(0,mob.indexOf('\n}\n')),/is-occluding/);
 });
