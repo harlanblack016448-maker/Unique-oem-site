@@ -130,6 +130,56 @@
     nav.insertAdjacentElement("afterend", bar);
   }
 
+  // Desktop floating quote pill is position:fixed at the bottom-right, so any
+  // photo that scrolls under it gets covered (kitchen/bathroom feature photos,
+  // capabilities factory photos). Instead of padding individual grids, fade the
+  // pill out while it would sit on top of section media, and bring it back once clear.
+  // Use section/… not main/…: pages only set id="main" on the hero; factory
+  // and feature photos live in later sibling sections (capabilities labs).
+  const CTA_MEDIA = "section img, section picture, section video, section svg.figure, .model-chip";
+  function ctaOverlapsMedia(cta, rects, gap){
+    const g = gap || 0;
+    for (let i = 0; i < rects.length; i++){
+      const r = rects[i];
+      if (!r || r.width === 0 || r.height === 0) continue;
+      if (r.left < cta.right + g && r.right > cta.left - g &&
+          r.top < cta.bottom + g && r.bottom > cta.top - g) return true;
+    }
+    return false;
+  }
+  window.__ctaOverlapsMedia = ctaOverlapsMedia;
+
+  function watchCtaOcclusion(bar){
+    const mq = window.matchMedia ? window.matchMedia("(min-width:821px)") : null;
+    const link = bar.querySelector("a");
+    let queued = false;
+    const check = () => {
+      queued = false;
+      let hide = false;
+      if (mq && mq.matches && bar.classList.contains("is-visible")) {
+        // is-visible sets transform:none (occluding no longer slides), so
+        // getBoundingClientRect is stable and still tracks fixed + --ads-lift.
+        const cta = bar.getBoundingClientRect();
+        const rects = Array.prototype.map.call(document.querySelectorAll(CTA_MEDIA), el => el.getBoundingClientRect());
+        // Never hide the pill out from under keyboard focus.
+        hide = !bar.contains(document.activeElement) && ctaOverlapsMedia(cta, rects, 8);
+      }
+      bar.classList.toggle("is-occluding", hide);
+      if (link) {
+        if (hide) link.setAttribute("tabindex", "-1"); else link.removeAttribute("tabindex");
+      }
+      bar.setAttribute("aria-hidden", hide ? "true" : "false");
+    };
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(check); } };
+    window.addEventListener("scroll", queue, { passive: true });
+    window.addEventListener("resize", queue);
+    window.addEventListener("load", queue);
+    if (mq && mq.addEventListener) mq.addEventListener("change", queue);
+    bar.addEventListener("focusout", queue);
+    new MutationObserver(queue).observe(bar, { attributes: true, attributeFilter: ["class"] });
+    queue();
+  }
+
   function ensureStickyCta(){
     if (document.querySelector(".sticky-cta")) return;
     if (document.body.dataset.page === "contact") return;
@@ -140,6 +190,7 @@
       bar.innerHTML = '<a href="#inquire" class="btn-pill" data-ad-request="specs" data-i18n="ad.cta">Request Specs & OEM Options</a>';
     }
     document.body.appendChild(bar);
+    if (window.requestAnimationFrame && window.MutationObserver) watchCtaOcclusion(bar);
     const hero = document.body.dataset.page === "lead" ? document.querySelector(".ad-section") : document.getElementById("main");
     const inquire = document.getElementById("inquire");
     if (!hero || !("IntersectionObserver" in window)) {
