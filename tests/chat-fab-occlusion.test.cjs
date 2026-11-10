@@ -2,6 +2,17 @@ const test=require('node:test'), assert=require('node:assert/strict');
 const fs=require('node:fs'), vm=require('node:vm'), path=require('node:path');
 const ROOT=path.join(__dirname,'..');
 const R=(l,t,w,h)=>({left:l,top:t,right:l+w,bottom:t+h,width:w,height:h});
+function pointIn(r,x,y){return r && x>=r.left && x<=r.right && y>=r.top && y<=r.bottom;}
+function paintedAt(nodes){
+  return (x,y)=>{
+    for (const n of nodes){
+      const r = n.getBoundingClientRect ? n.getBoundingClientRect() : n;
+      if (pointIn(r,x,y)) return [n];
+    }
+    return [];
+  };
+}
+
 
 function read(rel){return fs.readFileSync(path.join(ROOT,rel),'utf8');}
 function stripComments(css){return css.replace(/\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\//g,'');}
@@ -144,6 +155,35 @@ function makeFocusEnv(opts){
         while (x){ if (x === el) return true; x = x.parent; }
         return false;
       },
+      matches(sel){
+        return String(sel).split(',').map(x => x.trim()).some(s => {
+          if (!s) return false;
+          if (s.startsWith('.')) return s.slice(1).split('.').every(c => classSet.has(c));
+          const parts = s.split('.');
+          const tag = parts[0];
+          if (tag && el.tagName !== tag.toUpperCase()) return false;
+          return parts.slice(1).every(c => classSet.has(c));
+        });
+      },
+      closest(sel){
+        let n = el;
+        while (n){
+          if (typeof n.matches === 'function' && n.matches(sel)) return n;
+          n = n.parent;
+        }
+        return null;
+      },
+      querySelector(sel){
+        const walk = (node) => {
+          for (const c of (node.children || [])){
+            if (c.matches && c.matches(sel)) return c;
+            const d = walk(c);
+            if (d) return d;
+          }
+          return null;
+        };
+        return walk(el);
+      },
       addEventListener(type, fn){ on(el, type, fn); },
       removeEventListener(type, fn){
         const list = listeners.get(el) || [];
@@ -156,7 +196,7 @@ function makeFocusEnv(opts){
         if (classSet.has('uschat-fab')) return opts.fabRect || R(1206, 720, 56, 56);
         return R(0,0,0,0);
       },
-      click(){ emit(el, 'click', { preventDefault(){} }); },
+      click(ev){ emit(el, 'click', Object.assign({ preventDefault(){}, detail: 1 }, ev || {})); },
       _emit: (type, ev) => emit(el, type, ev),
       _attrs: attrs,
     };
@@ -177,9 +217,15 @@ function makeFocusEnv(opts){
     contains(c){ return this._s.has(c); },
   };
   const head = makeEl('head');
+  const mediaSection = makeEl('section');
   const media = (opts.mediaRects || []).map(r => {
+    const fig = makeEl('figure');
     const n = makeEl('img');
     n._rect = r;
+    fig._rect = r; /* default: card == img; caption tests enlarge this */
+    fig.appendChild(n);
+    mediaSection.appendChild(fig);
+    n._figure = fig;
     return n;
   });
 
@@ -211,8 +257,19 @@ function makeFocusEnv(opts){
         return [];
       },
       createElement(tag){ return makeEl(tag); },
+      elementsFromPoint(x,y){
+        if (typeof env.__hitAt === 'function') return env.__hitAt(x,y) || [];
+        return env.__hitStack || [];
+      },
+      elementFromPoint(x,y){
+        const st = typeof env.__hitAt === 'function' ? (env.__hitAt(x,y) || []) : (env.__hitStack || []);
+        return st[0] || null;
+      },
     },
   };
+  env.__hitStack = opts.hitStack ? opts.hitStack.slice() : media.slice();
+  env.__media = media;
+  env.__mediaSection = mediaSection;
   env.document.activeElement = body;
   env.window = env;
   // Mark CSS ready path: createElement('link') gets onload fired via ensureCss timeout/onload — we force via setTimeout noop + immediate onReady via error path.
@@ -221,7 +278,7 @@ function makeFocusEnv(opts){
   return env;
 }
 
-test('closed panel is inert/aria-hidden; open clears; close restores focus without ghost chips',()=>{
+test('closed panel is inert/aria-hidden; open clears; pointer close does not focus FAB or ghost chips',()=>{
   const env = makeFocusEnv({
     fabRect: R(1206, 720, 56, 56),
     mediaRects: [], // no occlusion — FAB should receive focus back
@@ -260,17 +317,17 @@ test('closed panel is inert/aria-hidden; open clears; close restores focus witho
   moq.focus();
   assert.equal(env.document.activeElement, moq);
 
-  // mouseClose via head close button
+  // mouseClose via head close button (detail 1)
   const head = panel.children.find(c => c.classList.contains('uschat-head'));
   const closeBtn = head.children.find(c => c.classList.contains('uschat-head-close'));
-  closeBtn.click();
+  closeBtn.click({ detail: 1 });
   assert.equal(env.document.body.classList.contains('uschat-open'), false);
   assert.equal(panel.getAttribute('inert'), '');
   assert.equal(panel.getAttribute('aria-hidden'), 'true');
-  // focus restored to FAB opener (visible, no occlusion)
-  assert.equal(env.document.activeElement, fab);
-  // ghost chip must not remain focused
+  // Pointer close must not programmatically focus the FAB (focus-guard trap).
+  assert.notEqual(env.document.activeElement, fab);
   assert.notEqual(env.document.activeElement, moq);
+  assert.notEqual(env.document.activeElement, closeBtn);
 });
 
 test('Escape close applies inert and restores focus to FAB when not occluding',()=>{
@@ -447,15 +504,10 @@ test('behavioral lifecycle hide→clear→open→close→overlap→clear (classe
   assert.ok(fab.classList.contains('uschat-occluding'));
   assert.equal(fab.getAttribute('aria-hidden'), 'true');
 
-  // CLEAR: photos leave — update media rects to well below viewport, re-run occlusion
-  env.document.querySelectorAll = function(sel){
-    if (String(sel).indexOf('section img') === 0) {
-      const n = env.document.createElement('img');
-      n._rect = R(640, 2000, 600, 320); // well below
-      return [n];
-    }
-    return [];
-  };
+  // CLEAR: photos leave the painted stack (org chart is under the FAB)
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  env.__hitStack = [org];
   // Trigger scroll handlers registered on window
   const scrolls = [];
   // Re-install: call check by focusing then blurring fab path — emit scroll on window
@@ -482,23 +534,14 @@ test('behavioral lifecycle hide→clear→open→close→overlap→clear (classe
   assert.equal(panel.hasAttribute('inert'), false);
   assert.equal(fab.classList.contains('uschat-occluding'), false); // open suppresses hide
 
-  // CLOSE on clear (media still below)
-  head.children.find(c => c.classList.contains('uschat-head-close')).click();
+  // CLOSE on clear (media still below) — pointer, must not focus FAB
+  head.children.find(c => c.classList.contains('uschat-head-close')).click({ detail: 1 });
   assert.equal(panel.getAttribute('inert'), '');
   assert.equal(fab.getAttribute('aria-hidden'), 'false');
-  assert.equal(env.document.activeElement, fab); // focus restored
+  assert.notEqual(env.document.activeElement, fab, 'pointer close must not focus FAB');
 
-  // OVERLAP again
-  env.document.querySelectorAll = function(sel){
-    if (String(sel).indexOf('section img') === 0) {
-      const n = env.document.createElement('img');
-      n._rect = R(640, 400, 600, 320);
-      return [n];
-    }
-    return [];
-  };
-  // Blur fab so focused guard allows hide
-  fab.blur();
+  // OVERLAP again — lab photo under FAB; no blur needed because pointer close left FAB unfocused
+  env.__hitStack = env.__media.slice();
   fab._emit('focusout', {});
   assert.ok(fab.classList.contains('uschat-occluding'), 'overlap hides again');
   assert.equal(fab.getAttribute('aria-hidden'), 'true');
@@ -507,14 +550,7 @@ test('behavioral lifecycle hide→clear→open→close→overlap→clear (classe
   assert.notEqual(hidden.visibility, 'hidden');
 
   // CLEAR again
-  env.document.querySelectorAll = function(sel){
-    if (String(sel).indexOf('section img') === 0) {
-      const n = env.document.createElement('img');
-      n._rect = R(640, 2000, 600, 320);
-      return [n];
-    }
-    return [];
-  };
+  env.__hitStack = [org];
   fab._emit('focusout', {});
   assert.equal(fab.classList.contains('uschat-occluding'), false, 'final clear shows FAB');
   assert.equal(fab.getAttribute('aria-hidden'), 'false');
@@ -543,4 +579,324 @@ test('uschat-in is one-shot: animationend drops it so occlusion clear cannot res
   assert.equal(r.animation, 'none');
   assert.equal(r.opacity, '1');
   assert.equal(r.visibility, 'visible');
+});
+
+
+test('capabilities org section contains no FAB_MEDIA (text/html chart only)',()=>{
+  const html = read('capabilities.html');
+  const orgStart = html.indexOf('cap.org.kicker');
+  const orgSecEnd = html.indexOf('</section>', orgStart);
+  assert.ok(orgStart > 0 && orgSecEnd > orgStart);
+  const org = html.slice(html.lastIndexOf('<section', orgStart), orgSecEnd);
+  assert.match(org, /org-chart/);
+  assert.doesNotMatch(org, /<img\b|<picture\b|<video\b|svg\.figure|model-chip/);
+});
+
+test('phantom AABB (0,0,1280x720) would keep hide true; hit-test against org chart clears',()=>{
+  // Reproduces production FAIL: after labs hide, scroll to organization.
+  // Lazy/offscreen lab imgs can still report a tall box at 0,0 that AABB-
+  // intersects a FAB at y=720 — but the painted stack is the org chart.
+  // Use a sliver of positive area (bottom 740) so a *painted* lab can hide;
+  // a 720-tall box only touches the FAB edge (zero-area) and is covered
+  // by the dedicated phantom+org test below.
+  const phantom = R(0, 0, 1280, 740);
+  const fabRect = R(1206, 720, 56, 56);
+  const env = makeFocusEnv({ fabRect, mediaRects: [phantom] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+
+  // Proof: AABB (the previous check) stays true with the phantom box
+  assert.equal(env.__fabOverlapsMedia(fabRect, [phantom], 8), true, 'AABB false-positive on phantom 1280x720@0,0');
+
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  const panel = root.children.find(c => c.classList.contains('uschat-panel'));
+
+  // hide: painted stack is the lab img (inside section>figure)
+  env.__hitStack = env.__media.slice();
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'), 'hide when lab photo is under FAB');
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+  const css = read('assets/chat-widget.css');
+  let computed = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(computed.opacity, '0');
+
+  // scroll clear: same phantom rects still AABB-overlap, but hit-test sees org chart
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  env.__hitStack = [org];
+  // leave AABB querySelectorAll pointing at the phantom-sized imgs (already in mediaRects)
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false, 'clear when only org chart is under FAB');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  computed = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(computed.opacity, '1');
+  assert.equal(computed.visibility, 'visible');
+
+  // helper API: media under point is null over org, img over labs
+  env.__hitStack = [org];
+  assert.equal(env.__fabMediaUnderPoint(fabRect.left+28, fabRect.top+28), null);
+  env.__hitStack = env.__media.slice();
+  assert.ok(env.__fabMediaUnderPoint(fabRect.left+28, fabRect.top+28));
+  assert.equal(env.__fabShouldOcclude(fab), true);
+  env.__hitStack = [org];
+  assert.equal(env.__fabShouldOcclude(fab), false);
+});
+
+test('occlusion check uses hit-test not AABB when elementsFromPoint exists',()=>{
+  const js = read('assets/chat-widget.js');
+  assert.match(js, /fabShouldOcclude/);
+  assert.match(js, /elementsFromPoint/);
+  assert.match(js, /fabMediaUnderPoint/);
+  // restoreFocusAfterClose must use the same check
+  const restore = js.slice(js.indexOf('function restoreFocusAfterClose'), js.indexOf('function setOpen'));
+  assert.match(restore, /fabShouldOcclude/);
+  assert.doesNotMatch(restore, /querySelectorAll\(FAB_MEDIA\)/);
+});
+
+
+test('center 10px outside image but 15x50 footprint overlap hides the FAB',()=>{
+  // Bathroom hero EDGEFAIL: FAB center sits ~10px past the photo edge, but
+  // the 56x56 disc still covers a ~15x50 sliver. Center-only hit-test missed it.
+  const fabRect = R(1206, 720, 56, 56); // center 1234, 748
+  const imgRect = R(640, 400, 584, 370); // right=1224 (10px left of center), bottom=770
+  // intersection: x 1206-1224 (18px ~15), y 720-770 (50px)
+  assert.equal(fabRect.left + fabRect.width/2 - imgRect.right, 10);
+  assert.equal(Math.min(fabRect.right, imgRect.right) - Math.max(fabRect.left, imgRect.left), 18);
+  assert.equal(Math.min(fabRect.bottom, imgRect.bottom) - Math.max(fabRect.top, imgRect.top), 50);
+
+  const env = makeFocusEnv({ fabRect, mediaRects: [imgRect] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const img = env.__media[0];
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  org._rect = R(0, 0, 1280, 800);
+  // Painted stack follows true boxes: center (1234,748) is outside the photo.
+  env.__hitAt = (x,y) => {
+    if (pointIn(imgRect, x, y)) return [img];
+    if (pointIn(org._rect, x, y)) return [org];
+    return [];
+  };
+  env.__hitStack = []; // must not leak a constant stack
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabMediaUnderPoint(1234, 748), null, 'center itself is outside the photo');
+  assert.equal(env.__fabShouldOcclude(fab), true, '15x50 sliver on the disc must hide');
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+});
+
+test('thin strip under the disc hides; AABB-only corner outside the disc does not',()=>{
+  const fabRect = R(1206, 720, 56, 56); // center 1234,748 radius 28
+  // 3px-wide vertical strip along the left of the disc (x 1206-1209), tall overlap
+  const thin = R(1000, 700, 209, 80); // right=1209, so 3px into the FAB box
+  const env = makeFocusEnv({ fabRect, mediaRects: [thin] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const img = env.__media[0];
+  env.__hitAt = (x,y) => pointIn(thin, x, y) ? [img] : [];
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabShouldOcclude(fab), true, '3px painted strip on the disc hides');
+
+  // Square-corner-only: media clips the top-left AABB corner well outside the disc
+  // Closest point to center is too far (>28px) so the circle does not overlap.
+  const corner = R(1200, 714, 10, 10); // covers (1200-1210, 714-724); FAB corner 1206,720
+  // center 1234,748 to closest (1210,724): dx=24 dy=24, dist~33.9 > 28
+  const env2 = makeFocusEnv({ fabRect, mediaRects: [corner] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env2);
+  const img2 = env2.__media[0];
+  env2.__hitAt = (x,y) => pointIn(corner, x, y) ? [img2] : [];
+  const fab2 = env2.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env2.__fabDiscOverlapsRect(1234, 748, 28, corner), false);
+  assert.equal(env2.__fabShouldOcclude(fab2), false, 'square corner outside the disc must not hide');
+});
+
+test('phantom 1280x720@0,0 still AABB-hits but painted org chart at intersection clears',()=>{
+  const fabRect = R(1206, 720, 56, 56);
+  const phantom = R(0, 0, 1280, 720); // bottom=720, touches FAB top
+  const env = makeFocusEnv({ fabRect, mediaRects: [phantom] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  assert.equal(env.__fabOverlapsMedia(fabRect, [phantom], 8), true);
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  org._rect = R(200, 200, 800, 500);
+  // Intersection samples sit on the phantom layout box, but paint is the org chart
+  // (or nothing in the FAB disc). Never return the img.
+  env.__hitAt = (x,y) => {
+    if (pointIn(org._rect, x, y)) return [org];
+    return [org]; // page content, not the offscreen lab img
+  };
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabShouldOcclude(fab), false);
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false);
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  const css = read('assets/chat-widget.css');
+  const computed = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(computed.opacity, '1');
+});
+
+
+test('isKeyboardCloseEvent: pointer detail>=1 / pointerType vs keyboard detail 0 and Escape',()=>{
+  const env = makeFocusEnv({ fabRect: R(1206, 720, 56, 56), mediaRects: [] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const k = env.__isKeyboardCloseEvent;
+  assert.equal(k({ detail: 1 }), false);
+  assert.equal(k({ detail: 2 }), false);
+  assert.equal(k({ pointerType: 'mouse', detail: 1 }), false);
+  assert.equal(k({ pointerType: 'touch', detail: 1 }), false);
+  assert.equal(k({ pointerType: 'pen' }), false);
+  assert.equal(k({ detail: 0 }), true, 'keyboard-generated click');
+  assert.equal(k({ key: 'Escape' }), true);
+  assert.equal(k(null), false);
+});
+
+test('pointer click close on clear: no FAB focus, then scroll to lab hides (no guard trap)',()=>{
+  const env = makeFocusEnv({
+    fabRect: R(1206, 720, 56, 56),
+    mediaRects: [R(640, 400, 600, 400)],
+  });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  env.__hitStack = [org]; // start clear
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const panel = root.children.find(c => c.classList.contains('uschat-panel'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  const closeBtn = panel.children.find(c => c.classList.contains('uschat-head'))
+    .children.find(c => c.classList.contains('uschat-head-close'));
+  fab.click({ detail: 1 }); // open
+  closeBtn.click({ detail: 1 }); // pointer close
+  assert.equal(panel.getAttribute('inert'), '');
+  assert.notEqual(env.document.activeElement, fab);
+  // scroll to lab — FAB is not focused, occlusion may run
+  env.__hitStack = env.__media.slice();
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'), 'pointer hide→clear then back to lab hides');
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+  const css = read('assets/chat-widget.css');
+  assert.equal(computeFab(css, fab.className.split(/\s+/), true).opacity, '0');
+});
+
+test('keyboard click detail 0 close on clear restores FAB focus; focused FAB is not hidden over lab (a11y exception)',()=>{
+  const env = makeFocusEnv({
+    fabRect: R(1206, 720, 56, 56),
+    mediaRects: [R(640, 400, 600, 400)],
+  });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  env.__hitStack = [org];
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const panel = root.children.find(c => c.classList.contains('uschat-panel'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  const closeBtn = panel.children.find(c => c.classList.contains('uschat-head'))
+    .children.find(c => c.classList.contains('uschat-head-close'));
+  fab.click({ detail: 0 });
+  closeBtn.click({ detail: 0 });
+  assert.equal(env.document.activeElement, fab, 'keyboard close restores focus to opener');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  // Intended exception: genuinely keyboard-focused FAB stays visible over media
+  env.__hitStack = env.__media.slice();
+  fab._emit('focusout', {}); // check still sees activeElement === fab
+  assert.equal(fab.classList.contains('uschat-occluding'), false, 'do not hide keyboard-focused FAB');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  // After blur, hide is allowed
+  fab.blur();
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+});
+
+test('Escape close on clear restores FAB focus (keyboard path)',()=>{
+  const env = makeFocusEnv({ fabRect: R(1206, 720, 56, 56), mediaRects: [] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  fab.click({ detail: 1 });
+  env.document._emit('keydown', { key: 'Escape' });
+  assert.equal(env.document.activeElement, fab);
+  assert.equal(env.document.body.classList.contains('uschat-open'), false);
+});
+
+test('pointer close of open FAB blurs it so the focus guard cannot trap',()=>{
+  const env = makeFocusEnv({ fabRect: R(1206, 720, 56, 56), mediaRects: [] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  fab.click({ detail: 1 }); // open, input focused
+  fab.focus(); // pointer user clicked the open (X) FAB — browser would focus it
+  fab.click({ detail: 1 }); // pointer close
+  assert.notEqual(env.document.activeElement, fab);
+  assert.equal(env.document.body.classList.contains('uschat-open'), false);
+});
+
+
+test('FAB over figcaption of a figure card hides, even when it misses the img pixels',()=>{
+  // Capabilities 400x985: photo ends ~681, FAB 701-757 sits on
+  // "Drop and compression fixture (illustration)" figcaption — img bounds
+  // miss it; the enclosing figure card must be the protected rect.
+  const fabRect = R(316, 701, 56, 56);
+  const imgRect = R(200, 500, 180, 181); // bottom 681, no intersect with FAB
+  const figRect = R(200, 500, 180, 260); // bottom 760, includes caption
+  const capRect = R(200, 681, 180, 79);  // caption 681-760
+  assert.equal(imgRect.bottom, 681);
+  assert.ok(fabRect.top > imgRect.bottom, 'FAB starts below the photo pixels');
+  assert.ok(fabRect.top < figRect.bottom && fabRect.left < figRect.right);
+
+  const env = makeFocusEnv({ fabRect, mediaRects: [imgRect] });
+  const img = env.__media[0];
+  img._figure._rect = figRect;
+  const cap = env.document.createElement('figcaption');
+  cap._rect = capRect;
+  img._figure.appendChild(cap);
+
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const prot = env.__fabProtectRect(img);
+  assert.equal(prot.bottom, 760, 'protected rect is the figure card');
+  assert.notEqual(prot.bottom, imgRect.bottom);
+
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  org._rect = R(0, 0, 400, 985);
+  env.__hitAt = (x,y) => {
+    if (pointIn(capRect, x, y) || pointIn(imgRect, x, y)) return [cap];
+    return [org];
+  };
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabIntersectRects(fabRect, imgRect), null, 'img alone does not meet the FAB');
+  assert.equal(env.__fabShouldOcclude(fab), true, 'caption on the figure card must hide the FAB');
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+
+  // clear: card well below the viewport, painted stack is the org/text section
+  img._rect = R(200, 2000, 180, 181);
+  img._figure._rect = R(200, 2000, 180, 260);
+  cap._rect = R(200, 2181, 180, 79);
+  env.__hitAt = () => [org];
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false, 'clear after leaving the card');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+});
+
+test('1px AABB kiss like bathroom hero edge does not hide unless the disc intersects',()=>{
+  // Image ends ~759, FAB top ~757, center x=343; a short 1px box sliver
+  // along the top-left of the 56x56 square that stays outside the disc
+  // must not hide (not a huge failure).
+  const fabRect = R(315, 757, 56, 56); // center 343, 785, radius 28
+  const imgRect = R(40, 200, 280, 558); // right=320, bottom=758; AABB 5x1
+  const env = makeFocusEnv({ fabRect, mediaRects: [imgRect] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const img = env.__media[0];
+  env.__hitAt = (x,y) => pointIn(imgRect, x, y) ? [img] : [];
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  const box = env.__fabIntersectRects(fabRect, imgRect);
+  assert.ok(box && box.width > 0 && box.height <= 2, 'tiny AABB sliver exists');
+  assert.equal(env.__fabDiscOverlapsRect(343, 785, 28, imgRect), false, 'disc misses');
+  assert.equal(env.__fabShouldOcclude(fab), false, 'box kiss only must not hide');
 });

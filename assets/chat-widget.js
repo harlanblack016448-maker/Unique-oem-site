@@ -185,10 +185,15 @@
     root.appendChild(fab); /* same stacking context as panel; panel z-index wins */
     document.body.appendChild(root);
 
-    // Fade the FAB while a section photo sits under it (same media scope as
-    // sticky-cta occlusion in partials.js — section/…, never bare main). Keep
-    // the FAB when the panel is open or it holds keyboard focus.
+    // Hide the FAB only when a section photo is actually painted under it.
+    // AABB against every section img rect is not enough: lazy/offscreen
+    // images can report a viewport-sized box (e.g. 1280x720 at 0,0 from
+    // width/height attrs) that still intersects a bottom-right FAB after
+    // the user has scrolled to a text-only section (capabilities org
+    // chart). elementsFromPoint uses the painted hit stack.
+    // Same media scope as sticky-cta — section/…, never bare main.
     var FAB_MEDIA = "section img, section picture, section video, section svg.figure, .model-chip";
+    var FAB_HIT_SKIP = ".uschat-root, .sticky-cta";
     function fabOverlapsMedia(rect, rects, gap) {
       if (typeof window.__ctaOverlapsMedia === "function") {
         return window.__ctaOverlapsMedia(rect, rects, gap);
@@ -204,6 +209,123 @@
     }
     window.__fabOverlapsMedia = fabOverlapsMedia;
 
+    function fabMediaUnderPoint(x, y) {
+      var stack;
+      if (typeof document.elementsFromPoint === "function") {
+        stack = document.elementsFromPoint(x, y) || [];
+      } else if (typeof document.elementFromPoint === "function") {
+        var one = document.elementFromPoint(x, y);
+        stack = one ? [one] : [];
+      } else {
+        return null; // no hit-test API; caller may fall back
+      }
+      for (var i = 0; i < stack.length; i++) {
+        var node = stack[i];
+        if (!node || !node.closest) continue;
+        if (node.closest(FAB_HIT_SKIP)) continue;
+        var media = node.closest("img, picture, video, svg.figure, .model-chip");
+        if (!media) {
+          var fig = node.closest("figure");
+          if (fig && fig.querySelector("img, picture, video, svg.figure")) media = fig;
+        }
+        if (!media) continue;
+        if (media.classList && media.classList.contains("model-chip")) return media;
+        if (media.closest && media.closest(".model-chip")) return media;
+        if (media.closest && media.closest("section")) return media;
+      }
+      return null;
+    }
+    window.__fabMediaUnderPoint = fabMediaUnderPoint;
+
+    function fabClamp(n, a, b) {
+      return n < a ? a : (n > b ? b : n);
+    }
+    function fabIntersectRects(a, b) {
+      var left = Math.max(a.left, b.left);
+      var top = Math.max(a.top, b.top);
+      var right = Math.min(a.right, b.right);
+      var bottom = Math.min(a.bottom, b.bottom);
+      if (right <= left || bottom <= top) return null;
+      return { left: left, top: top, right: right, bottom: bottom,
+        width: right - left, height: bottom - top };
+    }
+    /* 56x56 disc (border-radius 50%), not the square AABB corners. */
+    function fabDiscOverlapsRect(cx, cy, radius, r) {
+      var qx = fabClamp(cx, r.left, r.right);
+      var qy = fabClamp(cy, r.top, r.bottom);
+      var dx = qx - cx, dy = qy - cy;
+      return (dx * dx + dy * dy) <= (radius * radius);
+    }
+    function fabSampleIntersection(fab, r, cx, cy, radius) {
+      var inter = fabIntersectRects(fab, r);
+      if (!inter || !fabDiscOverlapsRect(cx, cy, radius, r)) return [];
+      var points = [];
+      function add(x, y) {
+        var dx = x - cx, dy = y - cy;
+        if ((dx * dx + dy * dy) <= (radius * radius)) points.push([x, y]);
+      }
+      /* Closest point on the media to the disc center: the contact point
+         when the center sits just outside the photo (bathroom hero edge). */
+      add(fabClamp(cx, r.left, r.right), fabClamp(cy, r.top, r.bottom));
+      /* Midpoint of the true overlap box — covers a thin strip the center
+         misses, without a sparse grid that can skip a 15x50 sliver. */
+      add((inter.left + inter.right) / 2, (inter.top + inter.bottom) / 2);
+      /* Corners of that overlap that still lie on the disc. */
+      add(inter.left, inter.top);
+      add(inter.right, inter.top);
+      add(inter.left, inter.bottom);
+      add(inter.right, inter.bottom);
+      return points;
+    }
+    /* Use the whole figure card (photo + figcaption) when the media sits
+       in a <figure>. Capabilities factory/lab cards put the FAB on the
+       caption after the img has ended; img-only bounds missed that. */
+    function fabProtectRect(node) {
+      var boxEl = node;
+      if (node && node.closest) {
+        var fig = node.closest("figure");
+        if (fig && fig.querySelector &&
+            fig.querySelector("img, picture, video, svg.figure")) {
+          boxEl = fig;
+        }
+      }
+      return boxEl.getBoundingClientRect();
+    }
+    window.__fabProtectRect = fabProtectRect;
+
+    function fabShouldOcclude(fabEl) {
+      var fab = fabEl.getBoundingClientRect();
+      if (!(fab.width > 0 && fab.height > 0)) return false;
+      var nodes = document.querySelectorAll(FAB_MEDIA);
+      var hasHit = typeof document.elementsFromPoint === "function" ||
+        typeof document.elementFromPoint === "function";
+      var i, r, rects, pts, p;
+      if (hasHit) {
+        var cx = fab.left + fab.width / 2;
+        var cy = fab.top + fab.height / 2;
+        var radius = Math.min(fab.width, fab.height) / 2;
+        for (i = 0; i < nodes.length; i++) {
+          r = fabProtectRect(nodes[i]);
+          if (!r || r.width === 0 || r.height === 0) continue;
+          pts = fabSampleIntersection(fab, r, cx, cy, radius);
+          for (p = 0; p < pts.length; p++) {
+            /* Painted stack at the sample, not the layout rect: phantom
+               1280x720@0,0 can AABB-hit the FAB but paint the org chart. */
+            if (fabMediaUnderPoint(pts[p][0], pts[p][1])) return true;
+          }
+        }
+        return false;
+      }
+      // Legacy fallback only when hit-testing is unavailable.
+      rects = [];
+      for (i = 0; i < nodes.length; i++) rects.push(fabProtectRect(nodes[i]));
+      return fabOverlapsMedia(fab, rects, 8);
+    }
+    window.__fabShouldOcclude = fabShouldOcclude;
+    window.__fabSampleIntersection = fabSampleIntersection;
+    window.__fabDiscOverlapsRect = fabDiscOverlapsRect;
+    window.__fabIntersectRects = fabIntersectRects;
+
     function watchFabOcclusion(fabEl, panelEl) {
       if (!window.requestAnimationFrame || !window.MutationObserver) return;
       var queued = false;
@@ -214,13 +336,7 @@
         var focused = fabEl.contains(document.activeElement) ||
           (panelEl && panelEl.contains(document.activeElement));
         if (!chatOpen && !focused) {
-          var rect = fabEl.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            var nodes = document.querySelectorAll(FAB_MEDIA);
-            var rects = [];
-            for (var i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
-            hide = fabOverlapsMedia(rect, rects, 8);
-          }
+          hide = fabShouldOcclude(fabEl);
         }
         fabEl.classList.toggle("uschat-occluding", hide);
         if (hide) {
@@ -393,18 +509,27 @@
         .then(function () { setBusy(false); if (open) input.focus(); });
     }
 
-    function restoreFocusAfterClose() {
-      /* Prefer the FAB opener when it is a visible control. If lab/hero media
-         would occlude it, leave focus on the document so Tab never lands on
-         ghost chips inside the closed panel (and occlusion can hide the FAB). */
-      var rect = fab.getBoundingClientRect();
-      var over = false;
-      if (rect.width > 0 && rect.height > 0) {
-        var nodes = document.querySelectorAll(FAB_MEDIA);
-        var rects = [];
-        for (var i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
-        over = fabOverlapsMedia(rect, rects, 8);
+    /* Pointer close (mouse/touch click, event.detail >= 1 or pointerType
+       mouse/touch/pen) must not programmatically focus the FAB: that left
+       activeElement on the opener and the occlusion focus-guard refused to
+       hide it over lab photos. Keyboard close (Escape, or a button click
+       with detail === 0 from Enter/Space) restores focus to the FAB when
+       it is not over media, so the control stays keyboard-reachable.
+       Intended exception: a genuinely keyboard-focused FAB is not hidden
+       while it holds focus (do not drop the user's tab stop). */
+    function isKeyboardCloseEvent(e) {
+      if (!e) return false;
+      if (e.key === "Escape") return true;
+      if (e.pointerType) {
+        return e.pointerType !== "mouse" && e.pointerType !== "touch" &&
+          e.pointerType !== "pen";
       }
+      return e.detail === 0;
+    }
+    window.__isKeyboardCloseEvent = isKeyboardCloseEvent;
+
+    function restoreFocusAfterClose(fromKeyboard) {
+      var over = fabShouldOcclude(fab);
       if (over) {
         fab.classList.add("uschat-occluding");
         fab.setAttribute("tabindex", "-1");
@@ -414,10 +539,13 @@
       fab.classList.remove("uschat-occluding");
       fab.removeAttribute("tabindex");
       fab.setAttribute("aria-hidden", "false");
-      try { fab.focus(); } catch (e) { /* ignore */ }
+      /* Only keyboard close moves focus back to the opener. */
+      if (fromKeyboard) {
+        try { fab.focus(); } catch (e) { /* ignore */ }
+      }
     }
 
-    function setOpen(v) {
+    function setOpen(v, ev) {
       open = !!v;
       document.body.classList.toggle("uschat-open", open);
       fab.setAttribute("aria-label", open ? t().ariaClose : t().ariaOpen);
@@ -430,24 +558,27 @@
         }
         try { input.focus(); } catch (e) { /* ignore */ }
       } else {
+        var fromKeyboard = isKeyboardCloseEvent(ev);
         var active = document.activeElement;
-        if (active && panel.contains(active)) {
+        /* Pointer close: also blur the FAB itself (clicking the open FAB
+           would otherwise leave it focused and trap the focus guard). */
+        if (active && (panel.contains(active) || fab === active || fab.contains(active))) {
           try { active.blur(); } catch (e) { /* ignore */ }
         }
         panel.setAttribute("inert", "");
         panel.setAttribute("aria-hidden", "true");
-        restoreFocusAfterClose();
+        restoreFocusAfterClose(fromKeyboard);
       }
     }
 
-    fab.addEventListener("click", function () { setOpen(!open); });
-    closeBtn.addEventListener("click", function () { setOpen(false); });
+    fab.addEventListener("click", function (e) { setOpen(!open, e); });
+    closeBtn.addEventListener("click", function (e) { setOpen(false, e); });
     sendBtn.addEventListener("click", function () { send(input.value); });
     input.addEventListener("keydown", function (e) {
       if (e.key === "Enter") { e.preventDefault(); send(input.value); }
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && open) setOpen(false);
+      if (e.key === "Escape" && open) setOpen(false, e);
     });
     document.addEventListener("us:i18n", paintLang);
     paintLang();
