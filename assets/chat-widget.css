@@ -74,6 +74,14 @@ body:has(.sticky-cta.is-visible) .uschat-panel {
   bottom: calc(148px + var(--ads-lift, 0px));
   max-height: calc(100vh - 172px - var(--ads-lift, 0px));
 }
+/* Quote pill faded for a photo: drop FAB so it does not stay raised into that photo. */
+body:has(.sticky-cta.is-visible.is-occluding) .uschat-fab { bottom: calc(24px + var(--ads-lift, 0px)); }
+body:has(.sticky-cta.is-visible.is-occluding) .uschat-panel {
+  bottom: calc(88px + var(--ads-lift, 0px));
+  max-height: calc(100vh - 112px - var(--ads-lift, 0px));
+}
+/* Fade FAB while a section photo sits under it (see chat-widget.js). */
+.uschat-fab.uschat-occluding { opacity: 0; pointer-events: none; }
 .uschat-open .uschat-panel {
   opacity: 1;
   transform: none;
@@ -194,6 +202,8 @@ body:has(.sticky-cta.is-visible) .uschat-panel {
   .uschat-fab { right: 14px; bottom: calc(24px + var(--ads-lift, 0px)); }
   body:has(.sticky-cta.is-visible) .uschat-fab { bottom: calc(80px + var(--ads-lift, 0px)); } /* above the full-width mobile sticky bar */
   body:has(.sticky-cta.is-visible) .uschat-panel { bottom: calc(148px + var(--ads-lift, 0px)); }
+  body:has(.sticky-cta.is-visible.is-occluding) .uschat-fab { bottom: calc(24px + var(--ads-lift, 0px)); }
+  body:has(.sticky-cta.is-visible.is-occluding) .uschat-panel { bottom: calc(88px + var(--ads-lift, 0px)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .uschat-panel, .uschat-fab { transition: none; }

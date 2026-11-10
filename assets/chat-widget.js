@@ -6,7 +6,7 @@
   if (window.__usChatLoaded) return;
   window.__usChatLoaded = true;
 
-  var CSS_URL = "/assets/chat-widget.css?v=6";
+  var CSS_URL = "/assets/chat-widget.css?v=7";
   var SID_KEY = "us_chat_sid_v1";
 
   var T = {
@@ -178,6 +178,68 @@
     root.appendChild(panel);
     document.body.appendChild(root);
     document.body.appendChild(fab);
+
+    // Fade the FAB while a section photo sits under it (same media scope as
+    // sticky-cta occlusion in partials.js — section/…, never bare main). Keep
+    // the FAB when the panel is open or it holds keyboard focus.
+    var FAB_MEDIA = "section img, section picture, section video, section svg.figure, .model-chip";
+    function fabOverlapsMedia(rect, rects, gap) {
+      if (typeof window.__ctaOverlapsMedia === "function") {
+        return window.__ctaOverlapsMedia(rect, rects, gap);
+      }
+      var g = gap || 0;
+      for (var i = 0; i < rects.length; i++) {
+        var r = rects[i];
+        if (!r || r.width === 0 || r.height === 0) continue;
+        if (r.left < rect.right + g && r.right > rect.left - g &&
+            r.top < rect.bottom + g && r.bottom > rect.top - g) return true;
+      }
+      return false;
+    }
+    window.__fabOverlapsMedia = fabOverlapsMedia;
+
+    function watchFabOcclusion(fabEl, panelEl) {
+      if (!window.requestAnimationFrame || !window.MutationObserver) return;
+      var queued = false;
+      function check() {
+        queued = false;
+        var hide = false;
+        var chatOpen = document.body.classList.contains("uschat-open");
+        var focused = fabEl.contains(document.activeElement) ||
+          (panelEl && panelEl.contains(document.activeElement));
+        if (!chatOpen && !focused) {
+          var rect = fabEl.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            var nodes = document.querySelectorAll(FAB_MEDIA);
+            var rects = [];
+            for (var i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
+            hide = fabOverlapsMedia(rect, rects, 8);
+          }
+        }
+        fabEl.classList.toggle("uschat-occluding", hide);
+        if (hide) {
+          fabEl.setAttribute("tabindex", "-1");
+          fabEl.setAttribute("aria-hidden", "true");
+        } else {
+          fabEl.removeAttribute("tabindex");
+          fabEl.setAttribute("aria-hidden", "false");
+        }
+      }
+      function queue() {
+        if (!queued) { queued = true; requestAnimationFrame(check); }
+      }
+      window.addEventListener("scroll", queue, { passive: true });
+      window.addEventListener("resize", queue);
+      window.addEventListener("load", queue);
+      fabEl.addEventListener("focusout", queue);
+      if (panelEl) panelEl.addEventListener("focusout", queue);
+      new MutationObserver(queue).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+      var sticky = document.querySelector(".sticky-cta");
+      if (sticky) new MutationObserver(queue).observe(sticky, { attributes: true, attributeFilter: ["class"] });
+      queue();
+    }
+
+    watchFabOcclusion(fab, panel);
 
     var open = false;
     var busy = false;
