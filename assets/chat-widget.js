@@ -6,7 +6,7 @@
   if (window.__usChatLoaded) return;
   window.__usChatLoaded = true;
 
-  var CSS_URL = "/assets/chat-widget.css?v=8";
+  var CSS_URL = "/assets/chat-widget.css?v=9";
   var SID_KEY = "us_chat_sid_v1";
 
   var T = {
@@ -140,6 +140,8 @@
     var panel = el("div", "uschat-panel");
     panel.setAttribute("role", "dialog");
     panel.setAttribute("aria-label", t().title);
+    panel.setAttribute("aria-hidden", "true");
+    panel.setAttribute("inert", "");
     panel.style.visibility = "hidden"; // anti-FOUC: revealed by reveal()
 
     var head = el("div", "uschat-head");
@@ -387,15 +389,51 @@
         .then(function () { setBusy(false); if (open) input.focus(); });
     }
 
-    function setOpen(v) {
-      open = v;
-      document.body.classList.toggle("uschat-open", v);
-      fab.setAttribute("aria-label", v ? t().ariaClose : t().ariaOpen);
-      if (v && !greeted) {
-        greeted = true;
-        addBot(t().greeting, { noFeedback: true });
+    function restoreFocusAfterClose() {
+      /* Prefer the FAB opener when it is a visible control. If lab/hero media
+         would occlude it, leave focus on the document so Tab never lands on
+         ghost chips inside the closed panel (and occlusion can hide the FAB). */
+      var rect = fab.getBoundingClientRect();
+      var over = false;
+      if (rect.width > 0 && rect.height > 0) {
+        var nodes = document.querySelectorAll(FAB_MEDIA);
+        var rects = [];
+        for (var i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
+        over = fabOverlapsMedia(rect, rects, 8);
       }
-      if (v) input.focus();
+      if (over) {
+        fab.classList.add("uschat-occluding");
+        fab.setAttribute("tabindex", "-1");
+        fab.setAttribute("aria-hidden", "true");
+        return;
+      }
+      fab.classList.remove("uschat-occluding");
+      fab.removeAttribute("tabindex");
+      fab.setAttribute("aria-hidden", "false");
+      try { fab.focus(); } catch (e) { /* ignore */ }
+    }
+
+    function setOpen(v) {
+      open = !!v;
+      document.body.classList.toggle("uschat-open", open);
+      fab.setAttribute("aria-label", open ? t().ariaClose : t().ariaOpen);
+      if (open) {
+        panel.removeAttribute("inert");
+        panel.setAttribute("aria-hidden", "false");
+        if (!greeted) {
+          greeted = true;
+          addBot(t().greeting, { noFeedback: true });
+        }
+        try { input.focus(); } catch (e) { /* ignore */ }
+      } else {
+        var active = document.activeElement;
+        if (active && panel.contains(active)) {
+          try { active.blur(); } catch (e) { /* ignore */ }
+        }
+        panel.setAttribute("inert", "");
+        panel.setAttribute("aria-hidden", "true");
+        restoreFocusAfterClose();
+      }
     }
 
     fab.addEventListener("click", function () { setOpen(!open); });
