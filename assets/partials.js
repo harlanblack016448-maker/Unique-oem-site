@@ -285,14 +285,14 @@
     if (!document.querySelector('link[data-us-chat-css]')) {
       const l = document.createElement("link");
       l.rel = "stylesheet";
-      l.href = "/assets/chat-widget.css?v=7";
+      l.href = "/assets/chat-widget.css?v=8";
       l.setAttribute("data-us-chat-css", "loading");
       l.addEventListener("load", function () { l.setAttribute("data-us-chat-css", "done"); });
       l.addEventListener("error", function () { l.setAttribute("data-us-chat-css", "done"); });
       document.head.appendChild(l);
     }
     const s = document.createElement("script");
-    s.src = "/assets/chat-widget.js?v=9";
+    s.src = "/assets/chat-widget.js?v=10";
     s.defer = true;
     s.setAttribute("data-us-chat", "1");
     document.body.appendChild(s);

@@ -6,7 +6,7 @@
   if (window.__usChatLoaded) return;
   window.__usChatLoaded = true;
 
-  var CSS_URL = "/assets/chat-widget.css?v=7";
+  var CSS_URL = "/assets/chat-widget.css?v=8";
   var SID_KEY = "us_chat_sid_v1";
 
   var T = {
@@ -176,8 +176,8 @@
 
     var root = el("div", "uschat-root");
     root.appendChild(panel);
+    root.appendChild(fab); /* same stacking context as panel; panel z-index wins */
     document.body.appendChild(root);
-    document.body.appendChild(fab);
 
     // Fade the FAB while a section photo sits under it (same media scope as
     // sticky-cta occlusion in partials.js — section/…, never bare main). Keep
