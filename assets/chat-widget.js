@@ -237,22 +237,77 @@
     }
     window.__fabMediaUnderPoint = fabMediaUnderPoint;
 
+    function fabClamp(n, a, b) {
+      return n < a ? a : (n > b ? b : n);
+    }
+    function fabIntersectRects(a, b) {
+      var left = Math.max(a.left, b.left);
+      var top = Math.max(a.top, b.top);
+      var right = Math.min(a.right, b.right);
+      var bottom = Math.min(a.bottom, b.bottom);
+      if (right <= left || bottom <= top) return null;
+      return { left: left, top: top, right: right, bottom: bottom,
+        width: right - left, height: bottom - top };
+    }
+    /* 56x56 disc (border-radius 50%), not the square AABB corners. */
+    function fabDiscOverlapsRect(cx, cy, radius, r) {
+      var qx = fabClamp(cx, r.left, r.right);
+      var qy = fabClamp(cy, r.top, r.bottom);
+      var dx = qx - cx, dy = qy - cy;
+      return (dx * dx + dy * dy) <= (radius * radius);
+    }
+    function fabSampleIntersection(fab, r, cx, cy, radius) {
+      var inter = fabIntersectRects(fab, r);
+      if (!inter || !fabDiscOverlapsRect(cx, cy, radius, r)) return [];
+      var points = [];
+      function add(x, y) {
+        var dx = x - cx, dy = y - cy;
+        if ((dx * dx + dy * dy) <= (radius * radius)) points.push([x, y]);
+      }
+      /* Closest point on the media to the disc center: the contact point
+         when the center sits just outside the photo (bathroom hero edge). */
+      add(fabClamp(cx, r.left, r.right), fabClamp(cy, r.top, r.bottom));
+      /* Midpoint of the true overlap box — covers a thin strip the center
+         misses, without a sparse grid that can skip a 15x50 sliver. */
+      add((inter.left + inter.right) / 2, (inter.top + inter.bottom) / 2);
+      /* Corners of that overlap that still lie on the disc. */
+      add(inter.left, inter.top);
+      add(inter.right, inter.top);
+      add(inter.left, inter.bottom);
+      add(inter.right, inter.bottom);
+      return points;
+    }
     function fabShouldOcclude(fabEl) {
-      var rect = fabEl.getBoundingClientRect();
-      if (!(rect.width > 0 && rect.height > 0)) return false;
-      var x = rect.left + rect.width / 2;
-      var y = rect.top + rect.height / 2;
-      if (typeof document.elementsFromPoint === "function" ||
-          typeof document.elementFromPoint === "function") {
-        return !!fabMediaUnderPoint(x, y);
+      var fab = fabEl.getBoundingClientRect();
+      if (!(fab.width > 0 && fab.height > 0)) return false;
+      var nodes = document.querySelectorAll(FAB_MEDIA);
+      var hasHit = typeof document.elementsFromPoint === "function" ||
+        typeof document.elementFromPoint === "function";
+      var i, r, rects, pts, p;
+      if (hasHit) {
+        var cx = fab.left + fab.width / 2;
+        var cy = fab.top + fab.height / 2;
+        var radius = Math.min(fab.width, fab.height) / 2;
+        for (i = 0; i < nodes.length; i++) {
+          r = nodes[i].getBoundingClientRect();
+          if (!r || r.width === 0 || r.height === 0) continue;
+          pts = fabSampleIntersection(fab, r, cx, cy, radius);
+          for (p = 0; p < pts.length; p++) {
+            /* Painted stack at the sample, not the layout rect: phantom
+               1280x720@0,0 can AABB-hit the FAB but paint the org chart. */
+            if (fabMediaUnderPoint(pts[p][0], pts[p][1])) return true;
+          }
+        }
+        return false;
       }
       // Legacy fallback only when hit-testing is unavailable.
-      var nodes = document.querySelectorAll(FAB_MEDIA);
-      var rects = [];
-      for (var i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
-      return fabOverlapsMedia(rect, rects, 8);
+      rects = [];
+      for (i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
+      return fabOverlapsMedia(fab, rects, 8);
     }
     window.__fabShouldOcclude = fabShouldOcclude;
+    window.__fabSampleIntersection = fabSampleIntersection;
+    window.__fabDiscOverlapsRect = fabDiscOverlapsRect;
 
     function watchFabOcclusion(fabEl, panelEl) {
       if (!window.requestAnimationFrame || !window.MutationObserver) return;

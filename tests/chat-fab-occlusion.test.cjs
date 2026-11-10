@@ -2,6 +2,17 @@ const test=require('node:test'), assert=require('node:assert/strict');
 const fs=require('node:fs'), vm=require('node:vm'), path=require('node:path');
 const ROOT=path.join(__dirname,'..');
 const R=(l,t,w,h)=>({left:l,top:t,right:l+w,bottom:t+h,width:w,height:h});
+function pointIn(r,x,y){return r && x>=r.left && x<=r.right && y>=r.top && y<=r.bottom;}
+function paintedAt(nodes){
+  return (x,y)=>{
+    for (const n of nodes){
+      const r = n.getBoundingClientRect ? n.getBoundingClientRect() : n;
+      if (pointIn(r,x,y)) return [n];
+    }
+    return [];
+  };
+}
+
 
 function read(rel){return fs.readFileSync(path.join(ROOT,rel),'utf8');}
 function stripComments(css){return css.replace(/\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\//g,'');}
@@ -244,8 +255,14 @@ function makeFocusEnv(opts){
         return [];
       },
       createElement(tag){ return makeEl(tag); },
-      elementsFromPoint(){ return env.__hitStack || []; },
-      elementFromPoint(){ const st = env.__hitStack || []; return st[0] || null; },
+      elementsFromPoint(x,y){
+        if (typeof env.__hitAt === 'function') return env.__hitAt(x,y) || [];
+        return env.__hitStack || [];
+      },
+      elementFromPoint(x,y){
+        const st = typeof env.__hitAt === 'function' ? (env.__hitAt(x,y) || []) : (env.__hitStack || []);
+        return st[0] || null;
+      },
     },
   };
   env.__hitStack = opts.hitStack ? opts.hitStack.slice() : media.slice();
@@ -577,9 +594,12 @@ test('capabilities org section contains no FAB_MEDIA (text/html chart only)',()=
 
 test('phantom AABB (0,0,1280x720) would keep hide true; hit-test against org chart clears',()=>{
   // Reproduces production FAIL: after labs hide, scroll to organization.
-  // Lazy/offscreen lab imgs can still report a 1280x720 box at 0,0 — that
-  // AABB-intersects a FAB at y=720 — but the painted stack is the org chart.
-  const phantom = R(0, 0, 1280, 720);
+  // Lazy/offscreen lab imgs can still report a tall box at 0,0 that AABB-
+  // intersects a FAB at y=720 — but the painted stack is the org chart.
+  // Use a sliver of positive area (bottom 740) so a *painted* lab can hide;
+  // a 720-tall box only touches the FAB edge (zero-area) and is covered
+  // by the dedicated phantom+org test below.
+  const phantom = R(0, 0, 1280, 740);
   const fabRect = R(1206, 720, 56, 56);
   const env = makeFocusEnv({ fabRect, mediaRects: [phantom] });
   vm.runInNewContext(read('assets/chat-widget.js'), env);
@@ -631,4 +651,89 @@ test('occlusion check uses hit-test not AABB when elementsFromPoint exists',()=>
   const restore = js.slice(js.indexOf('function restoreFocusAfterClose'), js.indexOf('function setOpen'));
   assert.match(restore, /fabShouldOcclude/);
   assert.doesNotMatch(restore, /querySelectorAll\(FAB_MEDIA\)/);
+});
+
+
+test('center 10px outside image but 15x50 footprint overlap hides the FAB',()=>{
+  // Bathroom hero EDGEFAIL: FAB center sits ~10px past the photo edge, but
+  // the 56x56 disc still covers a ~15x50 sliver. Center-only hit-test missed it.
+  const fabRect = R(1206, 720, 56, 56); // center 1234, 748
+  const imgRect = R(640, 400, 584, 370); // right=1224 (10px left of center), bottom=770
+  // intersection: x 1206-1224 (18px ~15), y 720-770 (50px)
+  assert.equal(fabRect.left + fabRect.width/2 - imgRect.right, 10);
+  assert.equal(Math.min(fabRect.right, imgRect.right) - Math.max(fabRect.left, imgRect.left), 18);
+  assert.equal(Math.min(fabRect.bottom, imgRect.bottom) - Math.max(fabRect.top, imgRect.top), 50);
+
+  const env = makeFocusEnv({ fabRect, mediaRects: [imgRect] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const img = env.__media[0];
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  org._rect = R(0, 0, 1280, 800);
+  // Painted stack follows true boxes: center (1234,748) is outside the photo.
+  env.__hitAt = (x,y) => {
+    if (pointIn(imgRect, x, y)) return [img];
+    if (pointIn(org._rect, x, y)) return [org];
+    return [];
+  };
+  env.__hitStack = []; // must not leak a constant stack
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabMediaUnderPoint(1234, 748), null, 'center itself is outside the photo');
+  assert.equal(env.__fabShouldOcclude(fab), true, '15x50 sliver on the disc must hide');
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+});
+
+test('thin strip under the disc hides; AABB-only corner outside the disc does not',()=>{
+  const fabRect = R(1206, 720, 56, 56); // center 1234,748 radius 28
+  // 3px-wide vertical strip along the left of the disc (x 1206-1209), tall overlap
+  const thin = R(1000, 700, 209, 80); // right=1209, so 3px into the FAB box
+  const env = makeFocusEnv({ fabRect, mediaRects: [thin] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const img = env.__media[0];
+  env.__hitAt = (x,y) => pointIn(thin, x, y) ? [img] : [];
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabShouldOcclude(fab), true, '3px painted strip on the disc hides');
+
+  // Square-corner-only: media clips the top-left AABB corner well outside the disc
+  // Closest point to center is too far (>28px) so the circle does not overlap.
+  const corner = R(1200, 714, 10, 10); // covers (1200-1210, 714-724); FAB corner 1206,720
+  // center 1234,748 to closest (1210,724): dx=24 dy=24, dist~33.9 > 28
+  const env2 = makeFocusEnv({ fabRect, mediaRects: [corner] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env2);
+  const img2 = env2.__media[0];
+  env2.__hitAt = (x,y) => pointIn(corner, x, y) ? [img2] : [];
+  const fab2 = env2.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env2.__fabDiscOverlapsRect(1234, 748, 28, corner), false);
+  assert.equal(env2.__fabShouldOcclude(fab2), false, 'square corner outside the disc must not hide');
+});
+
+test('phantom 1280x720@0,0 still AABB-hits but painted org chart at intersection clears',()=>{
+  const fabRect = R(1206, 720, 56, 56);
+  const phantom = R(0, 0, 1280, 720); // bottom=720, touches FAB top
+  const env = makeFocusEnv({ fabRect, mediaRects: [phantom] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  assert.equal(env.__fabOverlapsMedia(fabRect, [phantom], 8), true);
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  org._rect = R(200, 200, 800, 500);
+  // Intersection samples sit on the phantom layout box, but paint is the org chart
+  // (or nothing in the FAB disc). Never return the img.
+  env.__hitAt = (x,y) => {
+    if (pointIn(org._rect, x, y)) return [org];
+    return [org]; // page content, not the offscreen lab img
+  };
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabShouldOcclude(fab), false);
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false);
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  const css = read('assets/chat-widget.css');
+  const computed = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(computed.opacity, '1');
 });
