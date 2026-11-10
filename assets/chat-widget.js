@@ -6,7 +6,7 @@
   if (window.__usChatLoaded) return;
   window.__usChatLoaded = true;
 
-  var CSS_URL = "/assets/chat-widget.css?v=9";
+  var CSS_URL = "/assets/chat-widget.css?v=10";
   var SID_KEY = "us_chat_sid_v1";
 
   var T = {
@@ -118,11 +118,16 @@
     function tryReveal() {
       if (booted || !cssReady || !built) return;
       booted = true;
-      fab.style.visibility = "";
-      panel.style.visibility = "";
-      // CSS keyframe animation (uschat-pop) guarantees a smooth fade-in —
-      // immune to style-coalescing that made the rAF opacity trick pop.
+      root.classList.add("uschat-ready");
+      // One-shot entrance; drop uschat-in on end so later occlusion toggles
+      // never reassign animation (restarting pop left opacity/visibility wrong).
       fab.classList.add("uschat-in");
+      var onPopEnd = function (e) {
+        if (e && e.animationName && e.animationName !== "uschat-pop") return;
+        fab.classList.remove("uschat-in");
+        fab.removeEventListener("animationend", onPopEnd);
+      };
+      fab.addEventListener("animationend", onPopEnd);
     }
     ensureCss(function () { cssReady = true; tryReveal(); });
     var t = function () { return T[lang()]; };
@@ -135,14 +140,13 @@
       '<path d="M12 3C6.9 3 3 6.6 3 11c0 2.2 1 4.2 2.7 5.6-.1 1-.5 2.4-1.6 3.4 1.8 0 3.4-.8 4.4-1.5 1.1.3 2.3.5 3.5.5 5.1 0 9-3.6 9-8S17.1 3 12 3z"/></svg>' +
       '<svg class="uschat-fab-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">' +
       '<path d="M6 6l12 12M18 6L6 18"/></svg>';
-    fab.style.visibility = "hidden"; // anti-FOUC: revealed by reveal()
+    /* anti-FOUC: .uschat-root:not(.uschat-ready) hides via CSS, no inline */
 
     var panel = el("div", "uschat-panel");
     panel.setAttribute("role", "dialog");
     panel.setAttribute("aria-label", t().title);
     panel.setAttribute("aria-hidden", "true");
     panel.setAttribute("inert", "");
-    panel.style.visibility = "hidden"; // anti-FOUC: revealed by reveal()
 
     var head = el("div", "uschat-head");
     var mark = el("div", "uschat-head-mark", "U");

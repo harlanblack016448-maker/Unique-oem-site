@@ -4,6 +4,8 @@ const ROOT=path.join(__dirname,'..');
 const R=(l,t,w,h)=>({left:l,top:t,right:l+w,bottom:t+h,width:w,height:h});
 
 function read(rel){return fs.readFileSync(path.join(ROOT,rel),'utf8');}
+function stripComments(css){return css.replace(/\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\//g,'');}
+function declsOnly(body){return stripComments(body);}
 
 test('chat FAB media selector is section-scoped (not bare main)',()=>{
   const src=read('assets/chat-widget.js');
@@ -11,22 +13,31 @@ test('chat FAB media selector is section-scoped (not bare main)',()=>{
   assert.ok(m); assert.match(m[1],/^section img/); assert.doesNotMatch(m[1],/\bmain\b/);
 });
 
-test('occluding rule cancels uschat-pop fill so opacity cannot stick at 1',()=>{
+test('occluding uses opacity not visibility; cancels pop only while uschat-in',()=>{
   const css=read('assets/chat-widget.css');
-  // Pop animation must not use fill-mode both/forwards (that pins opacity:1).
   const pop=css.match(/\.uschat-fab\.uschat-in\s*\{([^}]*)\}/);
   assert.ok(pop,'uschat-in rule');
   assert.match(pop[1],/animation:\s*uschat-pop/);
   assert.doesNotMatch(pop[1],/\bboth\b|\bforwards\b/);
-  // Occluding must win against .uschat-in: cancel animation + hide for real.
-  const occ=css.match(/\.uschat-fab\.uschat-in\.uschat-occluding\s*,\s*\.uschat-fab\.uschat-occluding\s*\{([^}]*)\}/);
-  assert.ok(occ,'combined occluding selector (beats .uschat-in specificity)');
-  assert.match(occ[1],/animation:\s*none/);
-  assert.match(occ[1],/opacity:\s*0/);
-  assert.match(occ[1],/visibility:\s*hidden/);
-  assert.match(occ[1],/pointer-events:\s*none/);
-  // Source order: occluding block after uschat-in
-  assert.ok(css.indexOf('.uschat-fab.uschat-in') < css.indexOf('.uschat-fab.uschat-in.uschat-occluding'));
+  // Steady occluding: opacity hide like sticky-cta — NEVER visibility:hidden
+  // (visibility stuck after clear with aria-hidden=false / a11y tree empty).
+  const steady=css.match(/\.uschat-fab\.uschat-occluding\s*\{([^}]*)\}/);
+  assert.ok(steady,'steady occluding rule');
+  assert.match(steady[1],/opacity:\s*0/);
+  assert.match(steady[1],/pointer-events:\s*none/);
+  assert.doesNotMatch(declsOnly(steady[1]),/(?:^|\n)\s*visibility\s*:/);
+  assert.doesNotMatch(steady[1],/animation\s*:/); // must not reassign animation every toggle
+  // Boot+occluding: cancel running pop so opacity:0 wins during entrance only
+  const boot=css.match(/\.uschat-fab\.uschat-in\.uschat-occluding\s*\{([^}]*)\}/);
+  assert.ok(boot,'boot occluding cancels animation');
+  assert.match(boot[1],/animation:\s*none/);
+  // Closed panel must not use visibility:hidden (inheritance / sibling under root)
+  const panel=css.match(/(?:^|\n)\.uschat-panel\s*\{([^}]*)\}/);
+  assert.ok(panel);
+  assert.doesNotMatch(declsOnly(panel[1]),/(?:^|\n)\s*visibility\s*:/);
+  assert.match(panel[1],/pointer-events:\s*none/);
+  // Anti-FOUC via :not(.uschat-ready), not inline styles
+  assert.match(css,/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/);
 });
 
 test('FAB nests inside .uschat-root; panel z-index above FAB (Close wins hits)',()=>{
@@ -134,6 +145,10 @@ function makeFocusEnv(opts){
         return false;
       },
       addEventListener(type, fn){ on(el, type, fn); },
+      removeEventListener(type, fn){
+        const list = listeners.get(el) || [];
+        listeners.set(el, list.filter(x => !(x.type === type && x.fn === fn)));
+      },
       focus(){ env.document.activeElement = el; },
       blur(){ if (env.document.activeElement === el) env.document.activeElement = env.document.body; },
       getBoundingClientRect(){
@@ -300,16 +315,18 @@ test('mouseClose over lab media: closed panel inert; FAB occluded not focused (n
   assert.notEqual(env.document.activeElement, fab);
 });
 
-test('CSS closed panel uses visibility:hidden; open makes visible (no ghost pointer/focus)',()=>{
+test('CSS closed panel relies on opacity/pointer-events not visibility',()=>{
   const css = read('assets/chat-widget.css');
-  const closed = css.match(/\.uschat-panel\s*\{([^}]*)\}/);
+  const closed = css.match(/(?:^|\n)\.uschat-panel\s*\{([^}]*)\}/);
   assert.ok(closed);
-  assert.match(closed[1], /visibility:\s*hidden/);
+  assert.doesNotMatch(declsOnly(closed[1]), /(?:^|\n)\s*visibility\s*:/);
   assert.match(closed[1], /pointer-events:\s*none/);
-  const opened = css.match(/\.uschat-open\s+\.uschat-panel\s*\{([^}]*)\}/);
+  assert.match(closed[1], /opacity:\s*0/);
+  const opened = css.match(/(?:^|\n)\.uschat-open\s+\.uschat-panel\s*\{([^}]*)\}/);
   assert.ok(opened);
-  assert.match(opened[1], /visibility:\s*visible/);
+  assert.doesNotMatch(declsOnly(opened[1]), /(?:^|\n)\s*visibility\s*:/);
   assert.match(opened[1], /pointer-events:\s*auto/);
+  assert.match(opened[1], /opacity:\s*1/);
 });
 
 test('setOpen source sets inert on close and clears on open; restores focus helper present',()=>{
@@ -322,4 +339,208 @@ test('setOpen source sets inert on close and clears on open; restores focus help
   const initIdx = js.indexOf('panel.setAttribute("inert"');
   const appendIdx = js.indexOf('root.appendChild(panel)');
   assert.ok(initIdx > 0 && initIdx < appendIdx);
+});
+
+
+/* --- computed CSS cascade semantics for FAB show/hide --- */
+function parseRuleBody(css, selectorRe){
+  const m = css.match(selectorRe);
+  return m ? m[1] : '';
+}
+function ruleAtLine(css, classPath){
+  // classPath e.g. '.uschat-fab.uschat-occluding' must appear at line start (no prefix)
+  const re = new RegExp('(?:^|\\n)' + classPath.replace(/\./g, '\\.') + '\\s*\\{([^}]*)\\}');
+  return parseRuleBody(css, re);
+}
+function declare(body, prop){
+  const re = new RegExp(prop + '\\s*:\\s*([^;]+);');
+  const m = body.match(re);
+  return m ? m[1].trim() : null;
+}
+/** Resolve FAB computed visibility/opacity/animation/pointer-events from our stylesheet + classes. */
+function computeFab(css, classes, rootReady){
+  const set = new Set(classes);
+  // Inheritance baseline
+  let visibility = 'visible';
+  let opacity = '1';
+  let animation = 'none';
+  let pointerEvents = 'auto';
+  if (!rootReady) visibility = 'hidden'; // :not(.uschat-ready) .uschat-fab
+  // .uschat-fab — no visibility/opacity set
+  if (set.has('uschat-in')) {
+    const body = parseRuleBody(css, /\.uschat-fab\.uschat-in\s*\{([^}]*)\}/);
+    const a = declare(body, 'animation');
+    if (a) animation = a;
+  }
+  if (set.has('uschat-occluding')) {
+    const steady = ruleAtLine(css, '.uschat-fab.uschat-occluding');
+    const op = declare(steady, 'opacity'); if (op) opacity = op;
+    const pe = declare(steady, 'pointer-events'); if (pe) pointerEvents = pe;
+    const vis = declare(steady, 'visibility'); if (vis) visibility = vis;
+    const an = declare(steady, 'animation'); if (an) animation = an;
+    if (set.has('uschat-in')) {
+      const boot = ruleAtLine(css, '.uschat-fab.uschat-in.uschat-occluding');
+      const an2 = declare(boot, 'animation'); if (an2) animation = an2;
+    }
+  }
+  return { visibility, opacity, animation, pointerEvents };
+}
+
+test('computed cascade: hide→clear restores visible opacity without visibility:hidden',()=>{
+  const css = read('assets/chat-widget.css');
+  // overlap while booting
+  let r = computeFab(css, ['uschat-fab','uschat-in','uschat-occluding'], true);
+  assert.equal(r.opacity, '0');
+  assert.equal(r.pointerEvents, 'none');
+  assert.equal(r.animation, 'none');
+  assert.notEqual(r.visibility, 'hidden'); // must not use visibility for occlusion
+  // clear while still booting — pop may be assigned again (edge); visibility still not hidden
+  r = computeFab(css, ['uschat-fab','uschat-in'], true);
+  assert.equal(r.opacity, '1');
+  assert.equal(r.visibility, 'visible');
+  // after animationend drops uschat-in: steady visible
+  r = computeFab(css, ['uschat-fab'], true);
+  assert.equal(r.opacity, '1');
+  assert.equal(r.visibility, 'visible');
+  assert.equal(r.animation, 'none');
+  // overlap after boot
+  r = computeFab(css, ['uschat-fab','uschat-occluding'], true);
+  assert.equal(r.opacity, '0');
+  assert.equal(r.pointerEvents, 'none');
+  assert.equal(r.animation, 'none'); // steady rule must not set animation
+  assert.notEqual(r.visibility, 'hidden');
+  // clear after boot — CRITICAL regression: must be fully showable
+  r = computeFab(css, ['uschat-fab'], true);
+  assert.equal(r.opacity, '1');
+  assert.equal(r.visibility, 'visible');
+  assert.equal(r.pointerEvents, 'auto');
+  assert.equal(r.animation, 'none');
+});
+
+test('behavioral lifecycle hide→clear→open→close→overlap→clear (classes+aria+inert+ready)',()=>{
+  const env = makeFocusEnv({
+    fabRect: R(1206, 660, 56, 56),
+    mediaRects: [R(640, 400, 600, 320)], // initially overlapping
+  });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  assert.ok(root);
+  assert.ok(root.classList.contains('uschat-ready'), 'anti-FOUC ready class set (no inline visibility)');
+  const panel = root.children.find(c => c.classList.contains('uschat-panel'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  assert.ok(panel && fab);
+  assert.equal(fab.style.visibility, undefined);
+  assert.equal(panel.style.visibility, undefined);
+
+  // Simulate occlusion watcher effects by invoking scroll queue: media overlaps
+  // The watcher already queued on init; force another check via scroll listener.
+  // Find window scroll listeners — our mock stores on env.
+  // Directly drive class/aria the way check() would after measuring overlap:
+  // First: ensure overlap hide path via restoreFocusAfterClose-style + MutationObserver path.
+  // Open then close over media to hit restoreFocusAfterClose occlusion.
+  fab.click(); // open (clears inert)
+  assert.equal(panel.hasAttribute('inert'), false);
+  const head = panel.children.find(c => c.classList.contains('uschat-head'));
+  head.children.find(c => c.classList.contains('uschat-head-close')).click(); // close over media
+  assert.equal(panel.getAttribute('inert'), '');
+  assert.equal(panel.getAttribute('aria-hidden'), 'true');
+  assert.ok(fab.classList.contains('uschat-occluding'));
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+
+  // CLEAR: photos leave — update media rects to well below viewport, re-run occlusion
+  env.document.querySelectorAll = function(sel){
+    if (String(sel).indexOf('section img') === 0) {
+      const n = env.document.createElement('img');
+      n._rect = R(640, 2000, 600, 320); // well below
+      return [n];
+    }
+    return [];
+  };
+  // Trigger scroll handlers registered on window
+  const scrolls = [];
+  // Re-install: call check by focusing then blurring fab path — emit scroll on window
+  // Our makeFocusEnv stores window listeners via on(env, ...) only for document.
+  // Patch: manually toggle as watchFabOcclusion would when hide=false:
+  // Better — expose by dispatching through addEventListener on env (window).
+  // makeFocusEnv uses env.addEventListener for window. Retrieve and call.
+  // Simpler approach: change fab rect media and call fab._emit focusout which queues check.
+  // But querySelectorAll was used at check time — we replaced it. Emit focusout on fab.
+  fab._emit('focusout', {});
+  // rAF runs sync in mock → check() should clear occluding
+  assert.equal(fab.classList.contains('uschat-occluding'), false, 'clear after photos leave');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  // Computed CSS semantics: no visibility:hidden on steady clear
+  const css = read('assets/chat-widget.css');
+  const cleared = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(cleared.opacity, '1');
+  assert.equal(cleared.visibility, 'visible');
+  assert.notEqual(cleared.visibility, 'hidden');
+
+  // OPEN
+  fab.click();
+  assert.ok(env.document.body.classList.contains('uschat-open'));
+  assert.equal(panel.hasAttribute('inert'), false);
+  assert.equal(fab.classList.contains('uschat-occluding'), false); // open suppresses hide
+
+  // CLOSE on clear (media still below)
+  head.children.find(c => c.classList.contains('uschat-head-close')).click();
+  assert.equal(panel.getAttribute('inert'), '');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  assert.equal(env.document.activeElement, fab); // focus restored
+
+  // OVERLAP again
+  env.document.querySelectorAll = function(sel){
+    if (String(sel).indexOf('section img') === 0) {
+      const n = env.document.createElement('img');
+      n._rect = R(640, 400, 600, 320);
+      return [n];
+    }
+    return [];
+  };
+  // Blur fab so focused guard allows hide
+  fab.blur();
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'), 'overlap hides again');
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+  const hidden = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(hidden.opacity, '0');
+  assert.notEqual(hidden.visibility, 'hidden');
+
+  // CLEAR again
+  env.document.querySelectorAll = function(sel){
+    if (String(sel).indexOf('section img') === 0) {
+      const n = env.document.createElement('img');
+      n._rect = R(640, 2000, 600, 320);
+      return [n];
+    }
+    return [];
+  };
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false, 'final clear shows FAB');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  const final = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(final.opacity, '1');
+  assert.equal(final.visibility, 'visible');
+});
+
+test('uschat-in is one-shot: animationend drops it so occlusion clear cannot restart pop',()=>{
+  const env = makeFocusEnv({ fabRect: R(1206, 720, 56, 56), mediaRects: [] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  // After reveal, uschat-in is present until animationend
+  assert.ok(fab.classList.contains('uschat-in'), 'boot class present after reveal');
+  // Fire animationend
+  fab._emit('animationend', { animationName: 'uschat-pop' });
+  assert.equal(fab.classList.contains('uschat-in'), false, 'boot class removed after pop');
+  const css = read('assets/chat-widget.css');
+  // Occlude then clear without uschat-in: animation property stays none
+  fab.classList.add('uschat-occluding');
+  let r = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(r.animation, 'none');
+  fab.classList.remove('uschat-occluding');
+  r = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(r.animation, 'none');
+  assert.equal(r.opacity, '1');
+  assert.equal(r.visibility, 'visible');
 });
