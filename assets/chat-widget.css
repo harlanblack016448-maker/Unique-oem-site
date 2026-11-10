@@ -3,11 +3,18 @@
 .uschat-root {
   --uschat-font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   position: fixed;
-  z-index: 9999;
+  /* Single stacking context for FAB + panel so panel Close always wins hits. */
+  z-index: 10000;
   font-family: var(--uschat-font);
   font-size: 15px;
   line-height: 1.45;
   color: #111;
+}
+/* Anti-FOUC via class, not inline style — inline visibility:hidden survived
+   occlusion clear (aria-hidden=false) and kept the FAB out of the a11y tree. */
+.uschat-root:not(.uschat-ready) .uschat-fab,
+.uschat-root:not(.uschat-ready) .uschat-panel {
+  visibility: hidden;
 }
 
 /* --ads-lift is set by growth.js/growth.css while the ad-consent panel is visible,
@@ -33,10 +40,11 @@
   justify-content: center;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
   transition: transform 0.15s ease, opacity 0.15s ease, bottom 0.2s ease;
-  z-index: 10000;
+  z-index: 1; /* within .uschat-root */
 }
 .uschat-fab:hover { transform: scale(1.06); }
-.uschat-fab.uschat-in { animation: uschat-pop 0.22s ease-out both; }
+/* fill-mode both would pin opacity:1 after pop and defeat .uschat-occluding */
+.uschat-fab.uschat-in { animation: uschat-pop 0.22s ease-out; }
 @keyframes uschat-pop {
   from { opacity: 0; transform: scale(0.85); }
   to { opacity: 1; transform: scale(1); }
@@ -64,8 +72,11 @@
   opacity: 0;
   transform: translateY(12px) scale(0.98);
   pointer-events: none;
+  /* Closed: opacity + pointer-events + JS inert/aria-hidden.
+     Do NOT use visibility:hidden here — it is inherited by descendants and
+     interacted badly with FAB occlusion clear (sibling under same root). */
   transition: opacity 0.18s ease, transform 0.18s ease, bottom 0.2s ease;
-  z-index: 10000;
+  z-index: 2; /* above FAB within .uschat-root */
 }
 
 /* Rise above Request-a-Quote only while the pill/bar is visible. */
@@ -73,6 +84,27 @@ body:has(.sticky-cta.is-visible) .uschat-fab { bottom: calc(84px + var(--ads-lif
 body:has(.sticky-cta.is-visible) .uschat-panel {
   bottom: calc(148px + var(--ads-lift, 0px));
   max-height: calc(100vh - 172px - var(--ads-lift, 0px));
+}
+/* Quote pill faded for a photo: drop FAB so it does not stay raised into that photo. */
+body:has(.sticky-cta.is-visible.is-occluding) .uschat-fab { bottom: calc(24px + var(--ads-lift, 0px)); }
+body:has(.sticky-cta.is-visible.is-occluding) .uschat-panel {
+  bottom: calc(88px + var(--ads-lift, 0px));
+  max-height: calc(100vh - 112px - var(--ads-lift, 0px));
+}
+/* Fade FAB while a section photo sits under it (see chat-widget.js).
+   Opacity + pointer-events only (same idea as .sticky-cta.is-occluding).
+   visibility:hidden was sticky after clear: aria-hidden flipped false but
+   computed visibility stayed hidden / a11y tree empty.
+   Cancel uschat-pop only while the one-shot boot class is still present so
+   opacity:0 wins during entrance; after animationend JS drops uschat-in, so
+   toggling occluding no longer reassigns animation (no pop restart). */
+.uschat-fab.uschat-occluding {
+  opacity: 0;
+  transform: none;
+  pointer-events: none;
+}
+.uschat-fab.uschat-in.uschat-occluding {
+  animation: none;
 }
 .uschat-open .uschat-panel {
   opacity: 1;
@@ -194,6 +226,8 @@ body:has(.sticky-cta.is-visible) .uschat-panel {
   .uschat-fab { right: 14px; bottom: calc(24px + var(--ads-lift, 0px)); }
   body:has(.sticky-cta.is-visible) .uschat-fab { bottom: calc(80px + var(--ads-lift, 0px)); } /* above the full-width mobile sticky bar */
   body:has(.sticky-cta.is-visible) .uschat-panel { bottom: calc(148px + var(--ads-lift, 0px)); }
+  body:has(.sticky-cta.is-visible.is-occluding) .uschat-fab { bottom: calc(24px + var(--ads-lift, 0px)); }
+  body:has(.sticky-cta.is-visible.is-occluding) .uschat-panel { bottom: calc(88px + var(--ads-lift, 0px)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .uschat-panel, .uschat-fab { transition: none; }

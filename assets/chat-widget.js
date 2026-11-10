@@ -6,7 +6,7 @@
   if (window.__usChatLoaded) return;
   window.__usChatLoaded = true;
 
-  var CSS_URL = "/assets/chat-widget.css?v=6";
+  var CSS_URL = "/assets/chat-widget.css?v=10";
   var SID_KEY = "us_chat_sid_v1";
 
   var T = {
@@ -118,11 +118,16 @@
     function tryReveal() {
       if (booted || !cssReady || !built) return;
       booted = true;
-      fab.style.visibility = "";
-      panel.style.visibility = "";
-      // CSS keyframe animation (uschat-pop) guarantees a smooth fade-in —
-      // immune to style-coalescing that made the rAF opacity trick pop.
+      root.classList.add("uschat-ready");
+      // One-shot entrance; drop uschat-in on end so later occlusion toggles
+      // never reassign animation (restarting pop left opacity/visibility wrong).
       fab.classList.add("uschat-in");
+      var onPopEnd = function (e) {
+        if (e && e.animationName && e.animationName !== "uschat-pop") return;
+        fab.classList.remove("uschat-in");
+        fab.removeEventListener("animationend", onPopEnd);
+      };
+      fab.addEventListener("animationend", onPopEnd);
     }
     ensureCss(function () { cssReady = true; tryReveal(); });
     var t = function () { return T[lang()]; };
@@ -135,12 +140,13 @@
       '<path d="M12 3C6.9 3 3 6.6 3 11c0 2.2 1 4.2 2.7 5.6-.1 1-.5 2.4-1.6 3.4 1.8 0 3.4-.8 4.4-1.5 1.1.3 2.3.5 3.5.5 5.1 0 9-3.6 9-8S17.1 3 12 3z"/></svg>' +
       '<svg class="uschat-fab-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">' +
       '<path d="M6 6l12 12M18 6L6 18"/></svg>';
-    fab.style.visibility = "hidden"; // anti-FOUC: revealed by reveal()
+    /* anti-FOUC: .uschat-root:not(.uschat-ready) hides via CSS, no inline */
 
     var panel = el("div", "uschat-panel");
     panel.setAttribute("role", "dialog");
     panel.setAttribute("aria-label", t().title);
-    panel.style.visibility = "hidden"; // anti-FOUC: revealed by reveal()
+    panel.setAttribute("aria-hidden", "true");
+    panel.setAttribute("inert", "");
 
     var head = el("div", "uschat-head");
     var mark = el("div", "uschat-head-mark", "U");
@@ -176,8 +182,70 @@
 
     var root = el("div", "uschat-root");
     root.appendChild(panel);
+    root.appendChild(fab); /* same stacking context as panel; panel z-index wins */
     document.body.appendChild(root);
-    document.body.appendChild(fab);
+
+    // Fade the FAB while a section photo sits under it (same media scope as
+    // sticky-cta occlusion in partials.js — section/…, never bare main). Keep
+    // the FAB when the panel is open or it holds keyboard focus.
+    var FAB_MEDIA = "section img, section picture, section video, section svg.figure, .model-chip";
+    function fabOverlapsMedia(rect, rects, gap) {
+      if (typeof window.__ctaOverlapsMedia === "function") {
+        return window.__ctaOverlapsMedia(rect, rects, gap);
+      }
+      var g = gap || 0;
+      for (var i = 0; i < rects.length; i++) {
+        var r = rects[i];
+        if (!r || r.width === 0 || r.height === 0) continue;
+        if (r.left < rect.right + g && r.right > rect.left - g &&
+            r.top < rect.bottom + g && r.bottom > rect.top - g) return true;
+      }
+      return false;
+    }
+    window.__fabOverlapsMedia = fabOverlapsMedia;
+
+    function watchFabOcclusion(fabEl, panelEl) {
+      if (!window.requestAnimationFrame || !window.MutationObserver) return;
+      var queued = false;
+      function check() {
+        queued = false;
+        var hide = false;
+        var chatOpen = document.body.classList.contains("uschat-open");
+        var focused = fabEl.contains(document.activeElement) ||
+          (panelEl && panelEl.contains(document.activeElement));
+        if (!chatOpen && !focused) {
+          var rect = fabEl.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            var nodes = document.querySelectorAll(FAB_MEDIA);
+            var rects = [];
+            for (var i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
+            hide = fabOverlapsMedia(rect, rects, 8);
+          }
+        }
+        fabEl.classList.toggle("uschat-occluding", hide);
+        if (hide) {
+          fabEl.setAttribute("tabindex", "-1");
+          fabEl.setAttribute("aria-hidden", "true");
+        } else {
+          fabEl.removeAttribute("tabindex");
+          fabEl.setAttribute("aria-hidden", "false");
+        }
+      }
+      function queue() {
+        if (!queued) { queued = true; requestAnimationFrame(check); }
+      }
+      window.addEventListener("scroll", queue, { passive: true });
+      window.addEventListener("resize", queue);
+      window.addEventListener("load", queue);
+      fabEl.addEventListener("focusout", queue);
+      if (panelEl) panelEl.addEventListener("focusout", queue);
+      new MutationObserver(queue).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+      var sticky = document.querySelector(".sticky-cta");
+      if (sticky) new MutationObserver(queue).observe(sticky, { attributes: true, attributeFilter: ["class"] });
+      queue();
+    }
+
+    watchFabOcclusion(fab, panel);
 
     var open = false;
     var busy = false;
@@ -325,15 +393,51 @@
         .then(function () { setBusy(false); if (open) input.focus(); });
     }
 
-    function setOpen(v) {
-      open = v;
-      document.body.classList.toggle("uschat-open", v);
-      fab.setAttribute("aria-label", v ? t().ariaClose : t().ariaOpen);
-      if (v && !greeted) {
-        greeted = true;
-        addBot(t().greeting, { noFeedback: true });
+    function restoreFocusAfterClose() {
+      /* Prefer the FAB opener when it is a visible control. If lab/hero media
+         would occlude it, leave focus on the document so Tab never lands on
+         ghost chips inside the closed panel (and occlusion can hide the FAB). */
+      var rect = fab.getBoundingClientRect();
+      var over = false;
+      if (rect.width > 0 && rect.height > 0) {
+        var nodes = document.querySelectorAll(FAB_MEDIA);
+        var rects = [];
+        for (var i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
+        over = fabOverlapsMedia(rect, rects, 8);
       }
-      if (v) input.focus();
+      if (over) {
+        fab.classList.add("uschat-occluding");
+        fab.setAttribute("tabindex", "-1");
+        fab.setAttribute("aria-hidden", "true");
+        return;
+      }
+      fab.classList.remove("uschat-occluding");
+      fab.removeAttribute("tabindex");
+      fab.setAttribute("aria-hidden", "false");
+      try { fab.focus(); } catch (e) { /* ignore */ }
+    }
+
+    function setOpen(v) {
+      open = !!v;
+      document.body.classList.toggle("uschat-open", open);
+      fab.setAttribute("aria-label", open ? t().ariaClose : t().ariaOpen);
+      if (open) {
+        panel.removeAttribute("inert");
+        panel.setAttribute("aria-hidden", "false");
+        if (!greeted) {
+          greeted = true;
+          addBot(t().greeting, { noFeedback: true });
+        }
+        try { input.focus(); } catch (e) { /* ignore */ }
+      } else {
+        var active = document.activeElement;
+        if (active && panel.contains(active)) {
+          try { active.blur(); } catch (e) { /* ignore */ }
+        }
+        panel.setAttribute("inert", "");
+        panel.setAttribute("aria-hidden", "true");
+        restoreFocusAfterClose();
+      }
     }
 
     fab.addEventListener("click", function () { setOpen(!open); });
