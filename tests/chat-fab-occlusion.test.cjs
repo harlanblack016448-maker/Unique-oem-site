@@ -196,7 +196,7 @@ function makeFocusEnv(opts){
         if (classSet.has('uschat-fab')) return opts.fabRect || R(1206, 720, 56, 56);
         return R(0,0,0,0);
       },
-      click(){ emit(el, 'click', { preventDefault(){} }); },
+      click(ev){ emit(el, 'click', Object.assign({ preventDefault(){}, detail: 1 }, ev || {})); },
       _emit: (type, ev) => emit(el, type, ev),
       _attrs: attrs,
     };
@@ -276,7 +276,7 @@ function makeFocusEnv(opts){
   return env;
 }
 
-test('closed panel is inert/aria-hidden; open clears; close restores focus without ghost chips',()=>{
+test('closed panel is inert/aria-hidden; open clears; pointer close does not focus FAB or ghost chips',()=>{
   const env = makeFocusEnv({
     fabRect: R(1206, 720, 56, 56),
     mediaRects: [], // no occlusion — FAB should receive focus back
@@ -315,17 +315,17 @@ test('closed panel is inert/aria-hidden; open clears; close restores focus witho
   moq.focus();
   assert.equal(env.document.activeElement, moq);
 
-  // mouseClose via head close button
+  // mouseClose via head close button (detail 1)
   const head = panel.children.find(c => c.classList.contains('uschat-head'));
   const closeBtn = head.children.find(c => c.classList.contains('uschat-head-close'));
-  closeBtn.click();
+  closeBtn.click({ detail: 1 });
   assert.equal(env.document.body.classList.contains('uschat-open'), false);
   assert.equal(panel.getAttribute('inert'), '');
   assert.equal(panel.getAttribute('aria-hidden'), 'true');
-  // focus restored to FAB opener (visible, no occlusion)
-  assert.equal(env.document.activeElement, fab);
-  // ghost chip must not remain focused
+  // Pointer close must not programmatically focus the FAB (focus-guard trap).
+  assert.notEqual(env.document.activeElement, fab);
   assert.notEqual(env.document.activeElement, moq);
+  assert.notEqual(env.document.activeElement, closeBtn);
 });
 
 test('Escape close applies inert and restores focus to FAB when not occluding',()=>{
@@ -532,16 +532,14 @@ test('behavioral lifecycle hide→clear→open→close→overlap→clear (classe
   assert.equal(panel.hasAttribute('inert'), false);
   assert.equal(fab.classList.contains('uschat-occluding'), false); // open suppresses hide
 
-  // CLOSE on clear (media still below)
-  head.children.find(c => c.classList.contains('uschat-head-close')).click();
+  // CLOSE on clear (media still below) — pointer, must not focus FAB
+  head.children.find(c => c.classList.contains('uschat-head-close')).click({ detail: 1 });
   assert.equal(panel.getAttribute('inert'), '');
   assert.equal(fab.getAttribute('aria-hidden'), 'false');
-  assert.equal(env.document.activeElement, fab); // focus restored
+  assert.notEqual(env.document.activeElement, fab, 'pointer close must not focus FAB');
 
-  // OVERLAP again — lab photo is the topmost painted node under the FAB
+  // OVERLAP again — lab photo under FAB; no blur needed because pointer close left FAB unfocused
   env.__hitStack = env.__media.slice();
-  // Blur fab so focused guard allows hide
-  fab.blur();
   fab._emit('focusout', {});
   assert.ok(fab.classList.contains('uschat-occluding'), 'overlap hides again');
   assert.equal(fab.getAttribute('aria-hidden'), 'true');
@@ -736,4 +734,99 @@ test('phantom 1280x720@0,0 still AABB-hits but painted org chart at intersection
   const css = read('assets/chat-widget.css');
   const computed = computeFab(css, fab.className.split(/\s+/), true);
   assert.equal(computed.opacity, '1');
+});
+
+
+test('isKeyboardCloseEvent: pointer detail>=1 / pointerType vs keyboard detail 0 and Escape',()=>{
+  const env = makeFocusEnv({ fabRect: R(1206, 720, 56, 56), mediaRects: [] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const k = env.__isKeyboardCloseEvent;
+  assert.equal(k({ detail: 1 }), false);
+  assert.equal(k({ detail: 2 }), false);
+  assert.equal(k({ pointerType: 'mouse', detail: 1 }), false);
+  assert.equal(k({ pointerType: 'touch', detail: 1 }), false);
+  assert.equal(k({ pointerType: 'pen' }), false);
+  assert.equal(k({ detail: 0 }), true, 'keyboard-generated click');
+  assert.equal(k({ key: 'Escape' }), true);
+  assert.equal(k(null), false);
+});
+
+test('pointer click close on clear: no FAB focus, then scroll to lab hides (no guard trap)',()=>{
+  const env = makeFocusEnv({
+    fabRect: R(1206, 720, 56, 56),
+    mediaRects: [R(640, 400, 600, 400)],
+  });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  env.__hitStack = [org]; // start clear
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const panel = root.children.find(c => c.classList.contains('uschat-panel'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  const closeBtn = panel.children.find(c => c.classList.contains('uschat-head'))
+    .children.find(c => c.classList.contains('uschat-head-close'));
+  fab.click({ detail: 1 }); // open
+  closeBtn.click({ detail: 1 }); // pointer close
+  assert.equal(panel.getAttribute('inert'), '');
+  assert.notEqual(env.document.activeElement, fab);
+  // scroll to lab — FAB is not focused, occlusion may run
+  env.__hitStack = env.__media.slice();
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'), 'pointer hide→clear then back to lab hides');
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+  const css = read('assets/chat-widget.css');
+  assert.equal(computeFab(css, fab.className.split(/\s+/), true).opacity, '0');
+});
+
+test('keyboard click detail 0 close on clear restores FAB focus; focused FAB is not hidden over lab (a11y exception)',()=>{
+  const env = makeFocusEnv({
+    fabRect: R(1206, 720, 56, 56),
+    mediaRects: [R(640, 400, 600, 400)],
+  });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  env.__hitStack = [org];
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const panel = root.children.find(c => c.classList.contains('uschat-panel'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  const closeBtn = panel.children.find(c => c.classList.contains('uschat-head'))
+    .children.find(c => c.classList.contains('uschat-head-close'));
+  fab.click({ detail: 0 });
+  closeBtn.click({ detail: 0 });
+  assert.equal(env.document.activeElement, fab, 'keyboard close restores focus to opener');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  // Intended exception: genuinely keyboard-focused FAB stays visible over media
+  env.__hitStack = env.__media.slice();
+  fab._emit('focusout', {}); // check still sees activeElement === fab
+  assert.equal(fab.classList.contains('uschat-occluding'), false, 'do not hide keyboard-focused FAB');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  // After blur, hide is allowed
+  fab.blur();
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+});
+
+test('Escape close on clear restores FAB focus (keyboard path)',()=>{
+  const env = makeFocusEnv({ fabRect: R(1206, 720, 56, 56), mediaRects: [] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  fab.click({ detail: 1 });
+  env.document._emit('keydown', { key: 'Escape' });
+  assert.equal(env.document.activeElement, fab);
+  assert.equal(env.document.body.classList.contains('uschat-open'), false);
+});
+
+test('pointer close of open FAB blurs it so the focus guard cannot trap',()=>{
+  const env = makeFocusEnv({ fabRect: R(1206, 720, 56, 56), mediaRects: [] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  fab.click({ detail: 1 }); // open, input focused
+  fab.focus(); // pointer user clicked the open (X) FAB — browser would focus it
+  fab.click({ detail: 1 }); // pointer close
+  assert.notEqual(env.document.activeElement, fab);
+  assert.equal(env.document.body.classList.contains('uschat-open'), false);
 });

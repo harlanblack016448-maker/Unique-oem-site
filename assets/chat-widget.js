@@ -492,10 +492,26 @@
         .then(function () { setBusy(false); if (open) input.focus(); });
     }
 
-    function restoreFocusAfterClose() {
-      /* Prefer the FAB opener when it is a visible control. If lab/hero media
-         is actually under it, leave focus on the document so Tab never lands on
-         ghost chips inside the closed panel (and occlusion can hide the FAB). */
+    /* Pointer close (mouse/touch click, event.detail >= 1 or pointerType
+       mouse/touch/pen) must not programmatically focus the FAB: that left
+       activeElement on the opener and the occlusion focus-guard refused to
+       hide it over lab photos. Keyboard close (Escape, or a button click
+       with detail === 0 from Enter/Space) restores focus to the FAB when
+       it is not over media, so the control stays keyboard-reachable.
+       Intended exception: a genuinely keyboard-focused FAB is not hidden
+       while it holds focus (do not drop the user's tab stop). */
+    function isKeyboardCloseEvent(e) {
+      if (!e) return false;
+      if (e.key === "Escape") return true;
+      if (e.pointerType) {
+        return e.pointerType !== "mouse" && e.pointerType !== "touch" &&
+          e.pointerType !== "pen";
+      }
+      return e.detail === 0;
+    }
+    window.__isKeyboardCloseEvent = isKeyboardCloseEvent;
+
+    function restoreFocusAfterClose(fromKeyboard) {
       var over = fabShouldOcclude(fab);
       if (over) {
         fab.classList.add("uschat-occluding");
@@ -506,10 +522,13 @@
       fab.classList.remove("uschat-occluding");
       fab.removeAttribute("tabindex");
       fab.setAttribute("aria-hidden", "false");
-      try { fab.focus(); } catch (e) { /* ignore */ }
+      /* Only keyboard close moves focus back to the opener. */
+      if (fromKeyboard) {
+        try { fab.focus(); } catch (e) { /* ignore */ }
+      }
     }
 
-    function setOpen(v) {
+    function setOpen(v, ev) {
       open = !!v;
       document.body.classList.toggle("uschat-open", open);
       fab.setAttribute("aria-label", open ? t().ariaClose : t().ariaOpen);
@@ -522,24 +541,27 @@
         }
         try { input.focus(); } catch (e) { /* ignore */ }
       } else {
+        var fromKeyboard = isKeyboardCloseEvent(ev);
         var active = document.activeElement;
-        if (active && panel.contains(active)) {
+        /* Pointer close: also blur the FAB itself (clicking the open FAB
+           would otherwise leave it focused and trap the focus guard). */
+        if (active && (panel.contains(active) || fab === active || fab.contains(active))) {
           try { active.blur(); } catch (e) { /* ignore */ }
         }
         panel.setAttribute("inert", "");
         panel.setAttribute("aria-hidden", "true");
-        restoreFocusAfterClose();
+        restoreFocusAfterClose(fromKeyboard);
       }
     }
 
-    fab.addEventListener("click", function () { setOpen(!open); });
-    closeBtn.addEventListener("click", function () { setOpen(false); });
+    fab.addEventListener("click", function (e) { setOpen(!open, e); });
+    closeBtn.addEventListener("click", function (e) { setOpen(false, e); });
     sendBtn.addEventListener("click", function () { send(input.value); });
     input.addEventListener("keydown", function (e) {
       if (e.key === "Enter") { e.preventDefault(); send(input.value); }
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && open) setOpen(false);
+      if (e.key === "Escape" && open) setOpen(false, e);
     });
     document.addEventListener("us:i18n", paintLang);
     paintLang();
