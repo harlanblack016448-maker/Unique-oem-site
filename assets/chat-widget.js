@@ -185,10 +185,15 @@
     root.appendChild(fab); /* same stacking context as panel; panel z-index wins */
     document.body.appendChild(root);
 
-    // Fade the FAB while a section photo sits under it (same media scope as
-    // sticky-cta occlusion in partials.js — section/…, never bare main). Keep
-    // the FAB when the panel is open or it holds keyboard focus.
+    // Hide the FAB only when a section photo is actually painted under it.
+    // AABB against every section img rect is not enough: lazy/offscreen
+    // images can report a viewport-sized box (e.g. 1280x720 at 0,0 from
+    // width/height attrs) that still intersects a bottom-right FAB after
+    // the user has scrolled to a text-only section (capabilities org
+    // chart). elementsFromPoint uses the painted hit stack.
+    // Same media scope as sticky-cta — section/…, never bare main.
     var FAB_MEDIA = "section img, section picture, section video, section svg.figure, .model-chip";
+    var FAB_HIT_SKIP = ".uschat-root, .sticky-cta";
     function fabOverlapsMedia(rect, rects, gap) {
       if (typeof window.__ctaOverlapsMedia === "function") {
         return window.__ctaOverlapsMedia(rect, rects, gap);
@@ -204,6 +209,51 @@
     }
     window.__fabOverlapsMedia = fabOverlapsMedia;
 
+    function fabMediaUnderPoint(x, y) {
+      var stack;
+      if (typeof document.elementsFromPoint === "function") {
+        stack = document.elementsFromPoint(x, y) || [];
+      } else if (typeof document.elementFromPoint === "function") {
+        var one = document.elementFromPoint(x, y);
+        stack = one ? [one] : [];
+      } else {
+        return null; // no hit-test API; caller may fall back
+      }
+      for (var i = 0; i < stack.length; i++) {
+        var node = stack[i];
+        if (!node || !node.closest) continue;
+        if (node.closest(FAB_HIT_SKIP)) continue;
+        var media = node.closest("img, picture, video, svg.figure, .model-chip");
+        if (!media) {
+          var fig = node.closest("figure");
+          if (fig && fig.querySelector("img, picture, video, svg.figure")) media = fig;
+        }
+        if (!media) continue;
+        if (media.classList && media.classList.contains("model-chip")) return media;
+        if (media.closest && media.closest(".model-chip")) return media;
+        if (media.closest && media.closest("section")) return media;
+      }
+      return null;
+    }
+    window.__fabMediaUnderPoint = fabMediaUnderPoint;
+
+    function fabShouldOcclude(fabEl) {
+      var rect = fabEl.getBoundingClientRect();
+      if (!(rect.width > 0 && rect.height > 0)) return false;
+      var x = rect.left + rect.width / 2;
+      var y = rect.top + rect.height / 2;
+      if (typeof document.elementsFromPoint === "function" ||
+          typeof document.elementFromPoint === "function") {
+        return !!fabMediaUnderPoint(x, y);
+      }
+      // Legacy fallback only when hit-testing is unavailable.
+      var nodes = document.querySelectorAll(FAB_MEDIA);
+      var rects = [];
+      for (var i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
+      return fabOverlapsMedia(rect, rects, 8);
+    }
+    window.__fabShouldOcclude = fabShouldOcclude;
+
     function watchFabOcclusion(fabEl, panelEl) {
       if (!window.requestAnimationFrame || !window.MutationObserver) return;
       var queued = false;
@@ -214,13 +264,7 @@
         var focused = fabEl.contains(document.activeElement) ||
           (panelEl && panelEl.contains(document.activeElement));
         if (!chatOpen && !focused) {
-          var rect = fabEl.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            var nodes = document.querySelectorAll(FAB_MEDIA);
-            var rects = [];
-            for (var i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
-            hide = fabOverlapsMedia(rect, rects, 8);
-          }
+          hide = fabShouldOcclude(fabEl);
         }
         fabEl.classList.toggle("uschat-occluding", hide);
         if (hide) {
@@ -395,16 +439,9 @@
 
     function restoreFocusAfterClose() {
       /* Prefer the FAB opener when it is a visible control. If lab/hero media
-         would occlude it, leave focus on the document so Tab never lands on
+         is actually under it, leave focus on the document so Tab never lands on
          ghost chips inside the closed panel (and occlusion can hide the FAB). */
-      var rect = fab.getBoundingClientRect();
-      var over = false;
-      if (rect.width > 0 && rect.height > 0) {
-        var nodes = document.querySelectorAll(FAB_MEDIA);
-        var rects = [];
-        for (var i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
-        over = fabOverlapsMedia(rect, rects, 8);
-      }
+      var over = fabShouldOcclude(fab);
       if (over) {
         fab.classList.add("uschat-occluding");
         fab.setAttribute("tabindex", "-1");

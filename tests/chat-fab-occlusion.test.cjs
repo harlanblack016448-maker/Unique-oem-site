@@ -144,6 +144,35 @@ function makeFocusEnv(opts){
         while (x){ if (x === el) return true; x = x.parent; }
         return false;
       },
+      matches(sel){
+        return String(sel).split(',').map(x => x.trim()).some(s => {
+          if (!s) return false;
+          if (s.startsWith('.')) return s.slice(1).split('.').every(c => classSet.has(c));
+          const parts = s.split('.');
+          const tag = parts[0];
+          if (tag && el.tagName !== tag.toUpperCase()) return false;
+          return parts.slice(1).every(c => classSet.has(c));
+        });
+      },
+      closest(sel){
+        let n = el;
+        while (n){
+          if (typeof n.matches === 'function' && n.matches(sel)) return n;
+          n = n.parent;
+        }
+        return null;
+      },
+      querySelector(sel){
+        const walk = (node) => {
+          for (const c of (node.children || [])){
+            if (c.matches && c.matches(sel)) return c;
+            const d = walk(c);
+            if (d) return d;
+          }
+          return null;
+        };
+        return walk(el);
+      },
       addEventListener(type, fn){ on(el, type, fn); },
       removeEventListener(type, fn){
         const list = listeners.get(el) || [];
@@ -177,9 +206,13 @@ function makeFocusEnv(opts){
     contains(c){ return this._s.has(c); },
   };
   const head = makeEl('head');
+  const mediaSection = makeEl('section');
   const media = (opts.mediaRects || []).map(r => {
+    const fig = makeEl('figure');
     const n = makeEl('img');
     n._rect = r;
+    fig.appendChild(n);
+    mediaSection.appendChild(fig);
     return n;
   });
 
@@ -211,8 +244,13 @@ function makeFocusEnv(opts){
         return [];
       },
       createElement(tag){ return makeEl(tag); },
+      elementsFromPoint(){ return env.__hitStack || []; },
+      elementFromPoint(){ const st = env.__hitStack || []; return st[0] || null; },
     },
   };
+  env.__hitStack = opts.hitStack ? opts.hitStack.slice() : media.slice();
+  env.__media = media;
+  env.__mediaSection = mediaSection;
   env.document.activeElement = body;
   env.window = env;
   // Mark CSS ready path: createElement('link') gets onload fired via ensureCss timeout/onload — we force via setTimeout noop + immediate onReady via error path.
@@ -447,15 +485,10 @@ test('behavioral lifecycle hide→clear→open→close→overlap→clear (classe
   assert.ok(fab.classList.contains('uschat-occluding'));
   assert.equal(fab.getAttribute('aria-hidden'), 'true');
 
-  // CLEAR: photos leave — update media rects to well below viewport, re-run occlusion
-  env.document.querySelectorAll = function(sel){
-    if (String(sel).indexOf('section img') === 0) {
-      const n = env.document.createElement('img');
-      n._rect = R(640, 2000, 600, 320); // well below
-      return [n];
-    }
-    return [];
-  };
+  // CLEAR: photos leave the painted stack (org chart is under the FAB)
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  env.__hitStack = [org];
   // Trigger scroll handlers registered on window
   const scrolls = [];
   // Re-install: call check by focusing then blurring fab path — emit scroll on window
@@ -488,15 +521,8 @@ test('behavioral lifecycle hide→clear→open→close→overlap→clear (classe
   assert.equal(fab.getAttribute('aria-hidden'), 'false');
   assert.equal(env.document.activeElement, fab); // focus restored
 
-  // OVERLAP again
-  env.document.querySelectorAll = function(sel){
-    if (String(sel).indexOf('section img') === 0) {
-      const n = env.document.createElement('img');
-      n._rect = R(640, 400, 600, 320);
-      return [n];
-    }
-    return [];
-  };
+  // OVERLAP again — lab photo is the topmost painted node under the FAB
+  env.__hitStack = env.__media.slice();
   // Blur fab so focused guard allows hide
   fab.blur();
   fab._emit('focusout', {});
@@ -507,14 +533,7 @@ test('behavioral lifecycle hide→clear→open→close→overlap→clear (classe
   assert.notEqual(hidden.visibility, 'hidden');
 
   // CLEAR again
-  env.document.querySelectorAll = function(sel){
-    if (String(sel).indexOf('section img') === 0) {
-      const n = env.document.createElement('img');
-      n._rect = R(640, 2000, 600, 320);
-      return [n];
-    }
-    return [];
-  };
+  env.__hitStack = [org];
   fab._emit('focusout', {});
   assert.equal(fab.classList.contains('uschat-occluding'), false, 'final clear shows FAB');
   assert.equal(fab.getAttribute('aria-hidden'), 'false');
@@ -543,4 +562,73 @@ test('uschat-in is one-shot: animationend drops it so occlusion clear cannot res
   assert.equal(r.animation, 'none');
   assert.equal(r.opacity, '1');
   assert.equal(r.visibility, 'visible');
+});
+
+
+test('capabilities org section contains no FAB_MEDIA (text/html chart only)',()=>{
+  const html = read('capabilities.html');
+  const orgStart = html.indexOf('cap.org.kicker');
+  const orgSecEnd = html.indexOf('</section>', orgStart);
+  assert.ok(orgStart > 0 && orgSecEnd > orgStart);
+  const org = html.slice(html.lastIndexOf('<section', orgStart), orgSecEnd);
+  assert.match(org, /org-chart/);
+  assert.doesNotMatch(org, /<img\b|<picture\b|<video\b|svg\.figure|model-chip/);
+});
+
+test('phantom AABB (0,0,1280x720) would keep hide true; hit-test against org chart clears',()=>{
+  // Reproduces production FAIL: after labs hide, scroll to organization.
+  // Lazy/offscreen lab imgs can still report a 1280x720 box at 0,0 — that
+  // AABB-intersects a FAB at y=720 — but the painted stack is the org chart.
+  const phantom = R(0, 0, 1280, 720);
+  const fabRect = R(1206, 720, 56, 56);
+  const env = makeFocusEnv({ fabRect, mediaRects: [phantom] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+
+  // Proof: AABB (the previous check) stays true with the phantom box
+  assert.equal(env.__fabOverlapsMedia(fabRect, [phantom], 8), true, 'AABB false-positive on phantom 1280x720@0,0');
+
+  const root = env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const fab = root.children.find(c => c.classList.contains('uschat-fab'));
+  const panel = root.children.find(c => c.classList.contains('uschat-panel'));
+
+  // hide: painted stack is the lab img (inside section>figure)
+  env.__hitStack = env.__media.slice();
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'), 'hide when lab photo is under FAB');
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+  const css = read('assets/chat-widget.css');
+  let computed = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(computed.opacity, '0');
+
+  // scroll clear: same phantom rects still AABB-overlap, but hit-test sees org chart
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  env.__hitStack = [org];
+  // leave AABB querySelectorAll pointing at the phantom-sized imgs (already in mediaRects)
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false, 'clear when only org chart is under FAB');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  computed = computeFab(css, fab.className.split(/\s+/), true);
+  assert.equal(computed.opacity, '1');
+  assert.equal(computed.visibility, 'visible');
+
+  // helper API: media under point is null over org, img over labs
+  env.__hitStack = [org];
+  assert.equal(env.__fabMediaUnderPoint(fabRect.left+28, fabRect.top+28), null);
+  env.__hitStack = env.__media.slice();
+  assert.ok(env.__fabMediaUnderPoint(fabRect.left+28, fabRect.top+28));
+  assert.equal(env.__fabShouldOcclude(fab), true);
+  env.__hitStack = [org];
+  assert.equal(env.__fabShouldOcclude(fab), false);
+});
+
+test('occlusion check uses hit-test not AABB when elementsFromPoint exists',()=>{
+  const js = read('assets/chat-widget.js');
+  assert.match(js, /fabShouldOcclude/);
+  assert.match(js, /elementsFromPoint/);
+  assert.match(js, /fabMediaUnderPoint/);
+  // restoreFocusAfterClose must use the same check
+  const restore = js.slice(js.indexOf('function restoreFocusAfterClose'), js.indexOf('function setOpen'));
+  assert.match(restore, /fabShouldOcclude/);
+  assert.doesNotMatch(restore, /querySelectorAll\(FAB_MEDIA\)/);
 });
