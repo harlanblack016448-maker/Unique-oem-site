@@ -277,6 +277,22 @@
       add(inter.right, inter.bottom);
       return points;
     }
+    /* Use the whole figure card (photo + figcaption) when the media sits
+       in a <figure>. Capabilities factory/lab cards put the FAB on the
+       caption after the img has ended; img-only bounds missed that. */
+    function fabProtectRect(node) {
+      var boxEl = node;
+      if (node && node.closest) {
+        var fig = node.closest("figure");
+        if (fig && fig.querySelector &&
+            fig.querySelector("img, picture, video, svg.figure")) {
+          boxEl = fig;
+        }
+      }
+      return boxEl.getBoundingClientRect();
+    }
+    window.__fabProtectRect = fabProtectRect;
+
     function fabShouldOcclude(fabEl) {
       var fab = fabEl.getBoundingClientRect();
       if (!(fab.width > 0 && fab.height > 0)) return false;
@@ -289,7 +305,7 @@
         var cy = fab.top + fab.height / 2;
         var radius = Math.min(fab.width, fab.height) / 2;
         for (i = 0; i < nodes.length; i++) {
-          r = nodes[i].getBoundingClientRect();
+          r = fabProtectRect(nodes[i]);
           if (!r || r.width === 0 || r.height === 0) continue;
           pts = fabSampleIntersection(fab, r, cx, cy, radius);
           for (p = 0; p < pts.length; p++) {
@@ -302,12 +318,13 @@
       }
       // Legacy fallback only when hit-testing is unavailable.
       rects = [];
-      for (i = 0; i < nodes.length; i++) rects.push(nodes[i].getBoundingClientRect());
+      for (i = 0; i < nodes.length; i++) rects.push(fabProtectRect(nodes[i]));
       return fabOverlapsMedia(fab, rects, 8);
     }
     window.__fabShouldOcclude = fabShouldOcclude;
     window.__fabSampleIntersection = fabSampleIntersection;
     window.__fabDiscOverlapsRect = fabDiscOverlapsRect;
+    window.__fabIntersectRects = fabIntersectRects;
 
     function watchFabOcclusion(fabEl, panelEl) {
       if (!window.requestAnimationFrame || !window.MutationObserver) return;

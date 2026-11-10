@@ -222,8 +222,10 @@ function makeFocusEnv(opts){
     const fig = makeEl('figure');
     const n = makeEl('img');
     n._rect = r;
+    fig._rect = r; /* default: card == img; caption tests enlarge this */
     fig.appendChild(n);
     mediaSection.appendChild(fig);
+    n._figure = fig;
     return n;
   });
 
@@ -829,4 +831,72 @@ test('pointer close of open FAB blurs it so the focus guard cannot trap',()=>{
   fab.click({ detail: 1 }); // pointer close
   assert.notEqual(env.document.activeElement, fab);
   assert.equal(env.document.body.classList.contains('uschat-open'), false);
+});
+
+
+test('FAB over figcaption of a figure card hides, even when it misses the img pixels',()=>{
+  // Capabilities 400x985: photo ends ~681, FAB 701-757 sits on
+  // "Drop and compression fixture (illustration)" figcaption — img bounds
+  // miss it; the enclosing figure card must be the protected rect.
+  const fabRect = R(316, 701, 56, 56);
+  const imgRect = R(200, 500, 180, 181); // bottom 681, no intersect with FAB
+  const figRect = R(200, 500, 180, 260); // bottom 760, includes caption
+  const capRect = R(200, 681, 180, 79);  // caption 681-760
+  assert.equal(imgRect.bottom, 681);
+  assert.ok(fabRect.top > imgRect.bottom, 'FAB starts below the photo pixels');
+  assert.ok(fabRect.top < figRect.bottom && fabRect.left < figRect.right);
+
+  const env = makeFocusEnv({ fabRect, mediaRects: [imgRect] });
+  const img = env.__media[0];
+  img._figure._rect = figRect;
+  const cap = env.document.createElement('figcaption');
+  cap._rect = capRect;
+  img._figure.appendChild(cap);
+
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const prot = env.__fabProtectRect(img);
+  assert.equal(prot.bottom, 760, 'protected rect is the figure card');
+  assert.notEqual(prot.bottom, imgRect.bottom);
+
+  const org = env.document.createElement('div');
+  org.className = 'org-chart';
+  org._rect = R(0, 0, 400, 985);
+  env.__hitAt = (x,y) => {
+    if (pointIn(capRect, x, y) || pointIn(imgRect, x, y)) return [cap];
+    return [org];
+  };
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabIntersectRects(fabRect, imgRect), null, 'img alone does not meet the FAB');
+  assert.equal(env.__fabShouldOcclude(fab), true, 'caption on the figure card must hide the FAB');
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+
+  // clear: card well below the viewport, painted stack is the org/text section
+  img._rect = R(200, 2000, 180, 181);
+  img._figure._rect = R(200, 2000, 180, 260);
+  cap._rect = R(200, 2181, 180, 79);
+  env.__hitAt = () => [org];
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false, 'clear after leaving the card');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+});
+
+test('1px AABB kiss like bathroom hero edge does not hide unless the disc intersects',()=>{
+  // Image ends ~759, FAB top ~757, center x=343; a short 1px box sliver
+  // along the top-left of the 56x56 square that stays outside the disc
+  // must not hide (not a huge failure).
+  const fabRect = R(315, 757, 56, 56); // center 343, 785, radius 28
+  const imgRect = R(40, 200, 280, 558); // right=320, bottom=758; AABB 5x1
+  const env = makeFocusEnv({ fabRect, mediaRects: [imgRect] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const img = env.__media[0];
+  env.__hitAt = (x,y) => pointIn(imgRect, x, y) ? [img] : [];
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  const box = env.__fabIntersectRects(fabRect, imgRect);
+  assert.ok(box && box.width > 0 && box.height <= 2, 'tiny AABB sliver exists');
+  assert.equal(env.__fabDiscOverlapsRect(343, 785, 28, imgRect), false, 'disc misses');
+  assert.equal(env.__fabShouldOcclude(fab), false, 'box kiss only must not hide');
 });
