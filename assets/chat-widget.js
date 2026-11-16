@@ -229,9 +229,18 @@
           if (fig && fig.querySelector("img, picture, video, svg.figure")) media = fig;
         }
         if (!media) continue;
-        if (media.classList && media.classList.contains("model-chip")) return media;
-        if (media.closest && media.closest(".model-chip")) return media;
-        if (media.closest && media.closest("section")) return media;
+        if (media.classList && media.classList.contains("model-chip")) {
+          if (fabMediaClaimedAt(media, x, y)) return media;
+          continue;
+        }
+        if (media.closest && media.closest(".model-chip")) {
+          if (fabMediaClaimedAt(media, x, y)) return media;
+          continue;
+        }
+        if (media.closest && media.closest("section")) {
+          if (!fabMediaClaimedAt(media, x, y)) continue;
+          return media;
+        }
       }
       return null;
     }
@@ -280,6 +289,33 @@
     /* Use the whole figure card (photo + figcaption) when the media sits
        in a <figure>. Capabilities factory/lab cards put the FAB on the
        caption after the img has ended; img-only bounds missed that. */
+    /* A sample only counts as "media under the FAB" if it also sits in the
+       media's containing section (or on a .model-chip box). Lazy factory
+       imgs with width/height attrs can report a 1280x720 (or 100%-wide)
+       box at 0,0 — and land in the hit stack — while #factory is still
+       below the fold (home 1274x796, FAB top 716, phantom bottom 720). */
+    function fabSectionRect(node) {
+      if (!node || !node.closest) return null;
+      var sec = node.closest("section");
+      return sec ? sec.getBoundingClientRect() : null;
+    }
+    function fabPointInRect(x, y, r) {
+      return !!r && x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+    }
+    function fabMediaClaimedAt(media, x, y) {
+      if (!media) return false;
+      if (media.classList && media.classList.contains("model-chip")) {
+        return fabPointInRect(x, y, media.getBoundingClientRect());
+      }
+      if (media.closest && media.closest(".model-chip")) {
+        return fabPointInRect(x, y, media.closest(".model-chip").getBoundingClientRect());
+      }
+      var sr = fabSectionRect(media);
+      if (!sr || !(sr.width > 0 && sr.height > 0)) return false;
+      return fabPointInRect(x, y, sr);
+    }
+    window.__fabMediaClaimedAt = fabMediaClaimedAt;
+
     function fabProtectRect(node) {
       var boxEl = node;
       if (node && node.closest) {
@@ -307,6 +343,10 @@
         for (i = 0; i < nodes.length; i++) {
           r = fabProtectRect(nodes[i]);
           if (!r || r.width === 0 || r.height === 0) continue;
+          /* Phantom 0,0 boxes from offscreen lazy cards contradict the
+             containing section's real layout box — do not sample them. */
+          var sr = fabSectionRect(nodes[i]);
+          if (sr && (!(sr.width > 0 && sr.height > 0) || !fabIntersectRects(r, sr))) continue;
           pts = fabSampleIntersection(fab, r, cx, cy, radius);
           for (p = 0; p < pts.length; p++) {
             /* Painted stack at the sample, not the layout rect: phantom
@@ -318,7 +358,12 @@
       }
       // Legacy fallback only when hit-testing is unavailable.
       rects = [];
-      for (i = 0; i < nodes.length; i++) rects.push(fabProtectRect(nodes[i]));
+      for (i = 0; i < nodes.length; i++) {
+        r = fabProtectRect(nodes[i]);
+        var fr = fabSectionRect(nodes[i]);
+        if (fr && (!(fr.width > 0 && fr.height > 0) || !fabIntersectRects(r, fr))) continue;
+        rects.push(r);
+      }
       return fabOverlapsMedia(fab, rects, 8);
     }
     window.__fabShouldOcclude = fabShouldOcclude;
@@ -353,6 +398,28 @@
       window.addEventListener("scroll", queue, { passive: true });
       window.addEventListener("resize", queue);
       window.addEventListener("load", queue);
+      /* Lazy factory imgs load after window "load"; the load event does
+         not bubble, so capture it. ResizeObserver / IntersectionObserver
+         catch late layout and a section leaving the viewport after the
+         last scroll frame — no timeout. */
+      if (document.addEventListener) document.addEventListener("load", queue, true);
+      if (window.ResizeObserver) {
+        try {
+          var ro = new ResizeObserver(queue);
+          if (document.documentElement) ro.observe(document.documentElement);
+        } catch (roErr) { /* ignore */ }
+      }
+      if (window.IntersectionObserver) {
+        try {
+          var io = new IntersectionObserver(queue, { threshold: 0 });
+          var watch = document.querySelectorAll(FAB_MEDIA);
+          for (var wi = 0; wi < watch.length; wi++) {
+            io.observe(watch[wi]);
+            var wsec = watch[wi].closest && watch[wi].closest("section");
+            if (wsec) io.observe(wsec);
+          }
+        } catch (ioErr) { /* ignore */ }
+      }
       fabEl.addEventListener("focusout", queue);
       if (panelEl) panelEl.addEventListener("focusout", queue);
       new MutationObserver(queue).observe(document.body, { attributes: true, attributeFilter: ["class"] });

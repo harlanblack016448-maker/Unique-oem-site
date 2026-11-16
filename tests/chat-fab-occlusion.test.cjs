@@ -218,6 +218,9 @@ function makeFocusEnv(opts){
   };
   const head = makeEl('head');
   const mediaSection = makeEl('section');
+  /* Default: in-flow page section. Tests that model offscreen/lazy factory
+     cards override this with a below-the-fold box. */
+  mediaSection._rect = opts.sectionRect || R(0, 0, 2000, 4000);
   const media = (opts.mediaRects || []).map(r => {
     const fig = makeEl('figure');
     const n = makeEl('img');
@@ -245,6 +248,7 @@ function makeFocusEnv(opts){
       activeElement: null,
       head,
       body,
+      documentElement: body,
       addEventListener(type, fn){ on(env.document, type, fn); },
       _emit(type, ev){ emit(env.document, type, ev); },
       querySelector(sel){
@@ -900,3 +904,167 @@ test('1px AABB kiss like bathroom hero edge does not hide unless the disc inters
   assert.equal(env.__fabDiscOverlapsRect(343, 785, 28, imgRect), false, 'disc misses');
   assert.equal(env.__fabShouldOcclude(fab), false, 'box kiss only must not hide');
 });
+
+
+test('home top: lazy factory phantom 1280x720@0,0 in the hit stack must not hide the FAB',()=>{
+  // Nov16 QA 1274x796: after 10s at the top of Home the FAB was still missing
+  // (screenshot /workspace/unique-oem-qa-20261116/home-top-chat-fab-missing.png).
+  // Hero photo ends ~y=400, no overlap with a bottom-right FAB. Factory
+  // <figure> imgs (width=1280 height=720, loading=lazy) in #factory are
+  // below the fold, but a phantom attribute box at 0,0 bottom=720 intersects
+  // the disc: FAB top = 796-24-56 = 716, center y=744, closest point dist=24
+  // < radius 28. If the layout engine also puts that img in the painted
+  // stack, PR19's org-chart-only rejection does not fire. Scroll past the
+  // factory (images get real in-flow boxes) then return to top: FAB stays.
+  const fabRect = R(1200, 716, 56, 56); // 1274x796, right:18 bottom:24
+  const phantom = R(0, 0, 1280, 720);
+  const heroRect = R(720, 80, 500, 360); // ends y=440, clear of the FAB
+  assert.ok(fabRect.top < phantom.bottom, 'phantom AABB reaches into the FAB');
+  assert.equal(envDiscOverlap(fabRect, phantom), true, 'disc overlaps the phantom sliver');
+  assert.equal(envDiscOverlap(fabRect, heroRect), false, 'hero itself does not meet the FAB');
+
+  const env = makeFocusEnv({ fabRect, mediaRects: [phantom, heroRect],
+    sectionRect: R(0, 2200, 1280, 900) });
+  // First img is the factory phantom (section is below the fold). Hero lives
+  // in its own in-view section so a real hero overlap would still hide.
+  const factoryImg = env.__media[0];
+  const heroImg = env.__media[1];
+  const heroSec = env.document.createElement('section');
+  heroSec._rect = R(0, 0, 1274, 520);
+  heroSec.appendChild(heroImg._figure);
+  heroImg._figure._rect = heroRect;
+  factoryImg._figure._rect = phantom;
+
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+
+  env.__hitAt = (x,y) => {
+    // Browser-wrong layout: the lazy factory img's phantom box covers the
+    // top of the FAB, so it is in the hit stack even though #factory is
+    // below the fold and nothing is painted there.
+    if (pointIn(phantom, x, y)) return [factoryImg];
+    if (pointIn(heroRect, x, y)) return [heroImg];
+    return [];
+  };
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabOverlapsMedia(fabRect, [phantom], 8), true, 'AABB still false-positive');
+  assert.equal(env.__fabDiscOverlapsRect(1228, 744, 28, phantom), true, 'disc hits the 4px phantom sliver');
+  assert.ok(env.__fabMediaUnderPoint(1228, 720) === factoryImg ||
+            env.__fabMediaUnderPoint(1228, 716) === factoryImg ||
+            env.__fabMediaUnderPoint(1228, 744) === factoryImg ||
+            env.__fabShouldOcclude(fab) === false,
+    'document the phantom in the stack or already rejected');
+  assert.equal(env.__fabShouldOcclude(fab), false,
+    'offscreen factory section: phantom in the hit stack must not hide');
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false);
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+});
+
+test('home inquire/footer: stacked phantom factory boxes must not keep the FAB hidden',()=>{
+  // Nov15 QA 1920x1072 inquiry/footer
+  // (/workspace/unique-oem-qa-20261115/fail-home-chat-fab-not-returned.png):
+  // after scrolling past Home factory photos the FAB did not reliably return.
+  // A single 1280x720@0,0 box cannot reach a FAB at y=992, but three stacked
+  // attribute-sized cards (0-720, 720-1440, 1440-2160) can. #factory is no
+  // longer in the viewport (above, at the footer).
+  const fabRect = R(1846, 992, 56, 56); // 1920x1072, right:18 bottom:24
+  // 1920-wide (width:100% / unstyled block) — a 1280-attr box would stop
+  // short of a FAB at x=1846. The second card (720-1440) meets y=992-1048.
+  const stack = [R(0, 0, 1920, 720), R(0, 720, 1920, 720), R(0, 1440, 1920, 720)];
+  assert.equal(envIntersect(fabRect, stack[0]), false);
+  assert.ok(envIntersect(fabRect, stack[1]), 'second stacked card reaches the footer FAB');
+
+  const env = makeFocusEnv({ fabRect, mediaRects: stack,
+    sectionRect: R(0, -2200, 1920, 900) }); // factory already above the viewport
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const imgs = env.__media;
+  env.__hitAt = (x,y) => {
+    for (const img of imgs) {
+      if (pointIn(img._rect, x, y) || pointIn(img._figure._rect, x, y)) return [img];
+    }
+    return [];
+  };
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabOverlapsMedia(fabRect, stack, 8), true, 'stacked AABB reaches the footer FAB');
+  assert.equal(env.__fabShouldOcclude(fab), false,
+    'factory section offscreen: stacked phantoms in the hit stack must not hide');
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false);
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+});
+
+test('lazy factory cards still hide once their section is actually under the disc',()=>{
+  // Regression: the section-ownership filter must not drop a real in-view
+  // factory/lab card (PR19 capabilities hide still required).
+  const fabRect = R(1200, 716, 56, 56);
+  const card = R(640, 500, 600, 280); // bottom 780, overlaps the disc
+  const env = makeFocusEnv({ fabRect, mediaRects: [card],
+    sectionRect: R(0, 400, 1280, 600) });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const img = env.__media[0];
+  env.__hitAt = (x,y) => pointIn(card, x, y) ? [img] : [];
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabShouldOcclude(fab), true, 'in-view factory card still hides');
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+});
+
+test('unstyled stacked factory layout hides, then load/layout settlement clears without a timer',()=>{
+  // Early check can see a consistent but unstyled stack: #factory itself
+  // starts at 0,0 and is tall enough that the second 720px card lands on the
+  // FAB. After real layout the section is below the fold and the FAB must
+  // clear on the image load / ResizeObserver signal — not a timeout, and
+  // without requiring the user to scroll.
+  const fabRect = R(1200, 716, 56, 56);
+  const stacked = [R(0, 0, 1280, 720), R(0, 720, 1280, 720), R(0, 1440, 1280, 720)];
+  const env = makeFocusEnv({ fabRect, mediaRects: stacked,
+    sectionRect: R(0, 0, 1280, 3000) });
+  const roCbs = [];
+  env.ResizeObserver = function(cb){ this.observe = function(){ env.__roObserved = true; }; this.disconnect = function(){}; roCbs.push(cb); };
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const imgs = env.__media;
+  env.__hitAt = (x,y) => {
+    for (const img of imgs) {
+      if (pointIn(img._rect, x, y)) return [img];
+    }
+    return [];
+  };
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabShouldOcclude(fab), true, 'unstyled stacked section still looks like a real overlap');
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+
+  // Layout settles: factory section moves below the fold; images follow.
+  const settledSec = R(0, 2200, 1280, 900);
+  const settled = [R(20, 2300, 400, 225), R(430, 2300, 400, 225), R(840, 2300, 400, 225)];
+  env.__mediaSection._rect = settledSec;
+  imgs.forEach((img, i) => { img._rect = settled[i]; img._figure._rect = settled[i]; });
+  env.__hitAt = () => []; // page chrome at the top, not photos
+  // No scroll, no focusout, no timer: a capture load / ResizeObserver must recheck.
+  if (roCbs.length) {
+    roCbs.forEach(cb => cb([]));
+  } else {
+    env.document._emit('load', { target: imgs[0] });
+  }
+  assert.equal(env.__fabShouldOcclude(fab), false, 'settled below-the-fold factory does not occlude');
+  assert.equal(fab.classList.contains('uschat-occluding'), false,
+    'occlusion clears on load/layout without a scroll or timeout');
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+});
+
+function envDiscOverlap(fabRect, r){
+  const cx = fabRect.left + fabRect.width/2;
+  const cy = fabRect.top + fabRect.height/2;
+  const radius = Math.min(fabRect.width, fabRect.height)/2;
+  const qx = Math.min(Math.max(cx, r.left), r.right);
+  const qy = Math.min(Math.max(cy, r.top), r.bottom);
+  const dx = qx-cx, dy = qy-cy;
+  return (dx*dx+dy*dy) <= (radius*radius);
+}
+function envIntersect(a,b){
+  return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+}
