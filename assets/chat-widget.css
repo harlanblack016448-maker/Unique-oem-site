@@ -10,12 +10,11 @@
   line-height: 1.45;
   color: #111;
 }
-/* Anti-FOUC, not inline style (inline visibility:hidden survived occlusion
-   clear and kept the FAB out of the a11y tree). Gate on a data attribute —
-   not only .uschat-ready. Native 1280x800: after a second factory hide then
-   top clear, the root was class="uschat-root" with uschat-ready gone,
-   computed FAB visibility:hidden and opacity:1, 56x56 rect, aria-hidden=false.
-   tryReveal is one-shot (booted), so it cannot put the class back. */
+/* Anti-FOUC, not inline style. Canonical gate is data-uschat-ready, set
+   once after CSS and DOM are ready. Native clear-top: .uschat-ready was
+   absent, FAB visibility:hidden and opacity:1. The writer that cleared
+   the class is not identified in this repo; a className assignment would
+   drop .uschat-ready but not this attribute. No mutation re-lock. */
 .uschat-root:not([data-uschat-ready]) .uschat-fab,
 .uschat-root:not([data-uschat-ready]) .uschat-panel {
   visibility: hidden;
@@ -43,23 +42,15 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
-  /* Rest state is fully specified so a leftover animation/transition effect
-     cannot keep used opacity at 0 after .uschat-occluding is removed
-     (native 1280x800: second factory hide then footer/top clear, class and
-     aria already cleared, 56x56 rect, but not painted / not in the a11y tree).
-     Do not transition opacity here: a cancelled 0→1 transition can freeze
-     the used value. Fade only while hiding. Pop must not touch opacity. */
-  opacity: 1;
-  animation: none;
-  transition: transform 0.15s ease, bottom 0.2s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, bottom 0.2s ease;
   z-index: 1; /* within .uschat-root */
 }
 .uschat-fab:hover { transform: scale(1.06); }
 /* fill-mode both would pin opacity:1 after pop and defeat .uschat-occluding */
 .uschat-fab.uschat-in { animation: uschat-pop 0.22s ease-out; }
 @keyframes uschat-pop {
-  from { transform: scale(0.85); }
-  to { transform: scale(1); }
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
 }
 .uschat-fab svg { width: 26px; height: 26px; }
 .uschat-fab .uschat-fab-close { display: none; }
@@ -114,8 +105,6 @@ body:has(.sticky-cta.is-visible.is-occluding) .uschat-panel {
   opacity: 0;
   transform: none;
   pointer-events: none;
-  /* Fade out only; the rest state above snaps back to opacity:1. */
-  transition: transform 0.15s ease, opacity 0.15s ease, bottom 0.2s ease;
 }
 .uschat-fab.uschat-in.uschat-occluding {
   animation: none;

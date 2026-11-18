@@ -1070,82 +1070,40 @@ function envIntersect(a,b){
   return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 }
 
-test('uschat-pop does not animate opacity; clear snaps to opacity 1 without an opacity transition',()=>{
+test('canonical data-uschat-ready is set once after CSS and DOM; no mutation heal',()=>{
+  const js=read('assets/chat-widget.js');
+  assert.match(js, /if \(booted \|\| !cssReady \|\| !built\) return/);
+  assert.match(js, /root\.setAttribute\("data-uschat-ready", ""\)/);
+  assert.match(js, /root\.classList\.add\("uschat-ready"\)/);
+  assert.doesNotMatch(js, /watchReadyLock|lockReady/);
+  assert.doesNotMatch(js, /observe\(root,/);
+  assert.doesNotMatch(js, /getAnimations/);
   const css=read('assets/chat-widget.css');
-  const start=css.indexOf('@keyframes uschat-pop');
-  assert.ok(start>=0);
-  const slice=css.slice(start, start+280);
-  assert.doesNotMatch(slice, /opacity/);
-  assert.match(slice, /transform:\s*scale\(0\.85\)/);
-  const fab=css.match(/(?:^|\n)\.uschat-fab\s*\{([^}]*)\}/);
-  assert.ok(fab);
-  assert.match(fab[1], /opacity:\s*1/);
-  assert.match(fab[1], /animation:\s*none/);
-  assert.doesNotMatch(fab[1], /transition:[^;]*opacity/);
-  const occ=css.match(/\.uschat-fab\.uschat-occluding\s*\{([^}]*)\}/);
-  assert.ok(occ);
-  assert.match(occ[1], /opacity:\s*0/);
-  assert.match(occ[1], /transition:[^;]*opacity/);
-  assert.doesNotMatch(declsOnly(occ[1]), /(?:^|\n)\s*visibility\s*:/);
-});
-
-test('second hide→clear cancels leftover animations so rest opacity can apply',()=>{
-  const env=makeFocusEnv({ fabRect:R(1206,720,56,56), mediaRects:[R(640,400,600,400)] });
-  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  assert.match(css,/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab/);
+  assert.doesNotMatch(css,/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/);
+  const env=makeFocusEnv({ fabRect:R(1206,720,56,56), mediaRects:[] });
+  vm.runInNewContext(js, env);
   const root=env.document.body.children.find(c => c.classList.contains('uschat-root'));
-  const fab=root.children.find(c => c.classList.contains('uschat-fab'));
-  fab._emit('animationend', { animationName:'uschat-pop' });
-  assert.equal(fab.classList.contains('uschat-in'), false);
-  const calls=[];
-  fab.getAnimations=()=>({ forEach(fn){ fn({ cancel(){ calls.push(fab.classList.contains('uschat-occluding')); } }); } });
-  // first hide then clear
-  fab._emit('focusout', {});
-  assert.ok(fab.classList.contains('uschat-occluding'));
-  assert.equal(calls.length, 0, 'do not cancel while hiding');
-  const org=env.document.createElement('div');
-  org.className='org-chart';
-  env.__hitStack=[org];
-  fab._emit('focusout', {});
-  assert.equal(fab.classList.contains('uschat-occluding'), false);
-  assert.deepEqual(calls, [false], 'cancel leftover on first clear');
-  // second hide then clear — the native production failure
-  env.__hitStack=env.__media.slice();
-  fab._emit('focusout', {});
-  assert.ok(fab.classList.contains('uschat-occluding'));
-  assert.equal(calls.length, 1, 'do not cancel on second hide');
-  env.__hitStack=[org];
-  fab._emit('focusout', {});
-  assert.equal(fab.classList.contains('uschat-occluding'), false);
-  assert.equal(fab.getAttribute('aria-hidden'), 'false');
-  assert.deepEqual(calls, [false,false], 'cancel leftover on second clear');
-  const computed=computeFab(read('assets/chat-widget.css'), fab.className.split(/\s+/), true);
-  assert.equal(computed.opacity, '1');
-  assert.equal(computed.visibility, 'visible');
-  assert.equal(computed.animation, 'none');
+  assert.ok(root);
+  assert.equal(root.getAttribute('data-uschat-ready'), '');
+  assert.ok(root.classList.contains('uschat-ready'));
 });
 
-test('className overwrite after reveal cannot hide the FAB (anti-FOUC ready is durable)',()=>{
+test('simulated className wipe after reveal does not hide when data-uschat-ready remains',()=>{
+  // Simulated only: no production writer of root.className is identified
+  // in this repo. This checks the canonical attribute gate, not a proven
+  // overwrite path.
   const env=makeFocusEnv({ fabRect:R(1206,720,56,56), mediaRects:[] });
   vm.runInNewContext(read('assets/chat-widget.js'), env);
   const root=env.document.body.children.find(c => c.classList.contains('uschat-root') || (c.getAttribute && c.getAttribute('data-uschat-ready')!=null));
   const fab=root.children.find(c => c.classList.contains('uschat-fab'));
   assert.ok(root && fab);
-  assert.ok(root.classList.contains('uschat-ready'), 'ready class set on reveal');
   assert.equal(root.getAttribute('data-uschat-ready'), '');
-  assert.equal(fab.style.visibility, undefined);
-  // Native failure: root class became just "uschat-root", class-only anti-FOUC
-  // reapplied visibility:hidden while opacity stayed 1 and the disc kept a
-  // 56x56 rect. tryReveal will not run again (booted).
+  assert.ok(root.classList.contains('uschat-ready'));
   root.className='uschat-root';
-  assert.equal(root.classList.contains('uschat-ready'), false, 'old-fail: class is gone after overwrite');
-  assert.equal(root.getAttribute('data-uschat-ready'), '', 'data-uschat-ready survives className assignment');
+  assert.equal(root.classList.contains('uschat-ready'), false);
+  assert.equal(root.getAttribute('data-uschat-ready'), '', 'attribute survives className assignment');
   const css=read('assets/chat-widget.css');
-  // Hide rule must not trigger when the durable attribute is still present
   assert.match(css,/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab/);
-  const hide=css.match(/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab[^{]*\{([^}]*)\}/);
-  assert.ok(hide);
-  assert.match(hide[1], /visibility:\s*hidden/);
-  // Class-only gate would have hidden this state; the attribute gate must not.
-  const classOnly= /\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/.test(css);
-  assert.equal(classOnly, false);
+  assert.equal(/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/.test(css), false);
 });

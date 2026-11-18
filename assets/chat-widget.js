@@ -6,7 +6,7 @@
   if (window.__usChatLoaded) return;
   window.__usChatLoaded = true;
 
-  var CSS_URL = "/assets/chat-widget.css?v=12";
+  var CSS_URL = "/assets/chat-widget.css?v=13";
   var SID_KEY = "us_chat_sid_v1";
 
   var T = {
@@ -115,30 +115,14 @@
     // finished loading before this script ran and the early reveal was
     // swallowed by the !fab guard (widget stayed hidden forever).
     var booted = false, cssReady = false, built = false;
-    function lockReady() {
-      /* Durable reveal signal. className = "uschat-root" would drop
-         .uschat-ready; the data attribute survives that overwrite. */
-      if (!root.getAttribute("data-uschat-ready")) {
-        root.setAttribute("data-uschat-ready", "");
-      }
-      if (!root.classList.contains("uschat-ready")) {
-        root.classList.add("uschat-ready");
-      }
-    }
-    function watchReadyLock() {
-      if (!window.MutationObserver) return;
-      try {
-        new MutationObserver(function () { lockReady(); }).observe(root, {
-          attributes: true,
-          attributeFilter: ["class", "data-uschat-ready"]
-        });
-      } catch (lockErr) { /* ignore */ }
-    }
     function tryReveal() {
       if (booted || !cssReady || !built) return;
+      /* Canonical ready flag, set once after CSS and DOM are both ready.
+         No mutation re-lock: the writer that later dropped .uschat-ready
+         on production is not identified in this repo. */
+      root.setAttribute("data-uschat-ready", "");
+      root.classList.add("uschat-ready");
       booted = true;
-      lockReady();
-      watchReadyLock();
       // One-shot entrance; drop uschat-in on end so later occlusion toggles
       // never reassign animation (restarting pop left opacity/visibility wrong).
       fab.classList.add("uschat-in");
@@ -146,10 +130,8 @@
         if (e && e.animationName && e.animationName !== "uschat-pop") return;
         fab.classList.remove("uschat-in");
         fab.removeEventListener("animationend", onPopEnd);
-        fab.removeEventListener("animationcancel", onPopEnd);
       };
       fab.addEventListener("animationend", onPopEnd);
-      fab.addEventListener("animationcancel", onPopEnd);
     }
     ensureCss(function () { cssReady = true; tryReveal(); });
     var t = function () { return T[lang()]; };
@@ -412,13 +394,6 @@
         } else {
           fabEl.removeAttribute("tabindex");
           fabEl.setAttribute("aria-hidden", "false");
-          /* Cancel leftover pop / interrupted opacity transitions so the
-             specified rest state (opacity:1) can apply. No timeout. */
-          if (typeof fabEl.getAnimations === "function") {
-            try {
-              fabEl.getAnimations().forEach(function (a) { a.cancel(); });
-            } catch (animErr) { /* ignore */ }
-          }
         }
       }
       function queue() {
