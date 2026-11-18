@@ -47,8 +47,9 @@ test('occluding uses opacity not visibility; cancels pop only while uschat-in',(
   assert.ok(panel);
   assert.doesNotMatch(declsOnly(panel[1]),/(?:^|\n)\s*visibility\s*:/);
   assert.match(panel[1],/pointer-events:\s*none/);
-  // Anti-FOUC via :not(.uschat-ready), not inline styles
-  assert.match(css,/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/);
+  // Anti-FOUC via durable data attribute, not only .uschat-ready and not inline
+  assert.match(css,/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab/);
+  assert.doesNotMatch(css,/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/);
 });
 
 test('FAB nests inside .uschat-root; panel z-index above FAB (Close wins hits)',()=>{
@@ -426,7 +427,7 @@ function computeFab(css, classes, rootReady){
   let opacity = '1';
   let animation = 'none';
   let pointerEvents = 'auto';
-  if (!rootReady) visibility = 'hidden'; // :not(.uschat-ready) .uschat-fab
+  if (!rootReady) visibility = 'hidden'; // :not([data-uschat-ready]) .uschat-fab
   // .uschat-fab — no visibility/opacity set
   if (set.has('uschat-in')) {
     const body = parseRuleBody(css, /\.uschat-fab\.uschat-in\s*\{([^}]*)\}/);
@@ -1121,4 +1122,30 @@ test('second hide→clear cancels leftover animations so rest opacity can apply'
   assert.equal(computed.opacity, '1');
   assert.equal(computed.visibility, 'visible');
   assert.equal(computed.animation, 'none');
+});
+
+test('className overwrite after reveal cannot hide the FAB (anti-FOUC ready is durable)',()=>{
+  const env=makeFocusEnv({ fabRect:R(1206,720,56,56), mediaRects:[] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root=env.document.body.children.find(c => c.classList.contains('uschat-root') || (c.getAttribute && c.getAttribute('data-uschat-ready')!=null));
+  const fab=root.children.find(c => c.classList.contains('uschat-fab'));
+  assert.ok(root && fab);
+  assert.ok(root.classList.contains('uschat-ready'), 'ready class set on reveal');
+  assert.equal(root.getAttribute('data-uschat-ready'), '');
+  assert.equal(fab.style.visibility, undefined);
+  // Native failure: root class became just "uschat-root", class-only anti-FOUC
+  // reapplied visibility:hidden while opacity stayed 1 and the disc kept a
+  // 56x56 rect. tryReveal will not run again (booted).
+  root.className='uschat-root';
+  assert.equal(root.classList.contains('uschat-ready'), false, 'old-fail: class is gone after overwrite');
+  assert.equal(root.getAttribute('data-uschat-ready'), '', 'data-uschat-ready survives className assignment');
+  const css=read('assets/chat-widget.css');
+  // Hide rule must not trigger when the durable attribute is still present
+  assert.match(css,/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab/);
+  const hide=css.match(/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab[^{]*\{([^}]*)\}/);
+  assert.ok(hide);
+  assert.match(hide[1], /visibility:\s*hidden/);
+  // Class-only gate would have hidden this state; the attribute gate must not.
+  const classOnly= /\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/.test(css);
+  assert.equal(classOnly, false);
 });

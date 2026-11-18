@@ -10,10 +10,14 @@
   line-height: 1.45;
   color: #111;
 }
-/* Anti-FOUC via class, not inline style — inline visibility:hidden survived
-   occlusion clear (aria-hidden=false) and kept the FAB out of the a11y tree. */
-.uschat-root:not(.uschat-ready) .uschat-fab,
-.uschat-root:not(.uschat-ready) .uschat-panel {
+/* Anti-FOUC, not inline style (inline visibility:hidden survived occlusion
+   clear and kept the FAB out of the a11y tree). Gate on a data attribute —
+   not only .uschat-ready. Native 1280x800: after a second factory hide then
+   top clear, the root was class="uschat-root" with uschat-ready gone,
+   computed FAB visibility:hidden and opacity:1, 56x56 rect, aria-hidden=false.
+   tryReveal is one-shot (booted), so it cannot put the class back. */
+.uschat-root:not([data-uschat-ready]) .uschat-fab,
+.uschat-root:not([data-uschat-ready]) .uschat-panel {
   visibility: hidden;
 }
 
