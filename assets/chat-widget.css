@@ -10,10 +10,13 @@
   line-height: 1.45;
   color: #111;
 }
-/* Anti-FOUC via class, not inline style — inline visibility:hidden survived
-   occlusion clear (aria-hidden=false) and kept the FAB out of the a11y tree. */
-.uschat-root:not(.uschat-ready) .uschat-fab,
-.uschat-root:not(.uschat-ready) .uschat-panel {
+/* Anti-FOUC, not inline style. Canonical gate is data-uschat-ready, set
+   once after CSS and DOM are ready. Native clear-top: .uschat-ready was
+   absent, FAB visibility:hidden and opacity:1. The writer that cleared
+   the class is not identified in this repo; a className assignment would
+   drop .uschat-ready but not this attribute. No mutation re-lock. */
+.uschat-root:not([data-uschat-ready]) .uschat-fab,
+.uschat-root:not([data-uschat-ready]) .uschat-panel {
   visibility: hidden;
 }
 

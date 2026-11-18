@@ -32,3 +32,35 @@ test('media selector covers section photos outside #main (capabilities labs)',()
  assert.ok(mainEnd>0);
  assert.ok(html.indexOf('studio-drop.jpg')>mainEnd, 'lab photo must sit outside #main hero');
 });
+test('sticky CTA is hidden while #inquire is intersecting (hero already out)',()=>{
+ const src=fs.readFileSync(path.join(ROOT,'assets/partials.js'),'utf8');
+ assert.match(src,/document\.getElementById\("inquire"\)/);
+ assert.match(src,/bar\.classList\.toggle\("is-visible", heroOut && !inquireIn\)/);
+ assert.match(src,/if \(inquire && e\.target === inquire\) inquireIn = e\.isIntersecting/);
+});
+test('product and marketing CTA bands share the #inquire hook the observer already uses',()=>{
+ // Old fail: bathroom (and the same tile-dark-2 destination on kitchen,
+ // capabilities, about) had the inline quote button but no id="inquire",
+ // so inquireIn stayed false and the fixed pill remained visible on the
+ // destination copy. index.html and 8-electrode.html already had the id.
+ const pages=[
+  'products/bathroom.html',
+  'products/kitchen.html',
+  'products/8-electrode.html',
+  'capabilities.html',
+  'about.html',
+  'index.html',
+ ];
+ for (const rel of pages){
+  const html=fs.readFileSync(path.join(ROOT,rel),'utf8');
+  const marks=[...html.matchAll(/<section[^>]*id="inquire"[^>]*>/g)];
+  assert.equal(marks.length, 1, rel+' must have exactly one #inquire');
+  const i=html.indexOf('id="inquire"');
+  const after=html.slice(i, i+900);
+  assert.ok(/btn-pill/.test(after) || /id="lead-form"/.test(after),
+    rel+' #inquire must contain the inline quote CTA or the inquire form');
+ }
+ const bathroom=fs.readFileSync(path.join(ROOT,'products/bathroom.html'),'utf8');
+ assert.match(bathroom, /<section class="tile tile-dark-2" id="inquire"/);
+ assert.match(bathroom, /data-i18n="b\.cta\.title"/);
+});

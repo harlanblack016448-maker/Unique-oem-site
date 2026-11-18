@@ -47,8 +47,9 @@ test('occluding uses opacity not visibility; cancels pop only while uschat-in',(
   assert.ok(panel);
   assert.doesNotMatch(declsOnly(panel[1]),/(?:^|\n)\s*visibility\s*:/);
   assert.match(panel[1],/pointer-events:\s*none/);
-  // Anti-FOUC via :not(.uschat-ready), not inline styles
-  assert.match(css,/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/);
+  // Anti-FOUC via durable data attribute, not only .uschat-ready and not inline
+  assert.match(css,/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab/);
+  assert.doesNotMatch(css,/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/);
 });
 
 test('FAB nests inside .uschat-root; panel z-index above FAB (Close wins hits)',()=>{
@@ -426,7 +427,7 @@ function computeFab(css, classes, rootReady){
   let opacity = '1';
   let animation = 'none';
   let pointerEvents = 'auto';
-  if (!rootReady) visibility = 'hidden'; // :not(.uschat-ready) .uschat-fab
+  if (!rootReady) visibility = 'hidden'; // :not([data-uschat-ready]) .uschat-fab
   // .uschat-fab — no visibility/opacity set
   if (set.has('uschat-in')) {
     const body = parseRuleBody(css, /\.uschat-fab\.uschat-in\s*\{([^}]*)\}/);
@@ -1068,3 +1069,41 @@ function envDiscOverlap(fabRect, r){
 function envIntersect(a,b){
   return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 }
+
+test('canonical data-uschat-ready is set once after CSS and DOM; no mutation heal',()=>{
+  const js=read('assets/chat-widget.js');
+  assert.match(js, /if \(booted \|\| !cssReady \|\| !built\) return/);
+  assert.match(js, /root\.setAttribute\("data-uschat-ready", ""\)/);
+  assert.match(js, /root\.classList\.add\("uschat-ready"\)/);
+  assert.doesNotMatch(js, /watchReadyLock|lockReady/);
+  assert.doesNotMatch(js, /observe\(root,/);
+  assert.doesNotMatch(js, /getAnimations/);
+  const css=read('assets/chat-widget.css');
+  assert.match(css,/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab/);
+  assert.doesNotMatch(css,/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/);
+  const env=makeFocusEnv({ fabRect:R(1206,720,56,56), mediaRects:[] });
+  vm.runInNewContext(js, env);
+  const root=env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  assert.ok(root);
+  assert.equal(root.getAttribute('data-uschat-ready'), '');
+  assert.ok(root.classList.contains('uschat-ready'));
+});
+
+test('simulated className wipe after reveal does not hide when data-uschat-ready remains',()=>{
+  // Simulated only: no production writer of root.className is identified
+  // in this repo. This checks the canonical attribute gate, not a proven
+  // overwrite path.
+  const env=makeFocusEnv({ fabRect:R(1206,720,56,56), mediaRects:[] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root=env.document.body.children.find(c => c.classList.contains('uschat-root') || (c.getAttribute && c.getAttribute('data-uschat-ready')!=null));
+  const fab=root.children.find(c => c.classList.contains('uschat-fab'));
+  assert.ok(root && fab);
+  assert.equal(root.getAttribute('data-uschat-ready'), '');
+  assert.ok(root.classList.contains('uschat-ready'));
+  root.className='uschat-root';
+  assert.equal(root.classList.contains('uschat-ready'), false);
+  assert.equal(root.getAttribute('data-uschat-ready'), '', 'attribute survives className assignment');
+  const css=read('assets/chat-widget.css');
+  assert.match(css,/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab/);
+  assert.equal(/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/.test(css), false);
+});
