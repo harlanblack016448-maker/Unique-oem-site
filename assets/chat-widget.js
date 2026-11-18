@@ -6,7 +6,7 @@
   if (window.__usChatLoaded) return;
   window.__usChatLoaded = true;
 
-  var CSS_URL = "/assets/chat-widget.css?v=10";
+  var CSS_URL = "/assets/chat-widget.css?v=11";
   var SID_KEY = "us_chat_sid_v1";
 
   var T = {
@@ -128,6 +128,7 @@
         fab.removeEventListener("animationend", onPopEnd);
       };
       fab.addEventListener("animationend", onPopEnd);
+      fab.addEventListener("animationcancel", onPopEnd);
     }
     ensureCss(function () { cssReady = true; tryReveal(); });
     var t = function () { return T[lang()]; };
@@ -390,6 +391,13 @@
         } else {
           fabEl.removeAttribute("tabindex");
           fabEl.setAttribute("aria-hidden", "false");
+          /* Cancel leftover pop / interrupted opacity transitions so the
+             specified rest state (opacity:1) can apply. No timeout. */
+          if (typeof fabEl.getAnimations === "function") {
+            try {
+              fabEl.getAnimations().forEach(function (a) { a.cancel(); });
+            } catch (animErr) { /* ignore */ }
+          }
         }
       }
       function queue() {

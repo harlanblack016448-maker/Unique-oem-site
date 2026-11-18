@@ -1068,3 +1068,57 @@ function envDiscOverlap(fabRect, r){
 function envIntersect(a,b){
   return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 }
+
+test('uschat-pop does not animate opacity; clear snaps to opacity 1 without an opacity transition',()=>{
+  const css=read('assets/chat-widget.css');
+  const start=css.indexOf('@keyframes uschat-pop');
+  assert.ok(start>=0);
+  const slice=css.slice(start, start+280);
+  assert.doesNotMatch(slice, /opacity/);
+  assert.match(slice, /transform:\s*scale\(0\.85\)/);
+  const fab=css.match(/(?:^|\n)\.uschat-fab\s*\{([^}]*)\}/);
+  assert.ok(fab);
+  assert.match(fab[1], /opacity:\s*1/);
+  assert.match(fab[1], /animation:\s*none/);
+  assert.doesNotMatch(fab[1], /transition:[^;]*opacity/);
+  const occ=css.match(/\.uschat-fab\.uschat-occluding\s*\{([^}]*)\}/);
+  assert.ok(occ);
+  assert.match(occ[1], /opacity:\s*0/);
+  assert.match(occ[1], /transition:[^;]*opacity/);
+  assert.doesNotMatch(declsOnly(occ[1]), /(?:^|\n)\s*visibility\s*:/);
+});
+
+test('second hide→clear cancels leftover animations so rest opacity can apply',()=>{
+  const env=makeFocusEnv({ fabRect:R(1206,720,56,56), mediaRects:[R(640,400,600,400)] });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root=env.document.body.children.find(c => c.classList.contains('uschat-root'));
+  const fab=root.children.find(c => c.classList.contains('uschat-fab'));
+  fab._emit('animationend', { animationName:'uschat-pop' });
+  assert.equal(fab.classList.contains('uschat-in'), false);
+  const calls=[];
+  fab.getAnimations=()=>({ forEach(fn){ fn({ cancel(){ calls.push(fab.classList.contains('uschat-occluding')); } }); } });
+  // first hide then clear
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+  assert.equal(calls.length, 0, 'do not cancel while hiding');
+  const org=env.document.createElement('div');
+  org.className='org-chart';
+  env.__hitStack=[org];
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false);
+  assert.deepEqual(calls, [false], 'cancel leftover on first clear');
+  // second hide then clear — the native production failure
+  env.__hitStack=env.__media.slice();
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+  assert.equal(calls.length, 1, 'do not cancel on second hide');
+  env.__hitStack=[org];
+  fab._emit('focusout', {});
+  assert.equal(fab.classList.contains('uschat-occluding'), false);
+  assert.equal(fab.getAttribute('aria-hidden'), 'false');
+  assert.deepEqual(calls, [false,false], 'cancel leftover on second clear');
+  const computed=computeFab(read('assets/chat-widget.css'), fab.className.split(/\s+/), true);
+  assert.equal(computed.opacity, '1');
+  assert.equal(computed.visibility, 'visible');
+  assert.equal(computed.animation, 'none');
+});
