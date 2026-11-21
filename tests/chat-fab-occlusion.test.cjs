@@ -1107,3 +1107,99 @@ test('simulated className wipe after reveal does not hide when data-uschat-ready
   assert.match(css,/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab/);
   assert.equal(/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/.test(css), false);
 });
+
+
+/* --- anti-FOUC ready gate: actual CSS selector + CSS-load order --- */
+function antiFoucRuleHidesFab(css, root){
+  const m=css.match(/\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-fab\s*,\s*\.uschat-root:not\(\[data-uschat-ready\]\)\s*\.uschat-panel\s*\{([^}]*)\}/);
+  assert.ok(m, 'canonical :not([data-uschat-ready]) rule must exist');
+  assert.match(m[1], /visibility:\s*hidden/);
+  assert.equal(/\.uschat-root:not\(\.uschat-ready\)\s*\.uschat-fab/.test(css), false,
+    'class-only :not(.uschat-ready) gate must not hide the FAB');
+  return !!(root && root.classList.contains('uschat-root') && !root.hasAttribute('data-uschat-ready'));
+}
+
+function makePreloadCssEnv(opts){
+  opts=opts||{};
+  const env=makeFocusEnv(opts);
+  const link=env.document.createElement('link');
+  link.rel='stylesheet';
+  link.setAttribute('data-us-chat-css', opts.cssAttr || 'loading');
+  /* partials.js registers these before chat-widget.js runs. */
+  link.addEventListener('load', function(){ link.setAttribute('data-us-chat-css','done'); });
+  link.addEventListener('error', function(){ link.setAttribute('data-us-chat-css','done'); });
+  env.document.head.appendChild(link);
+  const prevQS=env.document.querySelector;
+  env.document.querySelector=function(sel){
+    if (sel==='link[data-us-chat-css]') return link;
+    return prevQS.call(env.document, sel);
+  };
+  const timers=[];
+  /* Queue timeouts so the load-event order can be tested without the 1200ms net. */
+  env.setTimeout=function(fn, ms){ timers.push({fn, ms:ms||0}); return timers.length; };
+  env.__link=link;
+  env.__flushCssTimers=function(){ const q=timers.splice(0); q.forEach(t=>{ try{ t.fn(); }catch(e){} }); };
+  return env;
+}
+
+function mountedRoot(env){
+  return env.document.body.children.find(c => c.classList && c.classList.contains('uschat-root'));
+}
+
+test('PR21 CSS: missing .uschat-ready alone does not hide when data-uschat-ready is set',()=>{
+  /* Daily 11/21 assumed a missing ready *class* still explained a
+     whole-page hidden FAB. After PR21 the live selector is
+     :not([data-uschat-ready]), so that premise is false. */
+  const css=read('assets/chat-widget.css');
+  const present={
+    classList:{ contains(c){ return c==='uschat-root'; } },
+    hasAttribute(n){ return n==='data-uschat-ready'; },
+  };
+  const missingClassStillReady=present;
+  assert.equal(antiFoucRuleHidesFab(css, missingClassStillReady), false);
+  const classOnly={
+    classList:{ contains(c){ return c==='uschat-root' || c==='uschat-ready'; } },
+    hasAttribute(){ return false; },
+  };
+  assert.equal(antiFoucRuleHidesFab(css, classOnly), true,
+    'without the data attribute the actual rule still hides, even if the class is present');
+});
+
+test('partials CSS load marking done must still reveal (order: partials handler then widget)',()=>{
+  /* Old fail: ensureCss saw data-us-chat-css=loading, then the shared
+     load event ran partials first (attr → done); the widget callback and
+     the 1200ms net both skipped onReady, so data-uschat-ready was never
+     set and :not([data-uschat-ready]) kept visibility:hidden. */
+  const env=makePreloadCssEnv({ fabRect:R(1206,720,56,56), mediaRects:[], cssAttr:'loading' });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root=mountedRoot(env);
+  assert.ok(root);
+  assert.equal(root.getAttribute('data-uschat-ready'), null, 'not revealed before CSS load');
+  assert.equal(antiFoucRuleHidesFab(read('assets/chat-widget.css'), root), true);
+  env.__link._emit('load');
+  assert.equal(env.__link.getAttribute('data-us-chat-css'), 'done');
+  assert.equal(root.getAttribute('data-uschat-ready'), '');
+  assert.ok(root.classList.contains('uschat-ready'));
+  assert.equal(antiFoucRuleHidesFab(read('assets/chat-widget.css'), root), false);
+  env.__flushCssTimers();
+  assert.equal(root.getAttribute('data-uschat-ready'), '', 'timeout must not undo or require a second reveal');
+});
+
+test('preloaded CSS already done still reveals once after CSS and DOM',()=>{
+  const env=makePreloadCssEnv({ fabRect:R(1206,720,56,56), mediaRects:[], cssAttr:'done' });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root=mountedRoot(env);
+  assert.ok(root);
+  assert.equal(root.getAttribute('data-uschat-ready'), '');
+  assert.equal(antiFoucRuleHidesFab(read('assets/chat-widget.css'), root), false);
+});
+
+test('preloaded CSS that never fires load still reveals via the existing safety net',()=>{
+  const env=makePreloadCssEnv({ fabRect:R(1206,720,56,56), mediaRects:[], cssAttr:'loading' });
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const root=mountedRoot(env);
+  assert.equal(root.getAttribute('data-uschat-ready'), null);
+  env.__flushCssTimers();
+  assert.equal(root.getAttribute('data-uschat-ready'), '');
+  assert.equal(antiFoucRuleHidesFab(read('assets/chat-widget.css'), root), false);
+});

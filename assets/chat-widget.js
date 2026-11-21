@@ -78,13 +78,18 @@
     // flips data-us-chat-css to "done" on load/error. Support both paths.
     var existing = document.querySelector('link[data-us-chat-css]');
     if (existing) {
-      if (existing.getAttribute("data-us-chat-css") === "done") { onReady(); return; }
+      /* Do not skip onReady just because the attr is already "done".
+         partials.js sets that attr on the same load event, which would
+         swallow this callback and the 1200ms net, leaving the FAB
+         visibility:hidden behind :not([data-uschat-ready]). */
+      var notified = false;
       var once2 = function () {
-        if (existing.getAttribute("data-us-chat-css") !== "done") {
-          existing.setAttribute("data-us-chat-css", "done");
-          onReady();
-        }
+        if (notified) return;
+        notified = true;
+        existing.setAttribute("data-us-chat-css", "done");
+        onReady();
       };
+      if (existing.getAttribute("data-us-chat-css") === "done") { once2(); return; }
       existing.addEventListener("load", once2);
       existing.addEventListener("error", once2);
       setTimeout(once2, 1200); // safety net
