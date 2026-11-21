@@ -292,7 +292,7 @@
       document.head.appendChild(l);
     }
     const s = document.createElement("script");
-    s.src = "/assets/chat-widget.js?v=20";
+    s.src = "/assets/chat-widget.js?v=21";
     s.defer = true;
     s.setAttribute("data-us-chat", "1");
     document.body.appendChild(s);
