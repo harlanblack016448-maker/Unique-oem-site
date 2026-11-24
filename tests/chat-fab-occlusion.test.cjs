@@ -1203,3 +1203,80 @@ test('preloaded CSS that never fires load still reveals via the existing safety 
   assert.equal(root.getAttribute('data-uschat-ready'), '');
   assert.equal(antiFoucRuleHidesFab(read('assets/chat-widget.css'), root), false);
 });
+
+test('FAB re-checks occlusion when its bottom transition ends on a factory photo',()=>{
+  // Desktop 1248x671 capabilities: quote pill sits on the peeking factory
+  // photo and fades (is-occluding). The FAB then transitions from bottom
+  // 84px (no overlap) to 24px (~23px onto the photo). Scroll already ran
+  // the check at the raised position; transitionend must re-check.
+  const raised = R(1174, 531, 56, 56);  // 671-84-56
+  const dropped = R(1174, 591, 56, 56); // 671-24-56
+  const imgRect = R(633, 624, 582, 327); // top 624: 23px under dropped FAB (591-647)
+  assert.equal(raised.bottom, 587);
+  assert.equal(dropped.bottom, 647);
+  assert.ok(dropped.top < imgRect.top && dropped.bottom > imgRect.top);
+  assert.ok(raised.bottom < imgRect.top, 'raised FAB is clear of the peeking photo');
+  const overlap = Math.min(dropped.bottom, imgRect.bottom) - Math.max(dropped.top, imgRect.top);
+  assert.equal(overlap, 23);
+
+  const env = makeFocusEnv({ fabRect: raised, mediaRects: [imgRect] });
+  const img = env.__media[0];
+  env.__hitAt = (x,y) => pointIn(imgRect, x, y) ? [img] : [];
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabShouldOcclude(fab), false, 'raised: no overlap yet');
+  assert.equal(fab.classList.contains('uschat-occluding'), false);
+
+  fab._rect = dropped;
+  assert.equal(env.__fabShouldOcclude(fab), true, 'dropped rect overlaps the photo');
+  assert.equal(fab.classList.contains('uschat-occluding'), false, 'class waits for transitionend');
+  fab._emit('transitionend', { propertyName: 'bottom', target: fab });
+  assert.ok(fab.classList.contains('uschat-occluding'), 'transitionend re-check hides the FAB');
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+});
+
+test('FAB over hero-img-wrap frame padding hides, even when it misses the img pixels',()=>{
+  // Bathroom hero: new factory-tech inspection plate adds 8–10px padding
+  // around the packshot. A FAB on that plate used to miss img/picture
+  // and never set uschat-occluding.
+  const fabRect = R(430, 700, 56, 56);
+  const imgRect = R(28, 430, 400, 260); // bottom 690, no intersect with FAB (top 700)
+  const wrapRect = R(20, 422, 460, 320); // bottom 742, plate padding under the disc
+  assert.ok(fabRect.top > imgRect.bottom, 'FAB starts below the photo pixels');
+  assert.ok(fabRect.top < wrapRect.bottom && fabRect.left < wrapRect.right);
+
+  const env = makeFocusEnv({ fabRect, mediaRects: [imgRect] });
+  const img = env.__media[0];
+  const wrap = env.document.createElement('div');
+  wrap.className = 'hero-img-wrap';
+  wrap._rect = wrapRect;
+  wrap.appendChild(img);
+  env.__mediaSection.appendChild(wrap);
+  img.parent = wrap;
+  if (img._figure && img._figure.parent) {
+    // figure no longer wraps the img for this case
+  }
+  // Re-parent: closest('.hero-img-wrap') must win; leave figure off this img
+  img._figure = null;
+  wrap.querySelector = (sel) => {
+    if (String(sel).indexOf('img') !== -1) return img;
+    return null;
+  };
+
+  env.__hitAt = (x,y) => {
+    if (pointIn(imgRect, x, y)) return [img];
+    if (pointIn(wrapRect, x, y)) return [wrap];
+    return [];
+  };
+  vm.runInNewContext(read('assets/chat-widget.js'), env);
+  const prot = env.__fabProtectRect(img);
+  assert.equal(prot.bottom, wrapRect.bottom, 'protected rect is the inspection wrap');
+  const fab = env.document.body.children.find(c => c.classList.contains('uschat-root'))
+    .children.find(c => c.classList.contains('uschat-fab'));
+  assert.equal(env.__fabIntersectRects(fabRect, imgRect), null, 'img alone does not meet the FAB');
+  assert.equal(env.__fabShouldOcclude(fab), true, 'frame padding on the wrap must hide the FAB');
+  fab._emit('focusout', {});
+  assert.ok(fab.classList.contains('uschat-occluding'));
+  assert.equal(fab.getAttribute('aria-hidden'), 'true');
+});

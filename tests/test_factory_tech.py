@@ -20,6 +20,15 @@ class FactoryTechVisual(unittest.TestCase):
             ".sticky-cta.is-visible.is-occluding{opacity:0;pointer-events:none}",
             css,
         )
+        self.assertRegex(
+            css,
+            r"\.model-grid,\s*\.grid-3,\s*\.lab-grid\{padding-right:168px\}",
+        )
+        self.assertIn("padding:72px 32px calc(96px + var(--ads-lift, 0px))", css)
+        self.assertIn(
+            ".site-footer{padding:56px 16px calc(96px + var(--ads-lift, 0px))}",
+            css,
+        )
 
     def test_home_product_cards_use_existing_catalog_images(self):
         html = (ROOT / "index.html").read_text(encoding="utf-8")
@@ -33,7 +42,7 @@ class FactoryTechVisual(unittest.TestCase):
                 self.assertTrue(path.is_file(), path)
                 self.assertGreater(path.stat().st_size, 1000)
 
-    def test_pages_pin_style_v32_and_keep_partials_v43(self):
+    def test_pages_pin_style_v33_and_keep_partials_v44(self):
         pages = (
             "index.html",
             "contact.html",
@@ -48,9 +57,9 @@ class FactoryTechVisual(unittest.TestCase):
         )
         for rel in pages:
             text = (ROOT / rel).read_text(encoding="utf-8")
-            self.assertIn("/assets/style.css?v=32", text, rel)
-            self.assertNotIn("/assets/style.css?v=31", text, rel)
-            self.assertIn("/assets/partials.js?v=43", text, rel)
+            self.assertIn("/assets/style.css?v=33", text, rel)
+            self.assertNotIn("/assets/style.css?v=32", text, rel)
+            self.assertIn("/assets/partials.js?v=44", text, rel)
 
 
 if __name__ == "__main__":

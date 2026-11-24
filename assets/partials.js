@@ -193,22 +193,26 @@
     if (window.requestAnimationFrame && window.MutationObserver) watchCtaOcclusion(bar);
     const hero = document.body.dataset.page === "lead" ? document.querySelector(".ad-section") : document.getElementById("main");
     const inquire = document.getElementById("inquire");
+    const footer = document.querySelector(".site-footer");
     if (!hero || !("IntersectionObserver" in window)) {
       bar.classList.add("is-visible");
       return;
     }
     let heroOut = false;
     let inquireIn = false;
-    const paint = () => bar.classList.toggle("is-visible", heroOut && !inquireIn);
+    let footerIn = false;
+    const paint = () => bar.classList.toggle("is-visible", heroOut && !inquireIn && !footerIn);
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (e.target === hero) heroOut = !e.isIntersecting;
         if (inquire && e.target === inquire) inquireIn = e.isIntersecting;
+        if (footer && e.target === footer) footerIn = e.isIntersecting;
       });
       paint();
     }, { threshold: 0.12 });
     io.observe(hero);
     if (inquire) io.observe(inquire);
+    if (footer) io.observe(footer);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -292,7 +296,7 @@
       document.head.appendChild(l);
     }
     const s = document.createElement("script");
-    s.src = "/assets/chat-widget.js?v=21";
+    s.src = "/assets/chat-widget.js?v=22";
     s.defer = true;
     s.setAttribute("data-us-chat", "1");
     document.body.appendChild(s);

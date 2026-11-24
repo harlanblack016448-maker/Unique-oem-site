@@ -237,6 +237,11 @@
           var fig = node.closest("figure");
           if (fig && fig.querySelector("img, picture, video, svg.figure")) media = fig;
         }
+        if (!media) {
+          var wrap = node.closest(".hero-img-wrap");
+          if (wrap && wrap.querySelector &&
+              wrap.querySelector("img, picture, video, svg.figure")) media = wrap;
+        }
         if (!media) continue;
         if (media.classList && media.classList.contains("model-chip")) {
           if (fabMediaClaimedAt(media, x, y)) return media;
@@ -332,6 +337,12 @@
         if (fig && fig.querySelector &&
             fig.querySelector("img, picture, video, svg.figure")) {
           boxEl = fig;
+        } else {
+          var wrap = node.closest(".hero-img-wrap");
+          if (wrap && wrap.querySelector &&
+              wrap.querySelector("img, picture, video, svg.figure")) {
+            boxEl = wrap;
+          }
         }
       }
       return boxEl.getBoundingClientRect();
@@ -431,6 +442,13 @@
       }
       fabEl.addEventListener("focusout", queue);
       if (panelEl) panelEl.addEventListener("focusout", queue);
+      /* bottom transitions 0.2s when the quote pill fades (is-occluding)
+         and the FAB drops from 84px to 24px onto a photo that was only
+         under the pill. Scroll/MutationObserver already ran at the
+         raised position; re-check when that move ends. */
+      fabEl.addEventListener("transitionend", function (ev) {
+        if (ev && ev.target === fabEl && ev.propertyName === "bottom") queue();
+      });
       new MutationObserver(queue).observe(document.body, { attributes: true, attributeFilter: ["class"] });
       var sticky = document.querySelector(".sticky-cta");
       if (sticky) new MutationObserver(queue).observe(sticky, { attributes: true, attributeFilter: ["class"] });
